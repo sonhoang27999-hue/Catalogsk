@@ -354,12 +354,12 @@ export function AddProductDialog({
               placeholder="https://res.cloudinary.com/..."
             />
           </Field>
-          <Field label="Link video nhúng">
+          <Field label="Link video (YouTube, TikTok, Facebook hoặc mã nhúng)">
             <Input
               value={form.videoUrl}
               maxLength={600}
               onChange={(e) => set("videoUrl")(e.target.value)}
-              placeholder="https://www.youtube.com/embed/..."
+              placeholder="Dán link YouTube bình thường cũng được"
             />
           </Field>
           <Field label="Link ảnh/video chi tiết lắp lên xe">

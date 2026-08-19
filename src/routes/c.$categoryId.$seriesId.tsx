@@ -13,6 +13,7 @@ import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { formatPrice, getSeries } from "@/data/catalog.repository";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductListNote } from "@/components/ProductListNote";
+import { toEmbedUrl } from "@/lib/video";
 
 export const Route = createFileRoute("/c/$categoryId/$seriesId")({
   loader: async ({ params, context }) => {
@@ -81,10 +82,10 @@ function SeriesPage() {
                 <ExternalLink className="size-3.5 shrink-0" />
               </a>
             ) : null}
-            {p.videoUrl ? (
+            {toEmbedUrl(p.videoUrl) ? (
               <div className="relative aspect-video w-full border-t border-border">
                 <iframe
-                  src={p.videoUrl}
+                  src={toEmbedUrl(p.videoUrl)!}
                   title={`Video ${p.name}`}
                   loading="lazy"
                   allowFullScreen

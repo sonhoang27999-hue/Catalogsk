@@ -16,16 +16,16 @@ export function AddTile({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex flex-col items-center gap-1.5 active:scale-[0.97] transition-transform"
+      className="group flex flex-col items-center gap-1.5 transition-transform active:scale-[0.97]"
     >
       <span
-        className={`flex w-full items-center justify-center rounded-md border-2 border-dashed border-brand/40 bg-brand-soft/50 text-brand ${
+        className={`flex w-full items-center justify-center rounded-lg border-2 border-dashed border-border bg-secondary/60 text-muted-foreground transition-colors group-hover:border-gold group-hover:text-gold group-active:border-gold group-active:text-gold ${
           shape === "square" ? "aspect-square" : "aspect-[4/3]"
         }`}
       >
         <Plus className="size-7" />
       </span>
-      <span className="line-clamp-2 text-center text-[11px] leading-tight font-medium text-brand">
+      <span className="line-clamp-2 text-center text-[11px] leading-tight font-medium text-muted-foreground transition-colors group-hover:text-gold">
         {label}
       </span>
     </button>
@@ -49,10 +49,16 @@ export function AddFab({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className={`fixed left-1/2 z-30 ${
-        variant === "primary" ? "bg-brand text-white" : "border border-brand bg-card text-brand"
-      } flex -translate-x-1/2 items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold shadow-lg transition-transform active:scale-95`}
-      style={{ marginLeft: "calc(min(50vw, 240px) - 110px)", bottom: 24 + stackIndex * 56 }}
+      className={`fixed z-40 ${
+        variant === "primary"
+          ? "bg-gold text-gold-foreground"
+          : "border border-gold bg-card text-gold"
+      } flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold shadow-lg transition-transform active:scale-95`}
+      style={{
+        // Neo vào mép phải của khung app 480px, không đè lên chân trang cố định.
+        right: "max(16px, calc(50vw - 240px + 16px))",
+        bottom: `calc(var(--fab-bottom, 60px) + ${stackIndex * 56}px)`,
+      }}
     >
       <Plus className="size-4" /> {label}
     </button>

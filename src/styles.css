@@ -170,3 +170,14 @@
     image-rendering: auto;
   }
 }
+
+/* Vị trí nút [+] nổi: nằm trên chân trang cố định (mobile) và khung app nổi (desktop). */
+:root {
+  --fab-bottom: 60px;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --fab-bottom: 108px;
+  }
+}

@@ -202,10 +202,11 @@ export function EditButton({
 
             {kind === "product" ? (
               <>
-                <Field label="Link video nhúng">
+                <Field label="Link video (YouTube, TikTok, Facebook hoặc mã nhúng)">
                   <Input
                     value={form.videoUrl ?? ""}
                     maxLength={600}
+                    placeholder="Dán link YouTube bình thường cũng được"
                     onChange={(e) => set("videoUrl")(e.target.value)}
                   />
                 </Field>

@@ -79,8 +79,24 @@ export type Category = {
 /**
  * Ưu tiên link ảnh do admin nhập (Cloudinary...), nếu trống thì dùng ảnh có sẵn trong app.
  */
+/**
+ * Chuyển một số link chia sẻ phổ biến thành link ảnh trực tiếp để thẻ <img> hiển thị được.
+ * Hỗ trợ: Google Drive, Dropbox, GitHub (blob). Link khác giữ nguyên.
+ */
+export const normalizeImageUrl = (raw: string): string => {
+  const url = raw.trim();
+  const drive =
+    url.match(/drive\.google\.com\/file\/d\/([^/?]+)/)?.[1] ??
+    (url.includes("drive.google.com") ? /[?&]id=([^&]+)/.exec(url)?.[1] : undefined);
+  if (drive) return `https://drive.google.com/thumbnail?id=${drive}&sz=w1600`;
+  if (/dropbox\.com/.test(url)) return url.replace(/[?&]dl=0/, "").concat(url.includes("?") ? "&raw=1" : "?raw=1");
+  if (/github\.com\/.+\/blob\//.test(url))
+    return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
+  return url;
+};
+
 export const resolveImage = (url?: string | null, key?: string | null): string => {
-  if (url && url.trim()) return url.trim();
+  if (url && url.trim()) return normalizeImageUrl(url);
   if (key && key in IMG) return IMG[key as ImageKey];
   return IMG.car;
 };

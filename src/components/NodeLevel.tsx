@@ -15,6 +15,7 @@ import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { ProductListNote } from "@/components/ProductListNote";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useDealerPrices } from "@/hooks/useDealerPrices";
+import { toEmbedUrl } from "@/lib/video";
 
 export function NodeLevel({
   categoryId,
@@ -108,10 +109,10 @@ export function NodeLevel({
                   Xem sản phẩm hoàn thiện lên xe
                 </a>
               ) : null}
-              {p.videoUrl ? (
+              {toEmbedUrl(p.videoUrl) ? (
                 <div className="relative aspect-video w-full border-t border-border">
                   <iframe
-                    src={p.videoUrl}
+                    src={toEmbedUrl(p.videoUrl)!}
                     title={`Video ${p.name}`}
                     loading="lazy"
                     allowFullScreen
