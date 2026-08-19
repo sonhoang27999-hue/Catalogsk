@@ -53,6 +53,7 @@ export type Database = {
       dealer_applications: {
         Row: {
           created_at: string
+          email: string | null
           full_name: string
           id: string
           note: string | null
@@ -63,6 +64,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email?: string | null
           full_name: string
           id?: string
           note?: string | null
@@ -73,6 +75,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email?: string | null
           full_name?: string
           id?: string
           note?: string | null
@@ -431,11 +434,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_admins: {
+        Args: never
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       list_price_viewers: {
         Args: never
         Returns: {
           email: string
         }[]
+      }
+      set_admin: {
+        Args: { _email: string; _enabled: boolean }
+        Returns: string
       }
       set_price_viewer: {
         Args: { _email: string; _enabled: boolean }

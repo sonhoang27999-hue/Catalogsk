@@ -8,7 +8,9 @@ import { displayLogin } from "@/lib/username";
 import { useAdmin } from "@/hooks/useAdmin";
 import { usePendingDealerApplications } from "@/hooks/usePendingDealerApplications";
 import { DealerCenter } from "@/components/admin/DealerCenter";
+import { ChangePassword } from "@/components/ChangePassword";
 import { ThemeManager } from "@/components/admin/ThemeManager";
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -94,6 +96,8 @@ export function HeaderMenu() {
                     <ThemeManager />
                   </>
                 ) : null}
+                <ChangePassword />
+
                 <Button variant="outline" className="w-full" onClick={signOut}>
                   <LogOut className="size-4" /> Đăng xuất
                 </Button>

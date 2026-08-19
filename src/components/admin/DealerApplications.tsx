@@ -3,9 +3,12 @@
  * và duyệt / từ chối / xoá hồ sơ.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, ClipboardList, Phone, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { setDealerApproval } from "@/lib/dealer.functions";
+
 
 type Application = {
   id: string;
@@ -29,6 +32,7 @@ const STATUS_CLASS: Record<string, string> = {
 
 export function DealerApplications({ embedded = false }: { embedded?: boolean } = {}) {
   const qc = useQueryClient();
+  const approve = useServerFn(setDealerApproval);
 
   const list = useQuery({
     queryKey: ["dealer-applications"],
@@ -47,7 +51,8 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
     toast.error(e instanceof Error ? e.message : "Không thực hiện được.");
 
   const statusMut = useMutation({
-    mutationFn: async (v: { id: string; status: string }) => {
+    mutationFn: async (v: { id: string; username: string; status: string }) => {
+      await approve({ data: { username: v.username, approved: v.status === "approved" } });
       const { error } = await supabase
         .from("dealer_applications")
         .update({ status: v.status })
@@ -60,6 +65,7 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
     },
     onError,
   });
+
 
   const delMut = useMutation({
     mutationFn: async (id: string) => {
@@ -83,8 +89,10 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
         </p>
       ) : null}
       <p className="mt-1 text-xs text-muted-foreground">
-        Duyệt hồ sơ rồi tạo tài khoản tương ứng ở mục quản lý tài khoản.
+        Tài khoản đã được tạo sẵn khi đăng ký (mật khẩu = tên đăng nhập). Bấm Duyệt để cho phép xem
+        giá nhập.
       </p>
+
 
       <ul className="mt-3 space-y-2">
         {items.map((a) => (
@@ -110,7 +118,7 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
                 <button
                   type="button"
                   className="flex items-center gap-1 rounded-md bg-secondary px-2 py-1 text-[11px]"
-                  onClick={() => statusMut.mutate({ id: a.id, status: "approved" })}
+                  onClick={() => statusMut.mutate({ id: a.id, username: a.username, status: "approved" })}
                 >
                   <Check className="size-3" /> Duyệt
                 </button>
@@ -119,7 +127,7 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
                 <button
                   type="button"
                   className="flex items-center gap-1 rounded-md bg-secondary px-2 py-1 text-[11px]"
-                  onClick={() => statusMut.mutate({ id: a.id, status: "rejected" })}
+                  onClick={() => statusMut.mutate({ id: a.id, username: a.username, status: "rejected" })}
                 >
                   <X className="size-3" /> Từ chối
                 </button>

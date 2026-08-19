@@ -1,13 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { z } from "zod";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { submitDealerApplication } from "@/lib/dealer.functions";
 import { normalizeUsername } from "@/lib/username";
+
 
 export const Route = createFileRoute("/dang-ky-dai-ly")({
   ssr: false,
@@ -35,7 +37,7 @@ const schema = z.object({
   username: z
     .string()
     .trim()
-    .min(3, "Tên đăng nhập tối thiểu 3 ký tự")
+    .min(6, "Tên đăng nhập tối thiểu 6 ký tự")
     .max(32, "Tên đăng nhập tối đa 32 ký tự"),
   fullName: z.string().trim().min(2, "Nhập họ tên").max(80, "Họ tên quá dài"),
   phone: z
@@ -46,7 +48,9 @@ const schema = z.object({
 
 function DealerSignupPage() {
   const navigate = useNavigate();
+  const register = useServerFn(submitDealerApplication);
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,23 +63,29 @@ function DealerSignupPage() {
       toast.error(parsed.error.issues[0]?.message ?? "Thông tin chưa hợp lệ.");
       return;
     }
+    if (password && password.length < 6) {
+      toast.error("Mật khẩu tối thiểu 6 ký tự.");
+      return;
+    }
     setLoading(true);
     try {
-      const { error } = await supabase.from("dealer_applications").insert({
-        username: normalizeUsername(parsed.data.username),
-        full_name: parsed.data.fullName,
-        phone: parsed.data.phone,
-        status: "pending",
+      await register({
+        data: {
+          username: normalizeUsername(parsed.data.username),
+          password: password || "",
+          fullName: parsed.data.fullName,
+          phone: parsed.data.phone,
+        },
       });
-      if (error) throw error;
       setDone(true);
-      toast.success("Đã gửi đăng ký, vui lòng chờ duyệt.");
+      toast.success("Đã tạo tài khoản, vui lòng chờ duyệt.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Không gửi được đăng ký.");
     } finally {
       setLoading(false);
     }
   };
+
 
   if (done) {
     return (
@@ -84,9 +94,12 @@ function DealerSignupPage() {
         <div className="px-5 py-10">
           <h2 className="text-xl font-bold">Đã gửi đăng ký</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Hồ sơ đại lý của bạn đang chờ duyệt. Chúng tôi sẽ liên hệ qua số điện thoại{" "}
-            <span className="text-foreground">{phone}</span>.
+            Tài khoản của bạn đã được tạo. Đăng nhập với tên đăng nhập{" "}
+            <span className="text-foreground">{normalizeUsername(username)}</span> và mật khẩu{" "}
+            <span className="text-foreground">{password ? "bạn vừa đặt" : "mặc định là tên đăng nhập"}</span>. Giá nhập sẽ hiển thị sau khi hồ sơ được duyệt; chúng
+            tôi sẽ liên hệ qua số điện thoại <span className="text-foreground">{phone}</span>.
           </p>
+
           <Button className="mt-6" onClick={() => navigate({ to: "/" })}>
             Về trang chủ
           </Button>
@@ -100,7 +113,8 @@ function DealerSignupPage() {
       <PageHeader title="Đăng ký đại lý" />
       <div className="px-5 py-8">
       <p className="mt-1 text-sm text-muted-foreground">
-        Điền thông tin để được cấp tài khoản xem giá nhập.
+        Điền thông tin để được cấp tài khoản xem giá nhập. Để trống mật khẩu thì mật khẩu mặc định
+        chính là tên đăng nhập.
       </p>
 
       <form onSubmit={submit} className="mt-6 space-y-3">
@@ -114,7 +128,22 @@ function DealerSignupPage() {
             placeholder="vd: daily01"
             onChange={(e) => setUsername(e.target.value)}
           />
+          <p className="text-xs text-muted-foreground">Tối thiểu 6 ký tự.</p>
         </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="reg-pass">Mật khẩu (không bắt buộc)</Label>
+          <Input
+            id="reg-pass"
+            type="password"
+            maxLength={72}
+            value={password}
+            placeholder="Để trống = dùng tên đăng nhập"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+
         <div className="space-y-1.5">
           <Label htmlFor="reg-name">Tên</Label>
           <Input
