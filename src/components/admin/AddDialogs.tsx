@@ -278,7 +278,6 @@ export function AddProductDialog({
 
   const save = useMutation({
     mutationFn: async (vars: { keepOpen: boolean }) => {
-      if (!form.name.trim()) throw new Error("Vui lòng nhập tên sản phẩm.");
       let target: Record<string, string> = {};
       if (nodeDbId) {
         target = { node_id: nodeDbId };
@@ -293,7 +292,7 @@ export function AddProductDialog({
       }
       const productId = await insertProduct({
         ...target,
-        name: form.name.trim().slice(0, 160),
+        name: form.name.trim().slice(0, 160) || "Sản phẩm",
         description: form.description.trim().slice(0, 2000) || null,
         image_url: form.imageUrl.trim() || null,
         video_url: form.videoUrl.trim() || null,
@@ -330,7 +329,7 @@ export function AddProductDialog({
           <DialogDescription>Sản phẩm mới sẽ thuộc {modelName}.</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
-          <Field label="Tên sản phẩm">
+          <Field label="Tên sản phẩm (không bắt buộc)">
             <Input
               value={form.name}
               maxLength={160}

@@ -9,6 +9,8 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { SortControls } from "@/components/admin/SortControls";
 import { DeleteButton } from "@/components/admin/DeleteButton";
+import { CutProductButton, PasteBar } from "@/components/admin/CutPaste";
+
 import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { formatPrice, getSeries } from "@/data/catalog.repository";
 import { ProductPrice } from "@/components/ProductPrice";
@@ -53,6 +55,13 @@ function SeriesPage() {
       <PageHeader title={series.name} />
 
       <div className="space-y-4 p-3 pb-32">
+        {isAdmin ? (
+          <PasteBar
+            modelDbId={targetModel?.dbId ?? null}
+            seriesDbId={series.dbId}
+            targetName={series.name}
+          />
+        ) : null}
         {products.map((p, i) => (
           <div key={p.id} className="space-y-1">
           <div className="block overflow-hidden rounded-2xl border border-border bg-card">
@@ -62,15 +71,16 @@ function SeriesPage() {
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
               ) : null}
             </div>
-            <div className="relative w-full bg-muted" style={{ aspectRatio: "4 / 5" }}>
+            <div className="w-full bg-muted">
               <img
                 src={p.image}
                 alt={p.name}
                 loading="lazy"
                 decoding="async"
-                className="absolute inset-0 h-full w-full object-contain"
+                className="block h-auto w-full object-contain"
               />
             </div>
+
             {p.detailUrl ? (
               <a
                 href={p.detailUrl}
@@ -124,7 +134,9 @@ function SeriesPage() {
                   origin: p.origin,
                 }}
               />
+              <CutProductButton id={p.dbId} name={p.name} />
               <DeleteButton table="products" id={p.dbId} name={p.name} />
+
             </div>
           ) : null}
           </div>

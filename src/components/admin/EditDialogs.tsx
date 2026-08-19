@@ -90,12 +90,13 @@ export function EditButton({
   const save = useMutation({
     mutationFn: async () => {
       const name = (form.name ?? "").trim();
-      if (!name) throw new Error("Vui lòng nhập tên.");
+      if (!name && kind !== "product") throw new Error("Vui lòng nhập tên.");
       const image = (form.imageUrl ?? "").trim() || null;
 
       if (kind === "product") {
         await saveRow("products", id, {
-          name: name.slice(0, 160),
+          name: name.slice(0, 160) || "Sản phẩm",
+
           description: (form.description ?? "").trim().slice(0, 2000) || null,
           image_url: image,
           video_url: (form.videoUrl ?? "").trim() || null,

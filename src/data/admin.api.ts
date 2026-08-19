@@ -128,6 +128,22 @@ export const insertProduct = async (values: Record<string, unknown>) => {
   return data.id as string;
 };
 
+/** Di chuyển sản phẩm sang mục (node), đời xe (model) hoặc gốc của hãng xe. */
+export const moveProduct = async (
+  productId: string,
+  target: { nodeDbId?: string | null; categoryDbId?: string | null; modelDbId?: string | null },
+) => {
+  const patch = target.nodeDbId
+    ? { node_id: target.nodeDbId, category_id: null, model_id: null }
+    : target.modelDbId
+      ? { node_id: null, category_id: null, model_id: target.modelDbId }
+      : { node_id: null, category_id: target.categoryDbId ?? null, model_id: null };
+  const { error } = await supabase.from("products").update(patch).eq("id", productId);
+  if (error) throw new Error(error.message);
+};
+
+
+
 /** Đổi thứ tự hiển thị của một bản ghi. */
 export const setSort = async (table: Table, id: string, sort: number) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

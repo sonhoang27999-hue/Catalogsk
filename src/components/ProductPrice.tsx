@@ -45,13 +45,18 @@ export function ProductPrice({ price, salePrice, dealerPrice, canViewDealerPrice
       </div>
 
       {canViewDealerPrice && dealerPrice != null ? (
-        <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-border pt-2">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Giá nhập
-          </span>
-          <span className="text-base font-bold tabular-nums text-success">
-            {formatPrice(dealerPrice)}
-          </span>
+        <div className="mt-2 border-t border-border pt-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              GIÁ NHẬP CHƯA GỒM VAT
+            </span>
+            <span className="text-base font-bold tabular-nums text-success">
+              {formatPrice(dealerPrice)}
+            </span>
+          </div>
+          <p className="mt-0.5 text-right text-[11px] font-medium text-muted-foreground">
+            {"\n"}
+          </p>
         </div>
       ) : null}
     </div>

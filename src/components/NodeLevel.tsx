@@ -13,6 +13,8 @@ import { ProductPrice } from "@/components/ProductPrice";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { ProductListNote } from "@/components/ProductListNote";
+import { CutProductButton, PasteBar } from "@/components/admin/CutPaste";
+
 import { useAdmin } from "@/hooks/useAdmin";
 import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { toEmbedUrl } from "@/lib/video";
@@ -43,7 +45,13 @@ export function NodeLevel({
 
   return (
     <div className="pb-32">
+      {isAdmin ? (
+        <div className="pt-3">
+          <PasteBar nodeDbId={parentNodeId} categoryDbId={categoryDbId} targetName={parentName} />
+        </div>
+      ) : null}
       {nodes.length > 0 || isAdmin ? (
+
         <div className="grid grid-cols-3 gap-3 p-3">
           {nodes.map((n, i) => (
             <div key={n.id} className="flex flex-col gap-1">
@@ -80,10 +88,10 @@ export function NodeLevel({
         </div>
       ) : null}
 
-      <div className="space-y-4 px-3 pb-3">
+      <div className="space-y-4 pb-3">
         {products.map((p, i) => (
           <div key={p.id} className="space-y-1">
-            <div className="block overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="block overflow-hidden border-y border-border bg-card">
               <div className="bg-secondary px-3 py-3">
                 <h2 className="text-base leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
@@ -96,7 +104,7 @@ export function NodeLevel({
                   alt={p.name}
                   loading="lazy"
                   decoding="async"
-                  className="h-auto w-full object-contain"
+                  className="block h-auto w-full object-contain"
                 />
               </div>
               {p.detailUrl ? (
@@ -130,7 +138,7 @@ export function NodeLevel({
               </div>
             </div>
             {isAdmin ? (
-              <div className="flex items-center justify-end gap-1">
+              <div className="flex items-center justify-end gap-1 px-3">
                 <SortControls table="products" ids={products.map((x) => x.dbId)} index={i} />
                 <EditButton
                   kind="product"
@@ -148,7 +156,9 @@ export function NodeLevel({
                     origin: p.origin,
                   }}
                 />
+                <CutProductButton id={p.dbId} name={p.name} />
                 <DeleteButton table="products" id={p.dbId} name={p.name} />
+
               </div>
             ) : null}
           </div>
