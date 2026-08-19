@@ -10,6 +10,8 @@ import { usePendingDealerApplications } from "@/hooks/usePendingDealerApplicatio
 import { DealerCenter } from "@/components/admin/DealerCenter";
 import { ChangePassword } from "@/components/ChangePassword";
 import { ThemeManager } from "@/components/admin/ThemeManager";
+import { ExcelImport } from "@/components/admin/ExcelImport";
+
 
 import { Button } from "@/components/ui/button";
 import {
@@ -93,9 +95,11 @@ export function HeaderMenu() {
                 {isAdmin ? (
                   <>
                     <DealerCenter pendingCount={pendingCount} />
+                    <ExcelImport />
                     <ThemeManager />
                   </>
                 ) : null}
+
                 <ChangePassword />
 
                 <Button variant="outline" className="w-full" onClick={signOut}>
