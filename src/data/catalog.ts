@@ -81,19 +81,44 @@ export type Category = {
  */
 /**
  * Chuyển một số link chia sẻ phổ biến thành link ảnh trực tiếp để thẻ <img> hiển thị được.
- * Hỗ trợ: Google Drive, Dropbox, GitHub (blob). Link khác giữ nguyên.
+ * Hỗ trợ: Google Drive, Dropbox, GitHub (blob), Imgur, và link thiếu "https://".
  */
 export const normalizeImageUrl = (raw: string): string => {
-  const url = raw.trim();
-  const drive =
-    url.match(/drive\.google\.com\/file\/d\/([^/?]+)/)?.[1] ??
-    (url.includes("drive.google.com") ? /[?&]id=([^&]+)/.exec(url)?.[1] : undefined);
-  if (drive) return `https://drive.google.com/thumbnail?id=${drive}&sz=w1600`;
-  if (/dropbox\.com/.test(url)) return url.replace(/[?&]dl=0/, "").concat(url.includes("?") ? "&raw=1" : "?raw=1");
+  // bỏ khoảng trắng, dấu nháy, ký tự xuống dòng khi copy/paste
+  let url = raw.trim().replace(/^["'<]+|["'>]+$/g, "").replace(/\s+/g, "");
+  if (!url) return url;
+  if (url.startsWith("//")) url = `https:${url}`;
+  // link dán thiếu giao thức (vd: drive.google.com/...), bỏ qua đường dẫn nội bộ /assets
+  if (!/^https?:\/\//i.test(url) && !url.startsWith("/") && !url.startsWith("data:")) {
+    url = `https://${url}`;
+  }
+
+  // Google Drive → link ảnh trực tiếp
+  if (/drive\.google\.com|docs\.google\.com/.test(url)) {
+    const id =
+      /\/file\/d\/([^/?#]+)/.exec(url)?.[1] ??
+      /[?&]id=([^&#]+)/.exec(url)?.[1] ??
+      /\/d\/([^/?#]+)/.exec(url)?.[1];
+    if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1600`;
+  }
+
+  // Dropbox → raw
+  if (/dropbox\.com/.test(url)) {
+    const clean = url.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=1/g, "");
+    return clean + (clean.includes("?") ? "&raw=1" : "?raw=1");
+  }
+
+  // GitHub blob → raw
   if (/github\.com\/.+\/blob\//.test(url))
     return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
+
+  // Imgur trang xem → ảnh trực tiếp
+  const imgur = /^https?:\/\/(?:www\.)?imgur\.com\/(?:gallery\/|a\/)?([A-Za-z0-9]+)$/.exec(url);
+  if (imgur) return `https://i.imgur.com/${imgur[1]}.jpg`;
+
   return url;
 };
+
 
 export const resolveImage = (url?: string | null, key?: string | null): string => {
   if (url && url.trim()) return normalizeImageUrl(url);

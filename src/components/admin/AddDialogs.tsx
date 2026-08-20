@@ -18,6 +18,7 @@ import {
 import { ensureDefaultModel, insertNode, insertProduct, saveDealerPrice, saveRow, toSlug } from "@/data/admin.api";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
 import { Field } from "./AddTile";
+import { ImageUrlPreview } from "./ImageUrlPreview";
 
 type Props = { open: boolean; onOpenChange: (v: boolean) => void };
 
@@ -167,7 +168,7 @@ export function AddSeriesDialog({
             <Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} placeholder="C-Class" />
           </Field>
           <Field label="Link ảnh (tuỳ chọn)">
-            <Input value={imageUrl} maxLength={600} onChange={(e) => setImageUrl(e.target.value)} />
+            <><Input value={imageUrl} maxLength={600} onChange={(e) => setImageUrl(e.target.value)} /><ImageUrlPreview url={imageUrl} /></>
           </Field>
           <Button className="h-11 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
             Lưu đời xe
@@ -225,7 +226,7 @@ export function AddModelDialog({
             <Input value={years} maxLength={40} onChange={(e) => setYears(e.target.value)} placeholder="2014-2021" />
           </Field>
           <Field label="Link ảnh (tuỳ chọn)">
-            <Input value={imageUrl} maxLength={600} onChange={(e) => setImageUrl(e.target.value)} />
+            <><Input value={imageUrl} maxLength={600} onChange={(e) => setImageUrl(e.target.value)} /><ImageUrlPreview url={imageUrl} /></>
           </Field>
           <Button className="h-11 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
             Lưu năm sản xuất
@@ -352,6 +353,7 @@ export function AddProductDialog({
               onChange={(e) => set("imageUrl")(e.target.value)}
               placeholder="https://res.cloudinary.com/..."
             />
+            <ImageUrlPreview url={form.imageUrl} />
           </Field>
           <Field label="Link video (YouTube, TikTok, Facebook hoặc mã nhúng)">
             <Input

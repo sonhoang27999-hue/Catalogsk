@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { saveDealerPrice, saveRow, toSlug } from "@/data/admin.api";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
+import { ImageUrlPreview } from "./ImageUrlPreview";
 import { Field } from "./AddTile";
 
 export type EditKind = "category" | "series" | "model" | "node" | "product";
@@ -199,7 +200,9 @@ export function EditButton({
                 onChange={(e) => set("imageUrl")(e.target.value)}
                 placeholder="https://res.cloudinary.com/..."
               />
+              <ImageUrlPreview url={form.imageUrl} />
             </Field>
+
 
             {kind === "product" ? (
               <>
