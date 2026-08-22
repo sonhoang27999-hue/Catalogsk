@@ -19,6 +19,7 @@ import {
 import { Field } from "@/components/admin/AddTile";
 import { HOME_BANNER_KEY, saveSetting, settingsQueryOptions } from "@/data/settings.api";
 import { useAdmin } from "@/hooks/useAdmin";
+import { SmartImage } from "@/components/SmartImage";
 
 export function HomeBanner() {
   const { isAdmin } = useAdmin();
@@ -40,13 +41,12 @@ export function HomeBanner() {
 
   return (
     <div className="relative bg-card px-3 pt-3">
-      <img
+      <SmartImage
         src={src}
         alt="Phụ kiện ô tô cao cấp"
         width={1280}
         height={720}
-        loading="lazy"
-        decoding="async"
+        eager
         className="aspect-video w-full rounded-lg object-cover"
       />
 
@@ -81,11 +81,9 @@ export function HomeBanner() {
                   />
                 </Field>
                 {url.trim() ? (
-                  <img
+                  <SmartImage
                     src={url.trim()}
                     alt="Xem trước ảnh bìa"
-                    loading="lazy"
-                    decoding="async"
                     className="aspect-video w-full rounded-lg bg-muted object-cover"
                   />
                 ) : null}

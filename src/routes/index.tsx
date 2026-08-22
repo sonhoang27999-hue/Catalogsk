@@ -12,6 +12,7 @@ import { HeaderMenu } from "@/components/HeaderMenu";
 import { SearchBar } from "@/components/SearchBar";
 import { catalogQueryOptions } from "@/data/catalog.api";
 import { searchCatalog } from "@/data/catalog.repository";
+import { SmartImage } from "@/components/SmartImage";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogQueryOptions),
@@ -69,11 +70,9 @@ function Home() {
                 params={{ categoryId: r.params.categoryId, seriesId: r.params.seriesId }}
                 className="flex items-center gap-3 rounded-md border border-border bg-card p-2"
               >
-                <img
+                <SmartImage
                   src={r.image}
                   alt={r.title}
-                  loading="lazy"
-                  decoding="async"
                   className="size-12 rounded-md bg-muted object-contain"
                 />
                 <span className="min-w-0">
@@ -108,11 +107,9 @@ function Home() {
                 >
                   <span className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-card text-brand transition-colors hover:border-gold active:border-gold focus-visible:border-gold">
                     {c.image && /^https?:\/\//.test(c.image) ? (
-                      <img
+                      <SmartImage
                         src={c.image}
                         alt={c.name}
-                        loading="lazy"
-                        decoding="async"
                         className="size-full object-contain p-1"
                       />
                     ) : (

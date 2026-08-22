@@ -16,6 +16,7 @@ import { formatPrice, getSeries } from "@/data/catalog.repository";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductListNote } from "@/components/ProductListNote";
 import { toEmbedUrl } from "@/lib/video";
+import { SmartImage } from "@/components/SmartImage";
 
 export const Route = createFileRoute("/c/$categoryId/$seriesId")({
   loader: async ({ params, context }) => {
@@ -72,11 +73,9 @@ function SeriesPage() {
               ) : null}
             </div>
             <div className="w-full bg-muted">
-              <img
+              <SmartImage
                 src={p.image}
                 alt={p.name}
-                loading="lazy"
-                decoding="async"
                 className="block h-auto w-full object-contain"
               />
             </div>

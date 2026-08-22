@@ -149,8 +149,18 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
 
+  // Nếu người dùng KHÔNG chọn "ghi nhớ đăng nhập", phiên chỉ tồn tại trong lần mở trình duyệt này.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("autodeco.remember") !== "0") return;
+    if (sessionStorage.getItem("autodeco.session") === "1") return;
+    sessionStorage.setItem("autodeco.session", "1");
+    void supabase.auth.signOut();
+  }, []);
+
   // Đăng ký service worker để app chạy như PWA; khi ở standalone, nút/swipe back của điện thoại
   // sẽ điều hướng theo lịch sử router thay vì thoát trình duyệt.
+
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
     void navigator.serviceWorker.register("/sw.js").catch(() => {

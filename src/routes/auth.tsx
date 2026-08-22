@@ -25,17 +25,26 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+const REMEMBER_KEY = "autodeco.remember";
+const LAST_LOGIN_KEY = "autodeco.lastLogin";
+
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/" });
     });
+    if (typeof window === "undefined") return;
+    const savedRemember = localStorage.getItem(REMEMBER_KEY);
+    if (savedRemember !== null) setRemember(savedRemember === "1");
+    const savedLogin = localStorage.getItem(LAST_LOGIN_KEY);
+    if (savedLogin) setEmail(savedLogin);
   }, [navigate]);
 
   const submit = async (e: React.FormEvent) => {
@@ -61,6 +70,9 @@ function AuthPage() {
         });
         if (error) throw error;
       }
+      localStorage.setItem(REMEMBER_KEY, remember ? "1" : "0");
+      if (remember) localStorage.setItem(LAST_LOGIN_KEY, email.trim());
+      else localStorage.removeItem(LAST_LOGIN_KEY);
       const { data } = await supabase.auth.getSession();
       if (data.session) navigate({ to: "/" });
     } catch (err) {
@@ -69,6 +81,7 @@ function AuthPage() {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen flex-col justify-center px-5 py-10">
@@ -101,7 +114,17 @@ function AuthPage() {
             placeholder="••••••"
           />
         </div>
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+            className="size-4 accent-[var(--brand)]"
+          />
+          Ghi nhớ đăng nhập trên thiết bị này
+        </label>
         <Button type="submit" className="w-full" disabled={loading}>
+
           {mode === "signin" ? "Đăng nhập" : "Tạo tài khoản"}
         </Button>
       </form>

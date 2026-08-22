@@ -18,6 +18,7 @@ import { CutProductButton, PasteBar } from "@/components/admin/CutPaste";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { toEmbedUrl } from "@/lib/video";
+import { SmartImage } from "@/components/SmartImage";
 
 export function NodeLevel({
   categoryId,
@@ -60,11 +61,9 @@ export function NodeLevel({
                 params={{ categoryId, nodeId: n.id }}
                 className="overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-gold active:border-gold focus-visible:border-gold"
               >
-                <img
+                <SmartImage
                   src={n.image}
                   alt={n.name}
-                  loading="lazy"
-                  decoding="async"
                   className="aspect-square w-full rounded-t-lg object-cover"
                 />
                 <p className="px-1 py-2 text-center text-xs leading-snug font-semibold text-foreground">
@@ -99,11 +98,9 @@ export function NodeLevel({
                 ) : null}
               </div>
               <div className="w-full bg-muted">
-                <img
+                <SmartImage
                   src={p.image}
                   alt={p.name}
-                  loading="lazy"
-                  decoding="async"
                   className="block h-auto w-full object-contain"
                 />
               </div>

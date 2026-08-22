@@ -11,6 +11,7 @@ import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { AddSeriesDialog } from "@/components/admin/AddDialogs";
 import { useAdmin } from "@/hooks/useAdmin";
 import { NodeLevel } from "@/components/NodeLevel";
+import { SmartImage } from "@/components/SmartImage";
 
 export const Route = createFileRoute("/c/$categoryId")({
   loader: async ({ params, context }) => {
@@ -83,11 +84,9 @@ function CategoryPage() {
             params={{ categoryId: category.id, seriesId: s.id }}
             className="overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-gold active:border-gold focus-visible:border-gold"
           >
-            <img
+            <SmartImage
               src={s.image}
               alt={s.name}
-              loading="lazy"
-              decoding="async"
               className="aspect-square w-full rounded-t-lg object-cover"
             />
             <p className="px-1 py-2 text-center text-[11px] leading-tight font-medium text-foreground">

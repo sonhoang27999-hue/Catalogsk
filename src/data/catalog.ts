@@ -119,6 +119,37 @@ export const normalizeImageUrl = (raw: string): string => {
   return url;
 };
 
+/**
+ * Danh sách link dự phòng cho cùng một ảnh: nếu link đầu lỗi (bị chặn hotlink,
+ * Google Drive đổi endpoint...) thì thử tiếp link sau.
+ */
+export const imageCandidates = (raw: string): string[] => {
+  const first = raw && raw.trim() ? normalizeImageUrl(raw) : "";
+  if (!first) return [];
+  const out = [first];
+
+  const driveId =
+    /drive\.google\.com\/thumbnail\?id=([^&]+)/.exec(first)?.[1] ??
+    /\/file\/d\/([^/?#]+)/.exec(first)?.[1] ??
+    /[?&]id=([^&#]+)/.exec(first)?.[1];
+  if (driveId) {
+    out.push(
+      `https://lh3.googleusercontent.com/d/${driveId}=w1600`,
+      `https://drive.google.com/uc?export=view&id=${driveId}`,
+      `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`,
+    );
+  }
+
+  // Dropbox: thử cả endpoint dl.dropboxusercontent.com
+  if (/dropbox\.com/.test(first)) {
+    out.push(first.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace(/[?&]raw=1/, ""));
+  }
+
+  return [...new Set(out)];
+};
+
+
+
 
 export const resolveImage = (url?: string | null, key?: string | null): string => {
   if (url && url.trim()) return normalizeImageUrl(url);
