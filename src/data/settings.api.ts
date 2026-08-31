@@ -32,7 +32,12 @@ export const THEME_VARS = [
   { key: "theme_background", cssVar: "--background", label: "Nền trang", fallback: "#0a0a0b" },
   { key: "theme_card", cssVar: "--card", label: "Nền thẻ / ô", fallback: "#18181b" },
   { key: "theme_foreground", cssVar: "--foreground", label: "Màu chữ chính", fallback: "#fafafa" },
-  { key: "theme_muted_foreground", cssVar: "--muted-foreground", label: "Màu chữ phụ", fallback: "#d4d4d8" },
+  {
+    key: "theme_muted_foreground",
+    cssVar: "--muted-foreground",
+    label: "Màu chữ phụ",
+    fallback: "#d4d4d8",
+  },
   { key: "theme_border", cssVar: "--border", label: "Màu viền", fallback: "#3f3f46" },
   { key: "theme_gold", cssVar: "--gold", label: "Màu nhấn (Gold)", fallback: "#d4af37" },
   { key: "theme_brand", cssVar: "--brand", label: "Màu thương hiệu", fallback: "#3f6fd8" },

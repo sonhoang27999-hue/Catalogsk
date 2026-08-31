@@ -5,7 +5,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-type Ctx = { supabase: { rpc: (fn: string, args: unknown) => Promise<{ data: unknown }> }; userId: string };
+type Ctx = {
+  supabase: { rpc: (fn: string, args: unknown) => Promise<{ data: unknown }> };
+  userId: string;
+};
 
 async function assertAdmin(context: Ctx) {
   const { data } = await context.supabase.rpc("has_role", {

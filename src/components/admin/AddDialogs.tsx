@@ -15,7 +15,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ensureDefaultModel, insertNode, insertProduct, saveDealerPrice, saveRow, toSlug } from "@/data/admin.api";
+import {
+  ensureDefaultModel,
+  insertNode,
+  insertProduct,
+  saveDealerPrice,
+  saveRow,
+  toSlug,
+} from "@/data/admin.api";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
 import { Field } from "./AddTile";
 import { ImageUrlPreview } from "./ImageUrlPreview";
@@ -79,7 +86,12 @@ export function AddCategoryDialog({ open, onOpenChange }: Props) {
         </DialogHeader>
         <div className="space-y-3">
           <Field label="Tên hãng xe">
-            <Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} placeholder="Mercedes" />
+            <Input
+              value={name}
+              maxLength={120}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Mercedes"
+            />
           </Field>
           <Field label="Icon (car, speaker, camera, lightbulb...)">
             <Input value={icon} maxLength={40} onChange={(e) => setIcon(e.target.value)} />
@@ -165,10 +177,22 @@ export function AddSeriesDialog({
         </DialogHeader>
         <div className="space-y-3">
           <Field label="Tên đời xe">
-            <Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} placeholder="C-Class" />
+            <Input
+              value={name}
+              maxLength={120}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="C-Class"
+            />
           </Field>
           <Field label="Link ảnh (tuỳ chọn)">
-            <><Input value={imageUrl} maxLength={600} onChange={(e) => setImageUrl(e.target.value)} /><ImageUrlPreview url={imageUrl} /></>
+            <>
+              <Input
+                value={imageUrl}
+                maxLength={600}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+              <ImageUrlPreview url={imageUrl} />
+            </>
           </Field>
           <Button className="h-11 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
             Lưu đời xe
@@ -220,13 +244,30 @@ export function AddModelDialog({
         </DialogHeader>
         <div className="space-y-3">
           <Field label="Năm sản xuất / mã khung">
-            <Input value={name} maxLength={120} onChange={(e) => setName(e.target.value)} placeholder="W205" />
+            <Input
+              value={name}
+              maxLength={120}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="W205"
+            />
           </Field>
           <Field label="Năm sản xuất">
-            <Input value={years} maxLength={40} onChange={(e) => setYears(e.target.value)} placeholder="2014-2021" />
+            <Input
+              value={years}
+              maxLength={40}
+              onChange={(e) => setYears(e.target.value)}
+              placeholder="2014-2021"
+            />
           </Field>
           <Field label="Link ảnh (tuỳ chọn)">
-            <><Input value={imageUrl} maxLength={600} onChange={(e) => setImageUrl(e.target.value)} /><ImageUrlPreview url={imageUrl} /></>
+            <>
+              <Input
+                value={imageUrl}
+                maxLength={600}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+              <ImageUrlPreview url={imageUrl} />
+            </>
           </Field>
           <Button className="h-11 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
             Lưu năm sản xuất

@@ -4,6 +4,7 @@
  * Dữ liệu THẬT nằm trên Lovable Cloud (bảng categories / series / models / products / videos)
  * và được nạp qua `src/data/catalog.api.ts`. Admin quản lý nội dung tại /admin.
  */
+import { normalizeImageUrl as normalize } from "@/lib/imageUrl";
 import { IMG, type ImageKey } from "./images";
 
 export type Spec = { label: string; value: string };
@@ -78,81 +79,13 @@ export type Category = {
 
 /**
  * Ưu tiên link ảnh do admin nhập (Cloudinary...), nếu trống thì dùng ảnh có sẵn trong app.
+ * Logic chuẩn hoá/kích thước ảnh nằm ở `src/lib/imageUrl.ts` (re-export để giữ tương thích).
  */
-/**
- * Chuyển một số link chia sẻ phổ biến thành link ảnh trực tiếp để thẻ <img> hiển thị được.
- * Hỗ trợ: Google Drive, Dropbox, GitHub (blob), Imgur, và link thiếu "https://".
- */
-export const normalizeImageUrl = (raw: string): string => {
-  // bỏ khoảng trắng, dấu nháy, ký tự xuống dòng khi copy/paste
-  let url = raw.trim().replace(/^["'<]+|["'>]+$/g, "").replace(/\s+/g, "");
-  if (!url) return url;
-  if (url.startsWith("//")) url = `https:${url}`;
-  // link dán thiếu giao thức (vd: drive.google.com/...), bỏ qua đường dẫn nội bộ /assets
-  if (!/^https?:\/\//i.test(url) && !url.startsWith("/") && !url.startsWith("data:")) {
-    url = `https://${url}`;
-  }
-
-  // Google Drive → link ảnh trực tiếp
-  if (/drive\.google\.com|docs\.google\.com/.test(url)) {
-    const id =
-      /\/file\/d\/([^/?#]+)/.exec(url)?.[1] ??
-      /[?&]id=([^&#]+)/.exec(url)?.[1] ??
-      /\/d\/([^/?#]+)/.exec(url)?.[1];
-    if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1600`;
-  }
-
-  // Dropbox → raw
-  if (/dropbox\.com/.test(url)) {
-    const clean = url.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=1/g, "");
-    return clean + (clean.includes("?") ? "&raw=1" : "?raw=1");
-  }
-
-  // GitHub blob → raw
-  if (/github\.com\/.+\/blob\//.test(url))
-    return url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
-
-  // Imgur trang xem → ảnh trực tiếp
-  const imgur = /^https?:\/\/(?:www\.)?imgur\.com\/(?:gallery\/|a\/)?([A-Za-z0-9]+)$/.exec(url);
-  if (imgur) return `https://i.imgur.com/${imgur[1]}.jpg`;
-
-  return url;
-};
-
-/**
- * Danh sách link dự phòng cho cùng một ảnh: nếu link đầu lỗi (bị chặn hotlink,
- * Google Drive đổi endpoint...) thì thử tiếp link sau.
- */
-export const imageCandidates = (raw: string): string[] => {
-  const first = raw && raw.trim() ? normalizeImageUrl(raw) : "";
-  if (!first) return [];
-  const out = [first];
-
-  const driveId =
-    /drive\.google\.com\/thumbnail\?id=([^&]+)/.exec(first)?.[1] ??
-    /\/file\/d\/([^/?#]+)/.exec(first)?.[1] ??
-    /[?&]id=([^&#]+)/.exec(first)?.[1];
-  if (driveId) {
-    out.push(
-      `https://lh3.googleusercontent.com/d/${driveId}=w1600`,
-      `https://drive.google.com/uc?export=view&id=${driveId}`,
-      `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`,
-    );
-  }
-
-  // Dropbox: thử cả endpoint dl.dropboxusercontent.com
-  if (/dropbox\.com/.test(first)) {
-    out.push(first.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace(/[?&]raw=1/, ""));
-  }
-
-  return [...new Set(out)];
-};
-
-
-
+export { normalizeImageUrl, imageCandidates, imageUrl, IMAGE_WIDTHS } from "@/lib/imageUrl";
+export type { ImageSize } from "@/lib/imageUrl";
 
 export const resolveImage = (url?: string | null, key?: string | null): string => {
-  if (url && url.trim()) return normalizeImageUrl(url);
+  if (url && url.trim()) return normalize(url);
   if (key && key in IMG) return IMG[key as ImageKey];
   return IMG.car;
 };

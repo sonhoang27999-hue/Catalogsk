@@ -54,9 +54,7 @@ export function ProductPrice({ price, salePrice, dealerPrice, canViewDealerPrice
               {formatPrice(dealerPrice)}
             </span>
           </div>
-          <p className="mt-0.5 text-right text-[11px] font-medium text-muted-foreground">
-            {"\n"}
-          </p>
+          <p className="mt-0.5 text-right text-[11px] font-medium text-muted-foreground">{"\n"}</p>
         </div>
       ) : null}
     </div>

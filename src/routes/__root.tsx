@@ -15,7 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeApplier } from "@/components/ThemeApplier";
 import { supabase } from "@/integrations/supabase/client";
-
+import { useCatalogRealtime } from "@/data/catalog.realtime";
 
 function NotFoundComponent() {
   return (
@@ -87,10 +87,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "AutoDeco" },
       { title: "AutoDeco - Danh mục Phụ kiện Ô tô" },
-      { name: "description", content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất." },
+      {
+        name: "description",
+        content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
+      },
       { name: "author", content: "AutoDeco" },
       { property: "og:title", content: "AutoDeco - Danh mục Phụ kiện Ô tô" },
-      { property: "og:description", content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất." },
+      {
+        property: "og:description",
+        content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@autodeco" },
@@ -135,6 +141,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Đồng bộ thời gian thực: khi dữ liệu catalog đổi, chỉ làm mới đúng phần bị ảnh hưởng.
+  useCatalogRealtime(queryClient);
   // Trang quản trị dùng toàn bộ chiều rộng màn hình (desktop), không dùng khung mobile 480px.
   const isFullWidth = pathname.startsWith("/admin") || pathname.startsWith("/auth");
 
@@ -168,8 +176,6 @@ function RootComponent() {
     });
   }, []);
 
-
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeApplier />
@@ -190,10 +196,8 @@ function RootComponent() {
             ~ Sản phẩm do SK Ambient Light Luxury phát triển ~
           </footer>
         </>
-
       )}
       <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
-

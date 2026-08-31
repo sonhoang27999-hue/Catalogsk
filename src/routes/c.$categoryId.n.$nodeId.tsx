@@ -2,29 +2,20 @@
  * Một tầng bất kỳ trong "Cấu trúc cây linh hoạt": hiển thị mục con + sản phẩm của tầng đó.
  */
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { catalogQueryOptions } from "@/data/catalog.api";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { PageSkeleton } from "@/components/CatalogSkeleton";
+import { nodeQueryOptions } from "@/data/catalog.queries";
 import { PageHeader } from "@/components/PageHeader";
 import { NodeLevel } from "@/components/NodeLevel";
-import { getCategory } from "@/data/catalog.repository";
-import type { CatalogNode } from "@/data/catalog";
-
-const findNode = (nodes: CatalogNode[], id: string, depth = 1): { node: CatalogNode; depth: number } | undefined => {
-  for (const n of nodes) {
-    if (n.id === id) return { node: n, depth };
-    const hit = findNode(n.children, id, depth + 1);
-    if (hit) return hit;
-  }
-  return undefined;
-};
 
 export const Route = createFileRoute("/c/$categoryId/n/$nodeId")({
+  // Chỉ nạp cây danh mục của hãng + sản phẩm của đúng tầng đang xem.
   loader: async ({ params, context }) => {
-    const catalog = await context.queryClient.ensureQueryData(catalogQueryOptions);
-    const category = getCategory(catalog, params.categoryId);
-    if (!category) throw notFound();
-    const hit = findNode(category.nodes, params.nodeId);
-    if (!hit) throw notFound();
-    return { category, node: hit.node, depth: hit.depth };
+    const found = await context.queryClient.ensureQueryData(
+      nodeQueryOptions(params.categoryId, params.nodeId),
+    );
+    if (!found) throw notFound();
+    return found;
   },
   head: ({ loaderData }) => {
     const name = loaderData?.node.name ?? "Danh mục";
@@ -40,7 +31,9 @@ export const Route = createFileRoute("/c/$categoryId/n/$nodeId")({
     };
   },
   notFoundComponent: () => (
-    <div className="p-6 text-center text-sm text-muted-foreground">Không tìm thấy danh mục này.</div>
+    <div className="p-6 text-center text-sm text-muted-foreground">
+      Không tìm thấy danh mục này.
+    </div>
   ),
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-center text-sm text-destructive">
@@ -48,10 +41,14 @@ export const Route = createFileRoute("/c/$categoryId/n/$nodeId")({
     </div>
   ),
   component: NodePage,
+  pendingComponent: PageSkeleton,
 });
 
 function NodePage() {
-  const { category, node, depth } = Route.useLoaderData();
+  const params = Route.useParams();
+  const { data } = useSuspenseQuery(nodeQueryOptions(params.categoryId, params.nodeId));
+  const loaderData = Route.useLoaderData();
+  const { category, node, depth } = data ?? loaderData;
 
   return (
     <div>

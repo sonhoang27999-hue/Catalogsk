@@ -4,7 +4,6 @@
  */
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { checkCanViewDealerPrice, checkIsAdmin } from "@/data/admin.api";
 
@@ -13,7 +12,6 @@ let refreshedForUser: string | null = null;
 
 export function useAdmin() {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [canViewDealerPrice, setCanViewDealerPrice] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,20 +27,17 @@ export function useAdmin() {
         setIsAdmin(ok);
         setCanViewDealerPrice(canPrice);
         setIsAuthenticated(!!userId);
-        // Catalog nạp lúc chưa đăng nhập (SSR) không có giá nhập → nạp lại đúng một lần.
+        // Giá nhập nạp riêng theo quyền → chỉ cần làm mới đúng nhóm query đó.
         if (canPrice && userId && refreshedForUser !== userId) {
           refreshedForUser = userId;
-          void queryClient
-            .invalidateQueries({ queryKey: ["catalog"] })
-            .then(() => router.invalidate());
+          void queryClient.invalidateQueries({ queryKey: ["dealer-prices"] });
         }
+
         if (!userId) refreshedForUser = null;
       }
     };
 
     void supabase.auth.getSession().then(({ data }) => evaluate(data.session?.user.id));
-
-
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "INITIAL_SESSION") return;
@@ -53,7 +48,7 @@ export function useAdmin() {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, [queryClient, router]);
+  }, [queryClient]);
 
   return { isAdmin, canViewDealerPrice, isAuthenticated, ready };
 }

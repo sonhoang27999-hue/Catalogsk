@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { submitDealerApplication } from "@/lib/dealer.functions";
 import { normalizeUsername } from "@/lib/username";
 
-
 export const Route = createFileRoute("/dang-ky-dai-ly")({
   ssr: false,
   head: () => ({
@@ -86,7 +85,6 @@ function DealerSignupPage() {
     }
   };
 
-
   if (done) {
     return (
       <>
@@ -96,8 +94,11 @@ function DealerSignupPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Tài khoản của bạn đã được tạo. Đăng nhập với tên đăng nhập{" "}
             <span className="text-foreground">{normalizeUsername(username)}</span> và mật khẩu{" "}
-            <span className="text-foreground">{password ? "bạn vừa đặt" : "mặc định là tên đăng nhập"}</span>. Giá nhập sẽ hiển thị sau khi hồ sơ được duyệt; chúng
-            tôi sẽ liên hệ qua số điện thoại <span className="text-foreground">{phone}</span>.
+            <span className="text-foreground">
+              {password ? "bạn vừa đặt" : "mặc định là tên đăng nhập"}
+            </span>
+            . Giá nhập sẽ hiển thị sau khi hồ sơ được duyệt; chúng tôi sẽ liên hệ qua số điện thoại{" "}
+            <span className="text-foreground">{phone}</span>.
           </p>
 
           <Button className="mt-6" onClick={() => navigate({ to: "/" })}>
@@ -112,64 +113,63 @@ function DealerSignupPage() {
     <>
       <PageHeader title="Đăng ký đại lý" />
       <div className="px-5 py-8">
-      <p className="mt-1 text-sm text-muted-foreground">
-        Điền thông tin để được cấp tài khoản xem giá nhập. Để trống mật khẩu thì mật khẩu mặc định
-        chính là tên đăng nhập.
-      </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Điền thông tin để được cấp tài khoản xem giá nhập. Để trống mật khẩu thì mật khẩu mặc định
+          chính là tên đăng nhập.
+        </p>
 
-      <form onSubmit={submit} className="mt-6 space-y-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="reg-user">Tên đăng nhập</Label>
-          <Input
-            id="reg-user"
-            autoCapitalize="none"
-            maxLength={32}
-            value={username}
-            placeholder="vd: daily01"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">Tối thiểu 6 ký tự.</p>
-        </div>
+        <form onSubmit={submit} className="mt-6 space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-user">Tên đăng nhập</Label>
+            <Input
+              id="reg-user"
+              autoCapitalize="none"
+              maxLength={32}
+              value={username}
+              placeholder="vd: daily01"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">Tối thiểu 6 ký tự.</p>
+          </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="reg-pass">Mật khẩu (không bắt buộc)</Label>
-          <Input
-            id="reg-pass"
-            type="password"
-            maxLength={72}
-            value={password}
-            placeholder="Để trống = dùng tên đăng nhập"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-pass">Mật khẩu (không bắt buộc)</Label>
+            <Input
+              id="reg-pass"
+              type="password"
+              maxLength={72}
+              value={password}
+              placeholder="Để trống = dùng tên đăng nhập"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-
-        <div className="space-y-1.5">
-          <Label htmlFor="reg-name">Tên</Label>
-          <Input
-            id="reg-name"
-            maxLength={80}
-            value={fullName}
-            placeholder="Họ và tên"
-            onChange={(e) => setFullName(e.target.value)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="reg-phone">Số điện thoại</Label>
-          <Input
-            id="reg-phone"
-            type="tel"
-            inputMode="numeric"
-            maxLength={11}
-            value={phone}
-            placeholder="0868055555"
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Đang gửi..." : "Gửi đăng ký"}
-        </Button>
-      </form>
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-name">Tên</Label>
+            <Input
+              id="reg-name"
+              maxLength={80}
+              value={fullName}
+              placeholder="Họ và tên"
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-phone">Số điện thoại</Label>
+            <Input
+              id="reg-phone"
+              type="tel"
+              inputMode="numeric"
+              maxLength={11}
+              value={phone}
+              placeholder="0868055555"
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Đang gửi..." : "Gửi đăng ký"}
+          </Button>
+        </form>
       </div>
     </>
   );

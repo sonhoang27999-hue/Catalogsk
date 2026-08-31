@@ -9,7 +9,6 @@ import { Check, ClipboardList, Phone, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { setDealerApproval } from "@/lib/dealer.functions";
 
-
 type Application = {
   id: string;
   username: string;
@@ -66,7 +65,6 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
     onError,
   });
 
-
   const delMut = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("dealer_applications").delete().eq("id", id);
@@ -93,7 +91,6 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
         giá nhập.
       </p>
 
-
       <ul className="mt-3 space-y-2">
         {items.map((a) => (
           <li key={a.id} className="rounded-lg border border-border p-2">
@@ -118,7 +115,9 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
                 <button
                   type="button"
                   className="flex items-center gap-1 rounded-md bg-secondary px-2 py-1 text-[11px]"
-                  onClick={() => statusMut.mutate({ id: a.id, username: a.username, status: "approved" })}
+                  onClick={() =>
+                    statusMut.mutate({ id: a.id, username: a.username, status: "approved" })
+                  }
                 >
                   <Check className="size-3" /> Duyệt
                 </button>
@@ -127,7 +126,9 @@ export function DealerApplications({ embedded = false }: { embedded?: boolean } 
                 <button
                   type="button"
                   className="flex items-center gap-1 rounded-md bg-secondary px-2 py-1 text-[11px]"
-                  onClick={() => statusMut.mutate({ id: a.id, username: a.username, status: "rejected" })}
+                  onClick={() =>
+                    statusMut.mutate({ id: a.id, username: a.username, status: "rejected" })
+                  }
                 >
                   <X className="size-3" /> Từ chối
                 </button>

@@ -82,13 +82,10 @@ function AuthPage() {
     }
   };
 
-
   return (
     <div className="flex min-h-screen flex-col justify-center px-5 py-10">
       <h1 className="text-xl font-bold">Đăng nhập</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Đại lý đăng nhập để xem giá nhập.
-      </p>
+      <p className="mt-1 text-sm text-muted-foreground">Đại lý đăng nhập để xem giá nhập.</p>
 
       <form onSubmit={submit} className="mt-6 space-y-3">
         <div className="space-y-1.5">
@@ -124,7 +121,6 @@ function AuthPage() {
           Ghi nhớ đăng nhập trên thiết bị này
         </label>
         <Button type="submit" className="w-full" disabled={loading}>
-
           {mode === "signin" ? "Đăng nhập" : "Tạo tài khoản"}
         </Button>
       </form>
@@ -137,17 +133,13 @@ function AuthPage() {
         {mode === "signin" ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập"}
       </button>
 
-      <Link
-        to="/dang-ky-dai-ly"
-        className="mt-2 text-center text-sm text-brand underline"
-      >
+      <Link to="/dang-ky-dai-ly" className="mt-2 text-center text-sm text-brand underline">
         Đăng ký làm đại lý
       </Link>
 
       <Link to="/" className="mt-2 text-center text-xs text-muted-foreground underline">
         Về trang chủ
       </Link>
-
     </div>
   );
 }

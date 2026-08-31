@@ -12,7 +12,6 @@ import type { PriceRow } from "@/lib/priceSheet";
  */
 export type ImportMode = "overwrite" | "insert-only";
 
-
 export type ImportResult = { created: number; updated: number; skipped: number };
 
 const uniqueSlug = (base: string, taken: Set<string>) => {
@@ -57,7 +56,6 @@ async function ensureCategory(name: string, cache: Map<string, string>, slugs: S
   cache.set(key, data.id);
   return data.id as string;
 }
-
 
 async function ensureSeries(
   categoryId: string,
@@ -130,7 +128,6 @@ export async function importPriceRows(
       form_code: row.model.slice(0, 80),
     };
     const existing = productKey.get(`${modelId}|${row.productName.toLowerCase()}`);
-
 
     if (existing) {
       if (mode === "insert-only") {

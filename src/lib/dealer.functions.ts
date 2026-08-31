@@ -8,17 +8,18 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { toLoginEmail, normalizeUsername } from "@/lib/username";
 
 export const submitDealerApplication = createServerFn({ method: "POST" })
-  .inputValidator((data: { username: string; password?: string; fullName: string; phone: string }) => {
-    const username = normalizeUsername(data.username);
-    if (username.length < 6) throw new Error("Tên đăng nhập tối thiểu 6 ký tự.");
-    const password = (data.password ?? "").trim();
-    if (password && password.length < 6) throw new Error("Mật khẩu tối thiểu 6 ký tự.");
-    if (!/^0\d{8,10}$/.test(data.phone.trim())) throw new Error("Số điện thoại không hợp lệ.");
-    const fullName = data.fullName.trim();
-    if (fullName.length < 2) throw new Error("Nhập họ tên.");
-    return { username, password: password || username, fullName, phone: data.phone.trim() };
-  })
-
+  .inputValidator(
+    (data: { username: string; password?: string; fullName: string; phone: string }) => {
+      const username = normalizeUsername(data.username);
+      if (username.length < 6) throw new Error("Tên đăng nhập tối thiểu 6 ký tự.");
+      const password = (data.password ?? "").trim();
+      if (password && password.length < 6) throw new Error("Mật khẩu tối thiểu 6 ký tự.");
+      if (!/^0\d{8,10}$/.test(data.phone.trim())) throw new Error("Số điện thoại không hợp lệ.");
+      const fullName = data.fullName.trim();
+      if (fullName.length < 2) throw new Error("Nhập họ tên.");
+      return { username, password: password || username, fullName, phone: data.phone.trim() };
+    },
+  )
 
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

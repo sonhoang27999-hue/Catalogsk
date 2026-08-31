@@ -18,7 +18,9 @@ import { CutProductButton, PasteBar } from "@/components/admin/CutPaste";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { toEmbedUrl } from "@/lib/video";
+import { LazyEmbed } from "@/components/LazyEmbed";
 import { SmartImage } from "@/components/SmartImage";
+import { ImageZoom } from "@/components/ImageZoom";
 
 export function NodeLevel({
   categoryId,
@@ -40,7 +42,10 @@ export function NodeLevel({
   products: Product[];
 }) {
   const { isAdmin, canViewDealerPrice } = useAdmin();
-  const dealerPrices = useDealerPrices(canViewDealerPrice);
+  const dealerPrices = useDealerPrices(
+    canViewDealerPrice,
+    products.map((p) => p.dbId),
+  );
   const [nodeOpen, setNodeOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
 
@@ -52,7 +57,6 @@ export function NodeLevel({
         </div>
       ) : null}
       {nodes.length > 0 || isAdmin ? (
-
         <div className="grid grid-cols-3 gap-3 p-3">
           {nodes.map((n, i) => (
             <div key={n.id} className="flex flex-col gap-1">
@@ -64,6 +68,8 @@ export function NodeLevel({
                 <SmartImage
                   src={n.image}
                   alt={n.name}
+                  size="thumb"
+                  sizes="33vw"
                   className="aspect-square w-full rounded-t-lg object-cover"
                 />
                 <p className="px-1 py-2 text-center text-xs leading-snug font-semibold text-foreground">
@@ -83,7 +89,9 @@ export function NodeLevel({
               ) : null}
             </div>
           ))}
-          {isAdmin ? <AddTile label={`Thêm ${childLabel}`} onClick={() => setNodeOpen(true)} /> : null}
+          {isAdmin ? (
+            <AddTile label={`Thêm ${childLabel}`} onClick={() => setNodeOpen(true)} />
+          ) : null}
         </div>
       ) : null}
 
@@ -94,15 +102,21 @@ export function NodeLevel({
               <div className="bg-secondary px-3 py-3">
                 <h2 className="text-base leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {p.description}
+                  </p>
                 ) : null}
               </div>
               <div className="w-full bg-muted">
-                <SmartImage
-                  src={p.image}
-                  alt={p.name}
-                  className="block h-auto w-full object-contain"
-                />
+                <ImageZoom src={p.image} alt={p.name}>
+                  <SmartImage
+                    src={p.image}
+                    alt={p.name}
+                    size="preview"
+                    sizes="(max-width: 480px) 100vw, 480px"
+                    className="block h-auto w-full object-contain"
+                  />
+                </ImageZoom>
               </div>
               {p.detailUrl ? (
                 <a
@@ -115,15 +129,11 @@ export function NodeLevel({
                 </a>
               ) : null}
               {toEmbedUrl(p.videoUrl) ? (
-                <div className="relative aspect-video w-full border-t border-border">
-                  <iframe
-                    src={toEmbedUrl(p.videoUrl)!}
-                    title={`Video ${p.name}`}
-                    loading="lazy"
-                    allowFullScreen
-                    className="absolute inset-0 h-full w-full"
-                  />
-                </div>
+                <LazyEmbed
+                  src={toEmbedUrl(p.videoUrl)!}
+                  title={`Video ${p.name}`}
+                  className="border-t border-border"
+                />
               ) : null}
               <div className="px-3 py-3">
                 <ProductPrice
@@ -155,7 +165,6 @@ export function NodeLevel({
                 />
                 <CutProductButton id={p.dbId} name={p.name} />
                 <DeleteButton table="products" id={p.dbId} name={p.name} />
-
               </div>
             ) : null}
           </div>

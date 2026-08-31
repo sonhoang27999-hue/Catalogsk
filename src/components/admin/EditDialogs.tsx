@@ -103,9 +103,7 @@ export function EditButton({
           video_url: (form.videoUrl ?? "").trim() || null,
           detail_url: (form.detailUrl ?? "").trim() || null,
           price: num(String(form.price ?? 0)),
-          sale_price: String(form.salePrice ?? "").trim()
-            ? num(String(form.salePrice))
-            : null,
+          sale_price: String(form.salePrice ?? "").trim() ? num(String(form.salePrice)) : null,
         });
         const dealer = String(form.dealerPrice ?? "").trim();
         await saveDealerPrice(id, dealer ? num(dealer) : null);
@@ -113,12 +111,12 @@ export function EditButton({
       }
 
       const base: Record<string, unknown> = { name: name.slice(0, 120), image_url: image };
-      if (kind !== "node") base['slug'] = toSlug(name).slice(0, 80);
+      if (kind !== "node") base["slug"] = toSlug(name).slice(0, 80);
       if (kind === "category") {
-        base['icon'] = (form.icon ?? "car").trim().slice(0, 40) || "car";
-        base['layout'] = form.layout ?? "classic";
+        base["icon"] = (form.icon ?? "car").trim().slice(0, 40) || "car";
+        base["layout"] = form.layout ?? "classic";
       }
-      if (kind === "model") base['years'] = (form.years ?? "").trim().slice(0, 40) || "—";
+      if (kind === "model") base["years"] = (form.years ?? "").trim().slice(0, 40) || "—";
 
       await saveRow(TABLE[kind], id, base);
     },
@@ -202,7 +200,6 @@ export function EditButton({
               />
               <ImageUrlPreview url={form.imageUrl} />
             </Field>
-
 
             {kind === "product" ? (
               <>

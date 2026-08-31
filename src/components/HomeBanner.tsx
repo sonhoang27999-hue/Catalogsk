@@ -46,6 +46,8 @@ export function HomeBanner() {
         alt="Phụ kiện ô tô cao cấp"
         width={1280}
         height={720}
+        size="preview"
+        sizes="(max-width: 480px) 100vw, 480px"
         eager
         className="aspect-video w-full rounded-lg object-cover"
       />
@@ -84,14 +86,11 @@ export function HomeBanner() {
                   <SmartImage
                     src={url.trim()}
                     alt="Xem trước ảnh bìa"
+                    size="thumb"
                     className="aspect-video w-full rounded-lg bg-muted object-cover"
                   />
                 ) : null}
-                <Button
-                  className="w-full"
-                  disabled={save.isPending}
-                  onClick={() => save.mutate()}
-                >
+                <Button className="w-full" disabled={save.isPending} onClick={() => save.mutate()}>
                   Lưu ảnh bìa
                 </Button>
               </div>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { imageCandidates, normalizeImageUrl } from "@/data/catalog";
 
 export function ImageUrlPreview({ url }: { url: string | null | undefined }) {
-  const list = imageCandidates(url ?? "");
+  const list = imageCandidates(url ?? "", "thumb");
   const [index, setIndex] = useState(0);
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ClipboardList, LogIn, LogOut, Menu, ShieldCheck, UserRound } from "lucide-react";
+import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import { DealerCenter } from "@/components/admin/DealerCenter";
 import { ChangePassword } from "@/components/ChangePassword";
 import { ThemeManager } from "@/components/admin/ThemeManager";
 import { ExcelImport } from "@/components/admin/ExcelImport";
-
+import { BackupManager } from "@/components/admin/BackupManager";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -96,7 +96,18 @@ export function HeaderMenu() {
                   <>
                     <DealerCenter pendingCount={pendingCount} />
                     <ExcelImport />
+                    <BackupManager />
                     <ThemeManager />
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setOpen(false);
+                        navigate({ to: "/anh-loi" });
+                      }}
+                    >
+                      <ImageOff className="size-4" /> Thống kê ảnh lỗi
+                    </Button>
                   </>
                 ) : null}
 
@@ -129,7 +140,6 @@ export function HeaderMenu() {
                 </Button>
               </>
             )}
-
           </div>
         </SheetContent>
       </Sheet>

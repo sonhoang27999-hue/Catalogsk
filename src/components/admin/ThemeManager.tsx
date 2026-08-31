@@ -14,11 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   saveSettings,
   settingsQueryOptions,
@@ -287,11 +283,13 @@ export function ThemeManager() {
                       title={p.name}
                     >
                       <span className="absolute inset-0 flex">
-                        {[p.values["theme_background"], p.values["theme_card"], p.values["theme_gold"]].map(
-                          (c, i) => (
-                            <span key={i} className="flex-1" style={{ backgroundColor: c }} />
-                          ),
-                        )}
+                        {[
+                          p.values["theme_background"],
+                          p.values["theme_card"],
+                          p.values["theme_gold"],
+                        ].map((c, i) => (
+                          <span key={i} className="flex-1" style={{ backgroundColor: c }} />
+                        ))}
                       </span>
                       {active && (
                         <span className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20 ring-2 ring-gold ring-offset-2 ring-offset-background">
@@ -331,7 +329,9 @@ export function ThemeManager() {
                       type="button"
                       onClick={() => setDraft((d) => ({ ...d, ...g.values }))}
                       className={`relative h-12 overflow-hidden rounded-xl transition-transform active:scale-95 ${
-                        active ? "ring-2 ring-gold ring-offset-2 ring-offset-background" : "border border-border"
+                        active
+                          ? "ring-2 ring-gold ring-offset-2 ring-offset-background"
+                          : "border border-border"
                       }`}
                       title={g.name}
                     >

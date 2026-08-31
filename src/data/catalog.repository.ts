@@ -1,51 +1,9 @@
 /**
- * Lớp truy vấn dữ liệu (data access layer) — thao tác trên cây catalog đã nạp từ Lovable Cloud.
- * Xem `src/data/catalog.api.ts` để biết cách nạp dữ liệu.
+ * Tiện ích dùng chung cho catalog: chuẩn hoá chuỗi, định dạng giá, bộ lọc năm SX/nhóm.
+ * Dữ liệu được nạp theo phạm vi ở `catalog.queries.ts`; tìm kiếm chạy ở database
+ * (`search.queries.ts`) — KHÔNG còn tải toàn bộ cây catalog xuống trình duyệt.
  */
-import type { Category, Model, Product, Series } from "./catalog";
-
-export const getCategory = (catalog: Category[], categoryId: string): Category | undefined =>
-  catalog.find((c) => c.id === categoryId);
-
-export const getSeries = (
-  catalog: Category[],
-  categoryId: string,
-  seriesId: string,
-): { category: Category; series: Series } | undefined => {
-  const category = getCategory(catalog, categoryId);
-  const series = category?.series.find((s) => s.id === seriesId);
-  return category && series ? { category, series } : undefined;
-};
-
-export const getModel = (
-  catalog: Category[],
-  categoryId: string,
-  seriesId: string,
-  modelId: string,
-): { category: Category; series: Series; model: Model } | undefined => {
-  const found = getSeries(catalog, categoryId, seriesId);
-  const model = found?.series.models.find((m) => m.id === modelId);
-  return found && model ? { ...found, model } : undefined;
-};
-
-export type ProductLocation = {
-  category: Category;
-  series: Series;
-  model: Model;
-  product: Product;
-};
-
-export const getProduct = (catalog: Category[], productId: string): ProductLocation | undefined => {
-  for (const category of catalog) {
-    for (const series of category.series) {
-      for (const model of series.models) {
-        const product = model.products.find((p) => p.id === productId);
-        if (product) return { category, series, model, product };
-      }
-    }
-  }
-  return undefined;
-};
+import type { Category } from "./catalog";
 
 export const formatPrice = (value: number) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(value);
@@ -68,59 +26,13 @@ export type SearchResult = {
   subtitle: string;
   image: string;
   level: "category" | "series" | "model" | "product";
-  params: { categoryId: string; seriesId?: string; modelId?: string; productId?: string };
-};
-
-/** Tìm kiếm xuyên 4 tầng (hãng xe, đời xe, năm sản xuất, sản phẩm). */
-export const searchCatalog = (catalog: Category[], query: string, limit = 24): SearchResult[] => {
-  const q = normalize(query);
-  if (!q) return [];
-  const out: SearchResult[] = [];
-  const hit = (text: string) => normalize(text).includes(q);
-
-  for (const category of catalog) {
-    if (hit(category.name)) {
-      out.push({
-        id: `c-${category.id}`,
-        title: category.name,
-        subtitle: "Hãng / nhóm phụ kiện",
-        image: category.image,
-        level: "category",
-        params: { categoryId: category.id },
-      });
-    }
-    for (const series of category.series) {
-      if (hit(series.name)) {
-        out.push({
-          id: `s-${category.id}-${series.id}`,
-          title: series.name,
-          subtitle: `Đời xe · ${category.name}`,
-          image: series.image,
-          level: "series",
-          params: { categoryId: category.id, seriesId: series.id },
-        });
-      }
-      for (const model of series.models) {
-        for (const product of model.products) {
-          if (hit(product.name) || hit(product.brand)) {
-            out.push({
-              id: `p-${product.id}`,
-              title: product.name,
-              subtitle: `Sản phẩm · ${series.name}`,
-              image: product.image,
-              level: "product",
-              params: {
-                categoryId: category.id,
-                seriesId: series.id,
-                productId: product.id,
-              },
-            });
-          }
-        }
-      }
-    }
-  }
-  return out.slice(0, limit);
+  params: {
+    categoryId: string;
+    seriesId?: string;
+    modelId?: string;
+    nodeId?: string;
+    productId?: string;
+  };
 };
 
 /** Tách năm bắt đầu / kết thúc từ chuỗi kiểu "2014-2021" hoặc "2018-Nay". */

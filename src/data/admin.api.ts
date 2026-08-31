@@ -63,7 +63,7 @@ export const toSlug = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-const unwrap = <T,>(res: { data: T | null; error: { message: string } | null }): T => {
+const unwrap = <T>(res: { data: T | null; error: { message: string } | null }): T => {
   if (res.error) throw new Error(res.error.message);
   return res.data as T;
 };
@@ -141,8 +141,6 @@ export const moveProduct = async (
   const { error } = await supabase.from("products").update(patch).eq("id", productId);
   if (error) throw new Error(error.message);
 };
-
-
 
 /** Đổi thứ tự hiển thị của một bản ghi. */
 export const setSort = async (table: Table, id: string, sort: number) => {

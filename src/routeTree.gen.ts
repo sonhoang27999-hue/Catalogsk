@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnhLoiRouteImport } from './routes/anh-loi'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DangKyDaiLyRouteImport } from './routes/dang-ky-dai-ly'
 import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
@@ -19,6 +20,11 @@ import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnhLoiRoute = AnhLoiRouteImport.update({
+  id: '/anh-loi',
+  path: '/anh-loi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -49,6 +55,7 @@ const CCategoryIdNNodeIdRoute = CCategoryIdNNodeIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
@@ -76,6 +85,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/anh-loi'
     | '/auth'
     | '/dang-ky-dai-ly'
     | '/c/$categoryId'
@@ -84,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/anh-loi'
     | '/auth'
     | '/dang-ky-dai-ly'
     | '/c/$categoryId'
@@ -92,6 +103,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/anh-loi'
     | '/auth'
     | '/dang-ky-dai-ly'
     | '/c/$categoryId'
@@ -101,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnhLoiRoute: typeof AnhLoiRoute
   AuthRoute: typeof AuthRoute
   DangKyDaiLyRoute: typeof DangKyDaiLyRoute
   CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
@@ -113,6 +126,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anh-loi': {
+      id: '/anh-loi'
+      path: '/anh-loi'
+      fullPath: '/anh-loi'
+      preLoaderRoute: typeof AnhLoiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -169,6 +189,7 @@ const CCategoryIdRouteWithChildren = CCategoryIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnhLoiRoute: AnhLoiRoute,
   AuthRoute: AuthRoute,
   DangKyDaiLyRoute: DangKyDaiLyRoute,
   CCategoryIdRoute: CCategoryIdRouteWithChildren,

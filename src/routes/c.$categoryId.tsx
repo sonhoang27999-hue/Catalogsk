@@ -1,9 +1,10 @@
 import { createFileRoute, Link, notFound, Outlet, useChildMatches } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/PageHeader";
 import { SearchBar } from "@/components/SearchBar";
-import { catalogQueryOptions } from "@/data/catalog.api";
-import { getCategory, normalize } from "@/data/catalog.repository";
+import { categoryQueryOptions } from "@/data/catalog.queries";
+import { normalize } from "@/data/catalog.repository";
 import { AddTile } from "@/components/admin/AddTile";
 import { SortControls } from "@/components/admin/SortControls";
 import { DeleteButton } from "@/components/admin/DeleteButton";
@@ -12,11 +13,14 @@ import { AddSeriesDialog } from "@/components/admin/AddDialogs";
 import { useAdmin } from "@/hooks/useAdmin";
 import { NodeLevel } from "@/components/NodeLevel";
 import { SmartImage } from "@/components/SmartImage";
+import { PageSkeleton } from "@/components/CatalogSkeleton";
 
 export const Route = createFileRoute("/c/$categoryId")({
+  // Chỉ nạp dữ liệu con của đúng hãng xe đang xem.
   loader: async ({ params, context }) => {
-    const catalog = await context.queryClient.ensureQueryData(catalogQueryOptions);
-    const category = getCategory(catalog, params.categoryId);
+    const category = await context.queryClient.ensureQueryData(
+      categoryQueryOptions(params.categoryId),
+    );
     if (!category) throw notFound();
     return { category };
   },
@@ -34,10 +38,14 @@ export const Route = createFileRoute("/c/$categoryId")({
     };
   },
   component: CategoryPage,
+  pendingComponent: PageSkeleton,
 });
 
 function CategoryPage() {
-  const { category } = Route.useLoaderData();
+  const params = Route.useParams();
+  const { data } = useSuspenseQuery(categoryQueryOptions(params.categoryId));
+  const loaderData = Route.useLoaderData();
+  const category = data ?? loaderData.category;
   const childMatches = useChildMatches();
   const [query, setQuery] = useState("");
   const { isAdmin } = useAdmin();
@@ -74,40 +82,47 @@ function CategoryPage() {
     <div>
       <PageHeader title={`Đời xe ${category.name}`} />
       <div className="px-3 pt-3">
-        <SearchBar value={query} onChange={setQuery} placeholder={`Tìm đời xe ${category.name}...`} />
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder={`Tìm đời xe ${category.name}...`}
+        />
       </div>
       <div className="grid grid-cols-3 gap-3 p-3">
         {series.map((s) => (
           <div key={s.id} className="flex flex-col gap-1">
-          <Link
-            to="/c/$categoryId/$seriesId"
-            params={{ categoryId: category.id, seriesId: s.id }}
-            className="overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-gold active:border-gold focus-visible:border-gold"
-          >
-            <SmartImage
-              src={s.image}
-              alt={s.name}
-              className="aspect-square w-full rounded-t-lg object-cover"
-            />
-            <p className="px-1 py-2 text-center text-[11px] leading-tight font-medium text-foreground">
-              {s.name}
-            </p>
-          </Link>
-          {isAdmin ? (
-            <div className="flex items-center justify-center gap-1">
-              <SortControls
-                table="series"
-                ids={category.series.map((x) => x.dbId)}
-                index={category.series.findIndex((x) => x.id === s.id)}
+            <Link
+              to="/c/$categoryId/$seriesId"
+              params={{ categoryId: category.id, seriesId: s.id }}
+              className="overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-gold active:border-gold focus-visible:border-gold"
+            >
+              <SmartImage
+                src={s.image}
+                alt={s.name}
+                size="thumb"
+                sizes="33vw"
+                className="aspect-square w-full rounded-t-lg object-cover"
               />
-              <EditButton
-                kind="series"
-                id={s.dbId}
-                values={{ name: s.name, imageUrl: externalImage(s.image) }}
-              />
-              <DeleteButton table="series" id={s.dbId} name={s.name} warnChildren />
-            </div>
-          ) : null}
+
+              <p className="px-1 py-2 text-center text-[11px] leading-tight font-medium text-foreground">
+                {s.name}
+              </p>
+            </Link>
+            {isAdmin ? (
+              <div className="flex items-center justify-center gap-1">
+                <SortControls
+                  table="series"
+                  ids={category.series.map((x) => x.dbId)}
+                  index={category.series.findIndex((x) => x.id === s.id)}
+                />
+                <EditButton
+                  kind="series"
+                  id={s.dbId}
+                  values={{ name: s.name, imageUrl: externalImage(s.image) }}
+                />
+                <DeleteButton table="series" id={s.dbId} name={s.name} warnChildren />
+              </div>
+            ) : null}
           </div>
         ))}
         {isAdmin ? <AddTile label="Thêm Đời Xe" onClick={() => setAddOpen(true)} /> : null}

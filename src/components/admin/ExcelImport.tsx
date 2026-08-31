@@ -72,8 +72,8 @@ export function ExcelImport() {
       {rows.length > 0 ? (
         <div className="mt-3 space-y-3">
           <p className="text-xs text-muted-foreground">
-            {fileName}: <span className="font-semibold text-foreground">{rows.length}</span> sản phẩm •{" "}
-            {brands.size} hãng xe • {models.size} đời xe
+            {fileName}: <span className="font-semibold text-foreground">{rows.length}</span> sản
+            phẩm • {brands.size} hãng xe • {models.size} đời xe
           </p>
 
           <div className="grid gap-2">
@@ -102,7 +102,6 @@ export function ExcelImport() {
               </button>
             ))}
           </div>
-
 
           <div className="max-h-56 overflow-auto rounded-lg border border-border">
             <table className="w-full text-left text-[11px]">

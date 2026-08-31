@@ -15,7 +15,10 @@ export type PriceRow = {
 };
 
 const BRANDS: [RegExp, string][] = [
-  [/toyota|corolla|camry|inova|innova|fortuner|vios|veloz|avanza|yaris|hilux|land\s*cruiser|prado/i, "Toyota"],
+  [
+    /toyota|corolla|camry|inova|innova|fortuner|vios|veloz|avanza|yaris|hilux|land\s*cruiser|prado/i,
+    "Toyota",
+  ],
   [/lexus/i, "Lexus"],
   [/honda|civic|crv|cr-v|hrv|hr-v|accord|\bcity\b|brv|br-v/i, "Honda"],
   [/mazda|cx-?\d/i, "Mazda"],
@@ -24,7 +27,10 @@ const BRANDS: [RegExp, string][] = [
   [/bmw/i, "BMW"],
   [/porsche|cayenne|macan|panamera/i, "Porsche"],
   [/mitsubishi|xpander|xforce|outlander|pajero|triton|attrage/i, "Mitsubishi"],
-  [/hyundai|huyndai|elantra|santafe|santa\s*fe|accent|tucson|creta|custin|stargazer|palisade|i10/i, "Hyundai"],
+  [
+    /hyundai|huyndai|elantra|santafe|santa\s*fe|accent|tucson|creta|custin|stargazer|palisade|i10/i,
+    "Hyundai",
+  ],
   [/vinfast|vf\s*\d|limo|green\s*mvp|lux\s*a|lux\s*sa|fadil/i, "VinFast"],
   [/\bmg\b/i, "MG"],
   [/kia|seltos|sonet|carnival|sorento|sportage|morning|k3\b|k5\b/i, "Kia"],
@@ -47,7 +53,6 @@ const BRANDS: [RegExp, string][] = [
   [/jeep|\bram\b/i, "Jeep"],
   [/baic|beijing/i, "BAIC"],
 ];
-
 
 const clean = (v: unknown) =>
   String(v ?? "")
@@ -92,8 +97,17 @@ const findHeader = (grid: unknown[][]) => {
       if (price < 0 && c.includes("giá niêm yết") && vat) price = i;
       if (sale < 0 && c.includes("lắp đặt khuyến mãi") && vat) sale = i;
     });
-    if (price < 0) cells.forEach((c, i) => { if (price < 0 && c.includes("giá niêm yết")) price = i; });
-    return { row: r, dealer, price, sale, detail: cells.findIndex((c) => c.includes("số chi tiết")) };
+    if (price < 0)
+      cells.forEach((c, i) => {
+        if (price < 0 && c.includes("giá niêm yết")) price = i;
+      });
+    return {
+      row: r,
+      dealer,
+      price,
+      sale,
+      detail: cells.findIndex((c) => c.includes("số chi tiết")),
+    };
   }
   return null;
 };
