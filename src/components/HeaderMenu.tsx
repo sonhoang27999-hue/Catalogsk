@@ -7,11 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { displayLogin } from "@/lib/username";
 import { useAdmin } from "@/hooks/useAdmin";
 import { usePendingDealerApplications } from "@/hooks/usePendingDealerApplications";
-import { DealerCenter } from "@/components/admin/DealerCenter";
 import { ChangePassword } from "@/components/ChangePassword";
 import { ThemeManager } from "@/components/admin/ThemeManager";
-import { ExcelImport } from "@/components/admin/ExcelImport";
-import { BackupManager } from "@/components/admin/BackupManager";
+import { AdminSettings } from "@/components/admin/AdminSettings";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -94,9 +92,7 @@ export function HeaderMenu() {
                 </div>
                 {isAdmin ? (
                   <>
-                    <DealerCenter pendingCount={pendingCount} />
-                    <ExcelImport />
-                    <BackupManager />
+                    <AdminSettings pendingCount={pendingCount} />
                     <ThemeManager />
                     <Button
                       variant="outline"
