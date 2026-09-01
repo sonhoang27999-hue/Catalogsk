@@ -11,18 +11,24 @@ type Ctx = {
   userId: string;
 };
 
-type Actor = { userId: string; isAdmin: boolean; isDealer1: boolean };
+type Actor = { userId: string; isAdmin: boolean; isManager: boolean; isDealer1: boolean };
 
-/** Xác định vai trò của người gọi; chặn nếu không phải admin hoặc đại lý cấp 1. */
+/** Quản trị viên (manager) có toàn quyền như admin, chỉ trừ sao lưu & khôi phục. */
+const isFull = (a: Actor) => a.isAdmin || a.isManager;
+
+/** Xác định vai trò của người gọi; chặn nếu không phải admin/manager/đại lý cấp 1. */
 async function getManager(context: Ctx): Promise<Actor> {
-  const [admin, dealer1] = await Promise.all([
+  const [admin, manager, dealer1] = await Promise.all([
     context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
+    context.supabase.rpc("has_role", { _user_id: context.userId, _role: "manager" }),
     context.supabase.rpc("has_role", { _user_id: context.userId, _role: "dealer1" }),
   ]);
   const isAdmin = admin.data === true;
+  const isManager = manager.data === true;
   const isDealer1 = dealer1.data === true;
-  if (!isAdmin && !isDealer1) throw new Error("Bạn không có quyền quản lý tài khoản.");
-  return { userId: context.userId, isAdmin, isDealer1 };
+  if (!isAdmin && !isManager && !isDealer1)
+    throw new Error("Bạn không có quyền quản lý tài khoản.");
+  return { userId: context.userId, isAdmin, isManager, isDealer1 };
 }
 
 /** Đại lý cấp 1 chỉ được thao tác trên tài khoản do chính mình tạo. */
@@ -31,7 +37,19 @@ async function assertCanManageUser(
   targetUserId: string,
   admin: { from: (t: string) => any }, // eslint-disable-line @typescript-eslint/no-explicit-any
 ) {
-  if (actor.isAdmin) return;
+  if (isFull(actor)) {
+    // Chống leo thang quyền: manager không được chỉnh tài khoản admin.
+    if (!actor.isAdmin) {
+      const { data: roles } = await admin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", targetUserId)
+        .eq("role", "admin");
+      if ((roles ?? []).length > 0)
+        throw new Error("Chỉ Admin mới chỉnh sửa được tài khoản Admin.");
+    }
+    return;
+  }
   const { data } = await admin
     .from("account_owners")
     .select("created_by")
@@ -56,7 +74,7 @@ export const listAccounts = createServerFn({ method: "GET" })
     const ownerOf = new Map((owners ?? []).map((o) => [o.user_id, o.created_by]));
 
     return data.users
-      .filter((u) => (actor.isAdmin ? true : ownerOf.get(u.id) === actor.userId))
+      .filter((u) => (isFull(actor) ? true : ownerOf.get(u.id) === actor.userId))
       .map((u) => ({
         id: u.id,
         email: u.email ?? "",
@@ -70,11 +88,16 @@ export const getAccountManagerRole = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
-    const [admin, dealer1] = await Promise.all([
+    const [admin, manager, dealer1] = await Promise.all([
       ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "admin" }),
+      ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "manager" }),
       ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "dealer1" }),
     ]);
-    return { isAdmin: admin.data === true, isDealer1: dealer1.data === true };
+    return {
+      isAdmin: admin.data === true,
+      isManager: manager.data === true,
+      isDealer1: dealer1.data === true,
+    };
   });
 
 export const createAccount = createServerFn({ method: "POST" })
@@ -94,13 +117,18 @@ export const createAccount = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const actor = await getManager(context as unknown as Ctx);
-    // Chỉ quản trị viên mới được tạo tài khoản quản trị viên / đại lý cấp 1.
+    // Chỉ admin/manager mới được tạo tài khoản quản trị / đại lý cấp 1.
+    // Manager không được tạo tài khoản Admin (chống leo thang quyền).
     const role = data.role ?? (data.dealer1 ? "dealer1" : data.priceViewer ? "dealer" : "user");
     const finalRole = actor.isAdmin
       ? role
-      : role === "admin" || role === "manager" || role === "dealer1"
-        ? "dealer"
-        : role;
+      : actor.isManager
+        ? role === "admin"
+          ? "manager"
+          : role
+        : role === "admin" || role === "manager" || role === "dealer1"
+          ? "dealer"
+          : role;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
@@ -175,8 +203,9 @@ export const setAccountDealer1 = createServerFn({ method: "POST" })
   .inputValidator((data: { userId: string; enabled: boolean }) => data)
   .handler(async ({ data, context }) => {
     const actor = await getManager(context as unknown as Ctx);
-    if (!actor.isAdmin) throw new Error("Chỉ quản trị viên mới cấp được quyền đại lý cấp 1.");
+    if (!isFull(actor)) throw new Error("Chỉ quản trị viên mới cấp được quyền đại lý cấp 1.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await assertCanManageUser(actor, data.userId, supabaseAdmin);
     if (data.enabled) {
       // Đại lý cấp 1 luôn xem được giá nhập.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -215,9 +244,22 @@ export const setAccountRole = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const actor = await getManager(context as unknown as Ctx);
-    if (!actor.isAdmin) throw new Error("Chỉ quản trị viên mới được đổi vai trò tài khoản.");
+    if (!isFull(actor)) throw new Error("Chỉ quản trị viên mới được đổi vai trò tài khoản.");
     if (data.userId === actor.userId)
       throw new Error("Không thể tự đổi vai trò của chính mình.");
+    // Manager không được gán hoặc chỉnh vai trò Admin (chống leo thang quyền).
+    if (!actor.isAdmin && data.role === "admin")
+      throw new Error("Chỉ Admin mới cấp được quyền Admin.");
+    if (!actor.isAdmin) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: targetAdmin } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.userId)
+        .eq("role", "admin");
+      if ((targetAdmin ?? []).length > 0)
+        throw new Error("Chỉ Admin mới chỉnh sửa được tài khoản Admin.");
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const next: string[] =

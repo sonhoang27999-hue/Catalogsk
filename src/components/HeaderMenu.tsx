@@ -24,10 +24,11 @@ import {
 export function HeaderMenu() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
-  const { isAdmin, isDealer1 } = useAdmin();
+  const { isAdmin, isManager, isDealer1 } = useAdmin();
+  const canSettings = isAdmin || isManager;
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const pendingCount = usePendingDealerApplications(isAdmin);
+  const pendingCount = usePendingDealerApplications(canSettings);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
@@ -95,9 +96,9 @@ export function HeaderMenu() {
                     </p>
                   </div>
                 </div>
-                {isAdmin ? (
+                {canSettings ? (
                   <>
-                    <AdminSettings pendingCount={pendingCount} />
+                    <AdminSettings pendingCount={pendingCount} isAdmin={isAdmin} />
                     <ThemeManager />
                     <Button
                       variant="outline"
@@ -111,7 +112,7 @@ export function HeaderMenu() {
                     </Button>
                   </>
                 ) : null}
-                {!isAdmin && isDealer1 ? <Dealer1Accounts /> : null}
+                {!canSettings && isDealer1 ? <Dealer1Accounts /> : null}
 
                 <ChangePassword />
 

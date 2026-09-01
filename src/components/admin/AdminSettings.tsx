@@ -20,8 +20,13 @@ import { ExcelImport } from "@/components/admin/ExcelImport";
 import { BackupManager } from "@/components/admin/BackupManager";
 import { AccessLogs } from "@/components/admin/AccessLogs";
 
-export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = {}) {
+export function AdminSettings({
+  pendingCount = 0,
+  isAdmin = false,
+}: { pendingCount?: number; isAdmin?: boolean } = {}) {
   const [open, setOpen] = useState(false);
+  // Sao lưu & khôi phục chỉ dành cho Admin.
+  const tabCount = isAdmin ? 4 : 3;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -47,7 +52,7 @@ export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = 
         </DialogHeader>
 
         <Tabs defaultValue="dealers" className="flex min-h-0 flex-1 flex-col">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${tabCount === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
             <TabsTrigger value="dealers" className="gap-1.5 text-xs sm:text-sm">
               <Users className="size-4" />
               <span className="hidden sm:inline">Đại lý & tài khoản</span>
@@ -68,11 +73,13 @@ export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = 
               <span className="hidden sm:inline">Lịch sử truy cập</span>
               <span className="sm:hidden">Lịch sử</span>
             </TabsTrigger>
-            <TabsTrigger value="backup" className="gap-1.5 text-xs sm:text-sm">
-              <DatabaseBackup className="size-4" />
-              <span className="hidden sm:inline">Sao lưu & khôi phục</span>
-              <span className="sm:hidden">Sao lưu</span>
-            </TabsTrigger>
+            {isAdmin ? (
+              <TabsTrigger value="backup" className="gap-1.5 text-xs sm:text-sm">
+                <DatabaseBackup className="size-4" />
+                <span className="hidden sm:inline">Sao lưu & khôi phục</span>
+                <span className="sm:hidden">Sao lưu</span>
+              </TabsTrigger>
+            ) : null}
           </TabsList>
 
           <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
@@ -85,9 +92,11 @@ export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = 
             <TabsContent value="logs" className="mt-0">
               <AccessLogs embedded />
             </TabsContent>
-            <TabsContent value="backup" className="mt-0">
-              <BackupManager />
-            </TabsContent>
+            {isAdmin ? (
+              <TabsContent value="backup" className="mt-0">
+                <BackupManager />
+              </TabsContent>
+            ) : null}
           </div>
         </Tabs>
       </DialogContent>

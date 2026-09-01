@@ -50,7 +50,9 @@ function roleOf(roles: string[]): AccountRole {
 
 export function AccountManager({ embedded = false }: { embedded?: boolean } = {}) {
   const qc = useQueryClient();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isManager } = useAdmin();
+  // Quản trị viên (manager) có toàn quyền như admin, chỉ không cấp/sửa vai trò Admin.
+  const full = isAdmin || isManager;
   const fetchList = useServerFn(listAccounts);
   const create = useServerFn(createAccount);
   const setPwd = useServerFn(setAccountPassword);
@@ -131,7 +133,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
         </p>
       ) : null}
       <p className="mt-1 text-xs text-muted-foreground">
-        {isAdmin
+        {full
           ? "Tạo tài khoản bằng tên đăng nhập và mật khẩu, không cần email."
           : "Bạn là đại lý cấp 1: chỉ xem và quản lý các tài khoản do chính bạn tạo."}
       </p>
@@ -162,7 +164,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {isAdmin ? (
+        {full ? (
           <div className="space-y-1">
             <Label className="flex items-center gap-1.5 text-xs">
               <ShieldCheck className="size-3.5" /> Phân quyền
@@ -172,7 +174,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="admin">Admin (toàn quyền)</SelectItem>
+                {isAdmin ? <SelectItem value="admin">Admin (toàn quyền)</SelectItem> : null}
                 <SelectItem value="manager">Quản trị viên</SelectItem>
                 <SelectItem value="dealer1">Đại lý cấp 1</SelectItem>
                 <SelectItem value="dealer">Đại lý (xem giá nhập)</SelectItem>
@@ -211,7 +213,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
                   <p className="text-[11px] text-muted-foreground">{ROLE_LABEL[rowRole]}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {!isAdmin && !isRowAdmin ? (
+                  {!full && !isRowAdmin ? (
                     <Switch
                       checked={isViewer}
                       aria-label="Quyền xem giá nhập"
@@ -243,7 +245,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
                 </div>
               </div>
 
-              {isAdmin ? (
+              {full && !(isRowAdmin && !isAdmin) ? (
                 <div className="mt-2 flex items-center gap-2">
                   <ShieldCheck className="size-3.5 shrink-0 text-muted-foreground" />
                   <Select
@@ -254,7 +256,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin (toàn quyền)</SelectItem>
+                      {isAdmin ? <SelectItem value="admin">Admin (toàn quyền)</SelectItem> : null}
                       <SelectItem value="manager">Quản trị viên</SelectItem>
                       <SelectItem value="dealer1">Đại lý cấp 1</SelectItem>
                       <SelectItem value="dealer">Đại lý (xem giá nhập)</SelectItem>
