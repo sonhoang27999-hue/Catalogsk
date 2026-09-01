@@ -6,9 +6,9 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-type Props = { src: string; title: string; className?: string };
+type Props = { src: string; title: string; className?: string; vertical?: boolean };
 
-export const LazyEmbed = memo(function LazyEmbed({ src, title, className }: Props) {
+export const LazyEmbed = memo(function LazyEmbed({ src, title, className, vertical }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -33,7 +33,14 @@ export const LazyEmbed = memo(function LazyEmbed({ src, title, className }: Prop
   }, [visible]);
 
   return (
-    <div ref={ref} className={cn("relative aspect-video w-full", className)}>
+    <div
+      ref={ref}
+      className={cn(
+        "relative w-full",
+        vertical ? "mx-auto aspect-[9/16] max-h-[70vh] max-w-[320px]" : "aspect-video",
+        className,
+      )}
+    >
       {visible ? (
         <iframe
           src={src}

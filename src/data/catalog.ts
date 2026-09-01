@@ -35,7 +35,7 @@ export type Product = {
   variants: Variant[];
 };
 
-export type Video = { id: string; title: string; url: string };
+export type Video = { id: string; dbId: string; title: string; url: string };
 
 export type Model = {
   id: string;

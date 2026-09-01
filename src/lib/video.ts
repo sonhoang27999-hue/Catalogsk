@@ -65,3 +65,27 @@ export function toEmbedUrl(input?: string | null): string | null {
 
   return url.toString();
 }
+
+/**
+ * Nhận diện video dọc (9:16): TikTok và YouTube Shorts.
+ * Dùng để hiển thị khung nhúng đúng tỷ lệ dọc thay vì ép ngang 16:9.
+ */
+export function isVerticalUrl(input?: string | null): boolean {
+  const raw = (input ?? "").trim();
+  if (!raw) return false;
+  const iframeSrc = raw.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
+  const src = iframeSrc?.[1] ?? raw;
+  let url: URL;
+  try {
+    url = new URL(src.startsWith("http") ? src : `https://${src}`);
+  } catch {
+    return false;
+  }
+  const host = url.hostname.replace(/^www\./, "").toLowerCase();
+  const path = url.pathname;
+  if (host.endsWith("tiktok.com")) return true;
+  if (host.endsWith("youtube.com") || host === "youtube-nocookie.com") {
+    return path.startsWith("/shorts/");
+  }
+  return false;
+}

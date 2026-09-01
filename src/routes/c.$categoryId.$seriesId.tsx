@@ -16,7 +16,7 @@ import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { formatPrice } from "@/data/catalog.repository";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductListNote } from "@/components/ProductListNote";
-import { toEmbedUrl } from "@/lib/video";
+import { isVerticalUrl, toEmbedUrl } from "@/lib/video";
 import { LazyEmbed } from "@/components/LazyEmbed";
 import { SmartImage } from "@/components/SmartImage";
 import { ImageZoom } from "@/components/ImageZoom";
@@ -115,6 +115,7 @@ function SeriesPage() {
                 <LazyEmbed
                   src={toEmbedUrl(p.videoUrl)!}
                   title={`Video ${p.name}`}
+                  vertical={isVerticalUrl(p.videoUrl)}
                   className="border-t border-border"
                 />
               ) : null}
@@ -167,8 +168,11 @@ function SeriesPage() {
             <h2 className="text-base font-bold text-foreground">Video lắp đặt thực tế</h2>
             {videos.map((v) => (
               <div key={v.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                <LazyEmbed src={v.url} title={v.title} />
-                <p className="px-3 py-2 text-sm font-medium">{v.title}</p>
+                <LazyEmbed src={toEmbedUrl(v.url) ?? v.url} title={v.title} vertical={isVerticalUrl(v.url)} />
+                <div className="flex items-center justify-between gap-2 px-3 py-2">
+                  <p className="text-sm font-medium">{v.title}</p>
+                  {isAdmin ? <DeleteButton table="videos" id={v.dbId} name={v.title} /> : null}
+                </div>
               </div>
             ))}
             {isAdmin ? (

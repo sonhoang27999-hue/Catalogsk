@@ -276,7 +276,7 @@ export async function fetchSeriesDetail(
     url: string;
   }[]) {
     const list = videosByModel.get(v.model_id) ?? [];
-    list.push({ id: v.id, title: v.title, url: v.url });
+    list.push({ id: v.id, dbId: v.id, title: v.title, url: v.url });
     videosByModel.set(v.model_id, list);
   }
 

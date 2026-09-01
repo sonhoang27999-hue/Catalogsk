@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-type Table = "categories" | "series" | "models" | "products" | "nodes";
+type Table = "categories" | "series" | "models" | "products" | "nodes" | "videos";
 
 export function DeleteButton({
   table,
