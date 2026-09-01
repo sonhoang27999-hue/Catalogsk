@@ -331,10 +331,14 @@ export async function fetchNodeDetail(
 /* Query options                                                              */
 /* -------------------------------------------------------------------------- */
 
-/** Dữ liệu điều hướng ít đổi → cache lâu hơn. */
-const NAV_CACHE = { staleTime: 5 * 60_000, gcTime: 30 * 60_000 };
+/**
+ * Cache để chuyển trang mượt, nhưng luôn revalidate ở nền khi component mount
+ * (`refetchOnMount: "always"`) — nhờ vậy khách CHƯA ĐĂNG NHẬP cũng thấy dữ liệu mới nhất
+ * thay vì dữ liệu HTML/SSR cũ.
+ */
+const NAV_CACHE = { staleTime: 5 * 60_000, gcTime: 30 * 60_000, refetchOnMount: "always" } as const;
 /** Dữ liệu sản phẩm đổi nhiều hơn (admin sửa) → cache ngắn hơn. */
-const CONTENT_CACHE = { staleTime: 60_000, gcTime: 15 * 60_000 };
+const CONTENT_CACHE = { staleTime: 60_000, gcTime: 15 * 60_000, refetchOnMount: "always" } as const;
 
 export const categoriesQueryOptions = queryOptions({
   queryKey: catalogKeys.categories,

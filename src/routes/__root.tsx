@@ -174,9 +174,30 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    void navigator.serviceWorker.register("/sw.js").catch(() => {
-      // Không cần báo lỗi nếu trình duyệt không hỗ trợ hoặc môi trường dev.
-    });
+
+    // Người dùng còn kẹt service worker CŨ (cache-first HTML): khi bản SW mới
+    // tiếp quản (controllerchange), reload MỘT LẦN để trang hiện tại là bản mới
+    // từ mạng thay vì HTML cũ trong cache. Chỉ reload nếu trước đó đã có SW
+    // điều khiển trang (tránh reload thừa cho khách lần đầu) và chỉ một lần
+    // (tránh vòng lặp reload).
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshed = false;
+    const onControllerChange = () => {
+      if (!hadController || refreshed) return;
+      refreshed = true;
+      window.location.reload();
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
+
+    void navigator.serviceWorker
+      // updateViaCache: "none" để trình duyệt luôn lấy sw.js mới, tránh kẹt bản cũ cache HTML.
+      .register("/sw.js", { updateViaCache: "none" })
+      .then((reg) => reg.update())
+      .catch(() => {
+        // Không cần báo lỗi nếu trình duyệt không hỗ trợ hoặc môi trường dev.
+      });
+
+    return () => navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
   }, []);
 
   return (
