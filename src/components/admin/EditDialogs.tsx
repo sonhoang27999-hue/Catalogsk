@@ -19,6 +19,7 @@ import {
 import { saveDealerPrice, saveRow, toSlug } from "@/data/admin.api";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
 import { ImageUrlPreview } from "./ImageUrlPreview";
+import { VideoUrlPreview } from "./VideoUrlPreview";
 import { Field } from "./AddTile";
 
 export type EditKind = "category" | "series" | "model" | "node" | "product";
@@ -203,13 +204,14 @@ export function EditButton({
 
             {kind === "product" ? (
               <>
-                <Field label="Link video (YouTube, TikTok, Facebook hoặc mã nhúng)">
+                <Field label="Link video TikTok / YouTube (hoặc mã nhúng)">
                   <Input
                     value={form.videoUrl ?? ""}
                     maxLength={600}
-                    placeholder="Dán link YouTube bình thường cũng được"
+                    placeholder="https://www.tiktok.com/... hoặc https://youtube.com/..."
                     onChange={(e) => set("videoUrl")(e.target.value)}
                   />
+                  <VideoUrlPreview url={form.videoUrl ?? ""} />
                 </Field>
                 <Field label="Link ảnh/video chi tiết lắp lên xe">
                   <Input

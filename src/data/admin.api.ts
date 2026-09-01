@@ -186,6 +186,13 @@ export const insertNode = async (values: {
   return data.id as string;
 };
 
+/** Thêm video riêng (không gắn sản phẩm) vào một đời xe (model). */
+export const insertVideo = async (values: { model_id: string; title: string; url: string }) => {
+  const { data, error } = await supabase.from("videos").insert(values).select("id").single();
+  if (error) throw new Error(error.message);
+  return data.id as string;
+};
+
 /** Tạo nhanh một "năm sản xuất" mặc định khi đời xe chưa có mục con nào. */
 export const ensureDefaultModel = async (seriesDbId: string, seriesName: string) => {
   const existing = await supabase

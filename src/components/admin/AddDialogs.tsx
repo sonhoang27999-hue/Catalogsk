@@ -19,13 +19,16 @@ import {
   ensureDefaultModel,
   insertNode,
   insertProduct,
+  insertVideo,
   saveDealerPrice,
   saveRow,
   toSlug,
 } from "@/data/admin.api";
+import { toEmbedUrl } from "@/lib/video";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
 import { Field } from "./AddTile";
 import { ImageUrlPreview } from "./ImageUrlPreview";
+import { VideoUrlPreview } from "./VideoUrlPreview";
 
 type Props = { open: boolean; onOpenChange: (v: boolean) => void };
 
@@ -396,13 +399,14 @@ export function AddProductDialog({
             />
             <ImageUrlPreview url={form.imageUrl} />
           </Field>
-          <Field label="Link video (YouTube, TikTok, Facebook hoặc mã nhúng)">
+          <Field label="Link video TikTok / YouTube (hoặc mã nhúng)">
             <Input
               value={form.videoUrl}
               maxLength={600}
               onChange={(e) => set("videoUrl")(e.target.value)}
-              placeholder="Dán link YouTube bình thường cũng được"
+              placeholder="https://www.tiktok.com/... hoặc https://youtube.com/..."
             />
+            <VideoUrlPreview url={form.videoUrl} />
           </Field>
           <Field label="Link ảnh/video chi tiết lắp lên xe">
             <Input
@@ -520,6 +524,81 @@ export function AddNodeDialog({
           </Field>
           <Button className="h-11 w-full" onClick={() => save.mutate()} disabled={save.isPending}>
             Lưu {levelLabel.toLowerCase()}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* -------------------- Video riêng (không gắn sản phẩm) -------------------- */
+
+export function AddVideoDialog({
+  open,
+  onOpenChange,
+  modelDbId,
+  seriesDbId,
+  seriesName,
+}: Props & {
+  modelDbId?: string | undefined;
+  seriesDbId?: string | undefined;
+  seriesName: string;
+}) {
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+  const handlers = useSaver();
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const embed = toEmbedUrl(url);
+      if (!url.trim() || !embed) throw new Error("Hãy dán link video trước.");
+      const targetModelId = modelDbId ?? (await ensureDefaultModel(seriesDbId!, seriesName));
+      await insertVideo({
+        model_id: targetModelId,
+        title: title.trim() || "Video",
+        url: embed,
+      });
+    },
+    ...handlers(() => {
+      setTitle("");
+      setUrl("");
+      onOpenChange(false);
+    }),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={shell}>
+        <DialogHeader>
+          <DialogTitle>Thêm video</DialogTitle>
+          <DialogDescription>
+            Video hiển thị trong mục "Video lắp đặt thực tế" của {seriesName}.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Field label="Tiêu đề video (tuỳ chọn)">
+            <Input
+              value={title}
+              maxLength={160}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Lắp đèn ambient thực tế..."
+            />
+          </Field>
+          <Field label="Link video TikTok / YouTube (hoặc mã nhúng)">
+            <Input
+              value={url}
+              maxLength={600}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://www.tiktok.com/... hoặc https://youtube.com/..."
+            />
+            <VideoUrlPreview url={url} />
+          </Field>
+          <Button
+            className="h-11 w-full"
+            onClick={() => save.mutate()}
+            disabled={save.isPending || !url.trim()}
+          >
+            Lưu video
           </Button>
         </div>
       </DialogContent>

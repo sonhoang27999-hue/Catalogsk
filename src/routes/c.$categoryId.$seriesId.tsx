@@ -4,8 +4,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ExternalLink } from "lucide-react";
 import { seriesQueryOptions } from "@/data/catalog.queries";
 import { PageHeader } from "@/components/PageHeader";
-import { AddFab } from "@/components/admin/AddTile";
-import { AddProductDialog } from "@/components/admin/AddDialogs";
+import { AddFab, AddTile } from "@/components/admin/AddTile";
+import { AddProductDialog, AddVideoDialog } from "@/components/admin/AddDialogs";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { SortControls } from "@/components/admin/SortControls";
@@ -55,6 +55,7 @@ function SeriesPage() {
   const series = (data ?? loaderData).series;
   const { isAdmin, canViewDealerPrice } = useAdmin();
   const [addOpen, setAddOpen] = useState(false);
+  const [addVideoOpen, setAddVideoOpen] = useState(false);
 
   const products = useMemo(() => series.models.flatMap((m) => m.products), [series.models]);
   const videos = useMemo(() => series.models.flatMap((m) => m.videos), [series.models]);
@@ -161,7 +162,7 @@ function SeriesPage() {
           </p>
         ) : null}
 
-        {videos.length > 0 ? (
+        {videos.length > 0 || isAdmin ? (
           <section className="space-y-3 pt-2">
             <h2 className="text-base font-bold text-foreground">Video lắp đặt thực tế</h2>
             {videos.map((v) => (
@@ -170,6 +171,9 @@ function SeriesPage() {
                 <p className="px-3 py-2 text-sm font-medium">{v.title}</p>
               </div>
             ))}
+            {isAdmin ? (
+              <AddTile label="Thêm video" shape="wide" onClick={() => setAddVideoOpen(true)} />
+            ) : null}
           </section>
         ) : null}
       </div>
@@ -184,6 +188,12 @@ function SeriesPage() {
             onOpenChange={setAddOpen}
             {...(targetModel ? { modelDbId: targetModel.dbId } : { seriesDbId: series.dbId })}
             modelName={series.name}
+          />
+          <AddVideoDialog
+            open={addVideoOpen}
+            onOpenChange={setAddVideoOpen}
+            {...(targetModel ? { modelDbId: targetModel.dbId } : { seriesDbId: series.dbId })}
+            seriesName={series.name}
           />
         </>
       ) : null}
