@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeApplier } from "@/components/ThemeApplier";
 import { supabase } from "@/integrations/supabase/client";
 import { useCatalogRealtime } from "@/data/catalog.realtime";
+import { useAccessLog } from "@/hooks/useAccessLog";
 
 function NotFoundComponent() {
   return (
@@ -143,6 +144,8 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // Đồng bộ thời gian thực: khi dữ liệu catalog đổi, chỉ làm mới đúng phần bị ảnh hưởng.
   useCatalogRealtime(queryClient);
+  // Ghi nhật ký truy cập của tài khoản đã đăng nhập (quản trị viên xem trong Cài đặt chuyên sâu).
+  useAccessLog();
   // Trang quản trị dùng toàn bộ chiều rộng màn hình (desktop), không dùng khung mobile 480px.
   const isFullWidth = pathname.startsWith("/admin") || pathname.startsWith("/auth");
 

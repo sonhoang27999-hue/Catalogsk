@@ -10,6 +10,7 @@ import { usePendingDealerApplications } from "@/hooks/usePendingDealerApplicatio
 import { ChangePassword } from "@/components/ChangePassword";
 import { ThemeManager } from "@/components/admin/ThemeManager";
 import { AdminSettings } from "@/components/admin/AdminSettings";
+import { Dealer1Accounts } from "@/components/admin/Dealer1Accounts";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +24,7 @@ import {
 export function HeaderMenu() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
-  const { isAdmin } = useAdmin();
+  const { isAdmin, isDealer1 } = useAdmin();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const pendingCount = usePendingDealerApplications(isAdmin);
@@ -84,6 +85,10 @@ export function HeaderMenu() {
                         <>
                           <ShieldCheck className="size-3.5" /> Quản trị viên
                         </>
+                      ) : isDealer1 ? (
+                        <>
+                          <ShieldCheck className="size-3.5" /> Đại lý cấp 1
+                        </>
                       ) : (
                         "Người dùng"
                       )}
@@ -106,6 +111,7 @@ export function HeaderMenu() {
                     </Button>
                   </>
                 ) : null}
+                {!isAdmin && isDealer1 ? <Dealer1Accounts /> : null}
 
                 <ChangePassword />
 

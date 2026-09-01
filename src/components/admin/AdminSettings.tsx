@@ -4,7 +4,7 @@
  * tối ưu thao tác trên màn hình máy tính bàn.
  */
 import { useState } from "react";
-import { DatabaseBackup, FileSpreadsheet, Settings2, Users } from "lucide-react";
+import { DatabaseBackup, FileSpreadsheet, History, Settings2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DealerCenter } from "@/components/admin/DealerCenter";
 import { ExcelImport } from "@/components/admin/ExcelImport";
 import { BackupManager } from "@/components/admin/BackupManager";
+import { AccessLogs } from "@/components/admin/AccessLogs";
 
 export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = {}) {
   const [open, setOpen] = useState(false);
@@ -46,7 +47,7 @@ export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = 
         </DialogHeader>
 
         <Tabs defaultValue="dealers" className="flex min-h-0 flex-1 flex-col">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dealers" className="gap-1.5 text-xs sm:text-sm">
               <Users className="size-4" />
               <span className="hidden sm:inline">Đại lý & tài khoản</span>
@@ -62,6 +63,11 @@ export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = 
               <span className="hidden sm:inline">Nhập bảng giá Excel</span>
               <span className="sm:hidden">Bảng giá</span>
             </TabsTrigger>
+            <TabsTrigger value="logs" className="gap-1.5 text-xs sm:text-sm">
+              <History className="size-4" />
+              <span className="hidden sm:inline">Lịch sử truy cập</span>
+              <span className="sm:hidden">Lịch sử</span>
+            </TabsTrigger>
             <TabsTrigger value="backup" className="gap-1.5 text-xs sm:text-sm">
               <DatabaseBackup className="size-4" />
               <span className="hidden sm:inline">Sao lưu & khôi phục</span>
@@ -75,6 +81,9 @@ export function AdminSettings({ pendingCount = 0 }: { pendingCount?: number } = 
             </TabsContent>
             <TabsContent value="excel" className="mt-0">
               <ExcelImport />
+            </TabsContent>
+            <TabsContent value="logs" className="mt-0">
+              <AccessLogs embedded />
             </TabsContent>
             <TabsContent value="backup" className="mt-0">
               <BackupManager />

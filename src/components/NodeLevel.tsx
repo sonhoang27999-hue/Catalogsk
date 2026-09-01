@@ -41,7 +41,7 @@ export function NodeLevel({
   nodes: CatalogNode[];
   products: Product[];
 }) {
-  const { isAdmin, canViewDealerPrice } = useAdmin();
+  const { canManage: isAdmin, canViewDealerPrice } = useAdmin();
   const dealerPrices = useDealerPrices(
     canViewDealerPrice,
     products.map((p) => p.dbId),

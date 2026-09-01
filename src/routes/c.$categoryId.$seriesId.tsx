@@ -53,7 +53,7 @@ function SeriesPage() {
   const { data } = useSuspenseQuery(seriesQueryOptions(params.categoryId, params.seriesId));
   const loaderData = Route.useLoaderData();
   const series = (data ?? loaderData).series;
-  const { isAdmin, canViewDealerPrice } = useAdmin();
+  const { canManage: isAdmin, canViewDealerPrice } = useAdmin();
   const [addOpen, setAddOpen] = useState(false);
   const [addVideoOpen, setAddVideoOpen] = useState(false);
 

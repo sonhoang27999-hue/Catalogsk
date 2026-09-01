@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const [query, setQuery] = useState("");
-  const { isAdmin } = useAdmin();
+  const { canManage: isAdmin } = useAdmin();
   const [addOpen, setAddOpen] = useState(false);
 
   // Tìm kiếm chạy ở database: chờ 300ms sau khi ngừng gõ, tối thiểu 2 ký tự.

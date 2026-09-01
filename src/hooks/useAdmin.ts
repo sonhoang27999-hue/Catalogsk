@@ -1,11 +1,11 @@
 /**
- * Trạng thái đăng nhập + quyền admin, dùng để ẩn/hiện các nút quản trị tại chỗ.
+ * Trạng thái đăng nhập + quyền admin / đại lý cấp 1, dùng để ẩn/hiện các nút quản trị tại chỗ.
  * Người dùng thường sẽ luôn nhận `isAdmin = false` nên không thấy nút nào.
  */
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { checkCanViewDealerPrice, checkIsAdmin } from "@/data/admin.api";
+import { checkCanViewDealerPrice, checkIsAdmin, checkIsDealer1, checkIsManager } from "@/data/admin.api";
 
 // Chỉ nạp lại catalog một lần cho mỗi phiên đăng nhập, tránh vòng lặp invalidate.
 let refreshedForUser: string | null = null;
@@ -13,6 +13,8 @@ let refreshedForUser: string | null = null;
 export function useAdmin() {
   const queryClient = useQueryClient();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isManager, setIsManager] = useState(false);
+  const [isDealer1, setIsDealer1] = useState(false);
   const [canViewDealerPrice, setCanViewDealerPrice] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [ready, setReady] = useState(false);
@@ -22,11 +24,16 @@ export function useAdmin() {
 
     const evaluate = async (userId?: string) => {
       const ok = userId ? await checkIsAdmin(userId) : false;
+      const manager = userId ? await checkIsManager(userId) : false;
+      const dealer1 = userId ? await checkIsDealer1(userId) : false;
       const canPrice = userId ? await checkCanViewDealerPrice(userId) : false;
       if (active) {
         setIsAdmin(ok);
+        setIsManager(manager);
+        setIsDealer1(dealer1);
         setCanViewDealerPrice(canPrice);
         setIsAuthenticated(!!userId);
+        setReady(true);
         // Giá nhập nạp riêng theo quyền → chỉ cần làm mới đúng nhóm query đó.
         if (canPrice && userId && refreshedForUser !== userId) {
           refreshedForUser = userId;
@@ -50,5 +57,6 @@ export function useAdmin() {
     };
   }, [queryClient]);
 
-  return { isAdmin, canViewDealerPrice, isAuthenticated, ready };
+  // canManage: admin hoặc quản trị viên — được chỉnh sửa nội dung catalog tại chỗ.
+  return { isAdmin, isManager, canManage: isAdmin || isManager, isDealer1, canViewDealerPrice, isAuthenticated, ready };
 }

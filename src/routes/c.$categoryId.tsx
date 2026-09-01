@@ -48,7 +48,7 @@ function CategoryPage() {
   const category = data ?? loaderData.category;
   const childMatches = useChildMatches();
   const [query, setQuery] = useState("");
-  const { isAdmin } = useAdmin();
+  const { canManage: isAdmin } = useAdmin();
   const [addOpen, setAddOpen] = useState(false);
 
   const series = useMemo(

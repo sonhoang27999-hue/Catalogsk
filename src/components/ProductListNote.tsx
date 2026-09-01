@@ -23,7 +23,7 @@ export const DEFAULT_PRODUCT_NOTE =
   "Giá trên đã gồm VAT, có thể không lấy VAT. Liên hệ: 0868055555 để đăng ký làm đại lý phân phối sỉ.";
 
 export function ProductListNote() {
-  const { isAdmin, isAuthenticated } = useAdmin();
+  const { canManage: isAdmin, isAuthenticated } = useAdmin();
   const settings = useQuery(settingsQueryOptions);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");

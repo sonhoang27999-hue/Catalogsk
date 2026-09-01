@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_logs: {
+        Row: {
+          created_at: string
+          email: string
+          event: string
+          id: string
+          path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          event?: string
+          id?: string
+          path?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event?: string
+          id?: string
+          path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      account_owners: {
+        Row: {
+          created_at: string
+          created_by: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -427,6 +472,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_any_role: {
+        Args: { _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -457,7 +506,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "price_viewer"
+      app_role: "admin" | "user" | "price_viewer" | "dealer1" | "manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -585,7 +634,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "price_viewer"],
+      app_role: ["admin", "user", "price_viewer", "dealer1", "manager"],
     },
   },
 } as const

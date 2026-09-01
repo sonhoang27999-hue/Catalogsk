@@ -34,7 +34,7 @@ const fmtHour = (t: number) =>
   new Date(t).toLocaleString("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit" });
 
 function ImageErrorsPage() {
-  const { isAdmin } = useAdmin();
+  const { canManage: isAdmin } = useAdmin();
   const [items, setItems] = useState<ImageErrorEntry[]>([]);
 
   useEffect(() => {

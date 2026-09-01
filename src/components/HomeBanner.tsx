@@ -22,7 +22,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { SmartImage } from "@/components/SmartImage";
 
 export function HomeBanner() {
-  const { isAdmin } = useAdmin();
+  const { canManage: isAdmin } = useAdmin();
   const settings = useQuery(settingsQueryOptions);
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");

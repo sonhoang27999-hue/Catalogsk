@@ -161,6 +161,30 @@ export const checkCanViewDealerPrice = async (userId: string) => {
   return (data ?? []).length > 0;
 };
 
+/** Kiểm tra người dùng có phải quản trị viên (manager) không. */
+export const checkIsManager = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "manager")
+    .maybeSingle();
+  if (error) return false;
+  return Boolean(data);
+};
+
+/** Kiểm tra người dùng có phải đại lý cấp 1 không (được tạo tài khoản đại lý). */
+export const checkIsDealer1 = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "dealer1")
+    .maybeSingle();
+  if (error) return false;
+  return Boolean(data);
+};
+
 /** Danh sách email đang được cấp quyền xem giá nhập (chỉ admin gọi được). */
 export const listPriceViewers = async () => {
   const { data, error } = await supabase.rpc("list_price_viewers");
