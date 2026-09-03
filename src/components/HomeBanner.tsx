@@ -49,8 +49,12 @@ export function HomeBanner() {
         size="preview"
         sizes="(max-width: 480px) 100vw, 480px"
         eager
+        // Chỉ khi MỌI đường tải (trực tiếp + proxy + link gốc) đều hỏng mới dùng
+        // ảnh bìa mặc định — không dùng ảnh sản phẩm chung chung gây hiểu nhầm.
+        fallback={defaultBanner}
         className="aspect-video w-full rounded-lg object-cover"
       />
+
 
       {isAdmin ? (
         <>

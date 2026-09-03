@@ -16,11 +16,22 @@ import { SEARCH_MIN_LENGTH, searchQueryOptions } from "@/data/search.queries";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { SmartImage } from "@/components/SmartImage";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
+import { HOME_BANNER_KEY, settingsQueryOptions } from "@/data/settings.api";
+import { imageUrl } from "@/lib/imageUrl";
 
 export const Route = createFileRoute("/")({
   // Trang chủ chỉ cần danh sách hãng xe (không nạp sản phẩm/video/giá nhập).
-  loader: ({ context }) => context.queryClient.ensureQueryData(categoriesQueryOptions),
-  head: () => ({
+  // settings đã được root loader nạp — ensureQueryData ở đây chỉ đọc lại từ
+  // cache (React Query gộp request trùng key), dùng để preload ảnh banner LCP.
+  loader: async ({ context }) => {
+    const [, settings] = await Promise.all([
+      context.queryClient.ensureQueryData(categoriesQueryOptions),
+      context.queryClient.ensureQueryData(settingsQueryOptions).catch(() => null),
+    ]);
+    const banner = settings?.[HOME_BANNER_KEY]?.trim();
+    return { bannerHref: banner ? imageUrl(banner, "preview") : null };
+  },
+  head: ({ loaderData }) => ({
     meta: [
       { title: "Danh mục Phụ kiện Ô tô | AutoDeco" },
       {
@@ -34,6 +45,11 @@ export const Route = createFileRoute("/")({
         content: "Catalog phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
       },
     ],
+    // Preload ảnh banner (phần tử LCP) để trình duyệt tải NGAY từ HTML,
+    // không phải chờ JS — lần mở đầu banner hiện sớm và rõ nét.
+    links: loaderData?.bannerHref
+      ? [{ rel: "preload", as: "image", href: loaderData.bannerHref, fetchPriority: "high" }]
+      : [],
   }),
   component: Home,
   pendingComponent: PageSkeleton,
@@ -122,7 +138,7 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-4 items-start gap-x-2 gap-y-4 px-3 py-4">
-            {filtered.map((c) => (
+            {filtered.map((c, tileIndex) => (
               <div key={c.id} className="flex flex-col items-center gap-1">
                 <Link
                   to="/c/$categoryId"
@@ -136,6 +152,8 @@ function Home() {
                         alt={c.name}
                         size="thumb"
                         sizes="25vw"
+                        // 2 hàng đầu nằm trong viewport ngay khi mở trang → tải sớm cho rõ nét
+                        eager={tileIndex < 8}
                         className="size-full object-contain p-1"
                       />
                     ) : (

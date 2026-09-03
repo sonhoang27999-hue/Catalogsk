@@ -65,12 +65,15 @@ export async function searchCatalogServer(query: string): Promise<SearchResult[]
   if (term.length < SEARCH_MIN_LENGTH) return [];
   const p = like(term);
 
+  // Sắp xếp kèm khoá phụ (created_at, id) để kết quả ổn định khi `sort` trùng nhau.
   const [catsRes, seriesRes, modelsRes, prodsRes] = await Promise.all([
     supabase
       .from("categories")
       .select(sel("id, slug, name, image_key, image_url"))
       .ilike("name", p)
       .order("sort")
+      .order("created_at")
+      .order("id")
       .limit(LIMIT_PER_LEVEL)
       .returns<CatRow[]>(),
     supabase
@@ -78,6 +81,8 @@ export async function searchCatalogServer(query: string): Promise<SearchResult[]
       .select(sel("id, slug, name, image_key, image_url, categories!inner(slug, name)"))
       .ilike("name", p)
       .order("sort")
+      .order("created_at")
+      .order("id")
       .limit(LIMIT_PER_LEVEL)
       .returns<SeriesRow[]>(),
     supabase
@@ -89,6 +94,8 @@ export async function searchCatalogServer(query: string): Promise<SearchResult[]
       )
       .or(`name.ilike.${p},years.ilike.${p}`)
       .order("sort")
+      .order("created_at")
+      .order("id")
       .limit(LIMIT_PER_LEVEL)
       .returns<ModelRow[]>(),
     supabase
@@ -100,6 +107,8 @@ export async function searchCatalogServer(query: string): Promise<SearchResult[]
       )
       .or(`name.ilike.${p},brand.ilike.${p},form_code.ilike.${p}`)
       .order("sort")
+      .order("created_at")
+      .order("id")
       .limit(LIMIT_PER_LEVEL)
       .returns<ProdRow[]>(),
   ]);

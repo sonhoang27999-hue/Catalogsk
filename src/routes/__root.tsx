@@ -17,6 +17,7 @@ import { ThemeApplier } from "@/components/ThemeApplier";
 import { supabase } from "@/integrations/supabase/client";
 import { useCatalogRealtime } from "@/data/catalog.realtime";
 import { useAccessLog } from "@/hooks/useAccessLog";
+import { settingsQueryOptions } from "@/data/settings.api";
 
 function NotFoundComponent() {
   return (
@@ -79,6 +80,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Nạp cấu hình giao diện (ảnh bìa, màu sắc) ngay từ server để khách và admin
+  // thấy giao diện GIỐNG HỆT NHAU ở lần vẽ đầu tiên. Lỗi mạng không làm sập trang.
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(settingsQueryOptions).catch(() => null),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -153,9 +158,10 @@ function RootComponent() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-      else queryClient.clear();
+      // queryClient.clear() huỷ các truy vấn đang chạy → useSuspenseQuery ném
+      // CancelledError và làm trắng trang. Chỉ cần đánh dấu dữ liệu cũ và nạp lại.
+      queryClient.invalidateQueries();
+      void router.invalidate();
     });
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);

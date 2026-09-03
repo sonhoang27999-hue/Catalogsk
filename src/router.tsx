@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
@@ -21,10 +22,15 @@ export const getRouter = () => {
     scrollRestoration: true,
     // Nạp trước dữ liệu khi người dùng chạm/di chuột vào liên kết.
     defaultPreload: "intent",
-    defaultPreloadStaleTime: 60_000,
+    // React Query quản lý độ tươi của cache (staleTime ở trên).
+    defaultPreloadStaleTime: 0,
     defaultPendingMs: 120,
     defaultPendingMinMs: 250,
   });
+
+  // Chuyển cache truy vấn từ server sang client khi SSR: khách thấy đúng
+  // banner/màu sắc/danh mục ngay ở lần vẽ đầu tiên, không còn "nháy" dữ liệu mặc định.
+  setupRouterSsrQueryIntegration({ router, queryClient });
 
   return router;
 };

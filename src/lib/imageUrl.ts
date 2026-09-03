@@ -32,15 +32,15 @@ export const IMAGE_WIDTHS: Record<Exclude<ImageSize, "original">, number> = {
 /** Tương thích ngược với tên cũ. */
 export const LEGACY_FULL: ImageSize = "detail";
 
-/** Nhân theo mật độ điểm ảnh của máy (giới hạn 2x) để ảnh không bị rỗ trên màn retina. */
-const dpr = (): number => {
-  if (typeof window === "undefined") return 1;
-  return Math.min(2, Math.max(1, Math.round(window.devicePixelRatio || 1)));
-};
-
+/**
+ * Chiều rộng mục tiêu — CỐ ĐỊNH (không phụ thuộc devicePixelRatio).
+ * Lý do: URL phải giống hệt nhau giữa server-render và trình duyệt để không
+ * hydration-mismatch / tải ảnh 2 lần. Màn retina được phục vụ bản 2x qua
+ * `srcSet` (xem imageSrcSet) — trình duyệt tự chọn, chất lượng không đổi.
+ */
 const targetWidth = (size: ImageSize): number | null => {
   if (size === "original") return null;
-  return Math.round(IMAGE_WIDTHS[size] * (size === "detail" ? 1 : dpr()));
+  return IMAGE_WIDTHS[size];
 };
 
 /**
@@ -93,17 +93,8 @@ const driveIdOf = (url: string): string | null =>
   /[?&]id=([^&#]+)/.exec(url)?.[1] ??
   null;
 
-/**
- * Áp kích thước mong muốn nếu NGUỒN hỗ trợ; nếu không thì trả về chính URL đã chuẩn hoá.
- */
-export const imageUrl = (raw: string | null | undefined, size: ImageSize = "preview"): string => {
-  const url = normalizeImageUrl(raw ?? "");
-  if (!url) return "";
-  const w = targetWidth(size);
-
-  // Ảnh bundle nội bộ (đã được Vite tối ưu), data URI, hoặc yêu cầu ảnh gốc → giữ nguyên
-  if (!w || url.startsWith("/") || url.startsWith("data:")) return url;
-
+/** Tạo URL đã resize về chiều rộng `w` nếu nguồn hỗ trợ; ngược lại trả null. */
+const resizeTo = (url: string, w: number): string | null => {
   // Google Drive: endpoint thumbnail nhận tham số sz=w<width>
   const driveId = driveIdOf(url);
   if (driveId) return `https://drive.google.com/thumbnail?id=${driveId}&sz=w${w}`;
@@ -126,8 +117,43 @@ export const imageUrl = (raw: string | null | undefined, size: ImageSize = "prev
   if (/ik\.imagekit\.io\//.test(url)) return `${url}${url.includes("?") ? "&" : "?"}tr=w-${w}`;
   if (/images\.weserv\.nl\//.test(url)) return `${url}${url.includes("?") ? "&" : "?"}w=${w}&q=90`;
 
+  return null;
+};
+
+/**
+ * Áp kích thước mong muốn nếu NGUỒN hỗ trợ; nếu không thì trả về chính URL đã chuẩn hoá.
+ */
+export const imageUrl = (raw: string | null | undefined, size: ImageSize = "preview"): string => {
+  const url = normalizeImageUrl(raw ?? "");
+  if (!url) return "";
+  const w = targetWidth(size);
+
+  // Ảnh bundle nội bộ (đã được Vite tối ưu), data URI, hoặc yêu cầu ảnh gốc → giữ nguyên
+  if (!w || url.startsWith("/") || url.startsWith("data:")) return url;
+
   // Nguồn không hỗ trợ resize (Dropbox, GitHub raw, Imgur, host tự do...) → dùng ảnh gốc
-  return url;
+  return resizeTo(url, w) ?? url;
+};
+
+/**
+ * `srcset` 1x/2x cho nguồn hỗ trợ resize: trình duyệt tự chọn bản 2x trên màn
+ * retina → ảnh sắc nét như trước, còn máy thường chỉ tải bản nhẹ hơn.
+ * Trả undefined với nguồn không resize được (giữ nguyên hành vi cũ).
+ */
+export const imageSrcSet = (
+  raw: string | null | undefined,
+  size: ImageSize = "preview",
+): string | undefined => {
+  // detail đã đủ lớn (2600px) — không nhân đôi để tránh phóng to quá ảnh gốc.
+  if (size === "original" || size === "detail") return undefined;
+  const url = normalizeImageUrl(raw ?? "");
+  if (!url || url.startsWith("/") || url.startsWith("data:")) return undefined;
+  const w = targetWidth(size);
+  if (!w) return undefined;
+  const x1 = resizeTo(url, w);
+  const x2 = resizeTo(url, w * 2);
+  if (!x1 || !x2) return undefined;
+  return `${x1} ${w}w, ${x2} ${w * 2}w`;
 };
 
 /** Nguồn ảnh này có tạo được biến thể nhỏ hơn không (dùng để quyết định có nên tải "ảnh gốc" riêng). */
@@ -141,6 +167,22 @@ export const supportsResize = (raw: string | null | undefined): boolean => {
     /ik\.imagekit\.io\//.test(url) ||
     /images\.weserv\.nl\//.test(url)
   );
+};
+
+/**
+ * Proxy ảnh công cộng (images.weserv.nl): tải CÙNG ảnh gốc qua CDN trung gian
+ * đáng tin cậy. Dùng làm dự phòng khi host gốc chặn hotlink / chặn theo IP /
+ * mạng chập chờn — nhờ đó khách vãng lai vẫn thấy ĐÚNG ảnh admin đã chọn,
+ * không bao giờ rơi về ảnh mặc định chỉ vì host bên thứ ba khó tính.
+ */
+const weservProxy = (url: string, size: ImageSize): string | null => {
+  if (!/^https?:\/\//i.test(url)) return null;
+  // Đã là proxy/nguồn nội bộ ổn định thì không cần bọc thêm.
+  if (/images\.weserv\.nl|wsrv\.nl/.test(url)) return null;
+  if (/\/storage\/v1\/(object|render\/image)\/public\//.test(url)) return null;
+  const w = targetWidth(size);
+  const base = `https://images.weserv.nl/?url=${encodeURIComponent(url)}`;
+  return w ? `${base}&w=${w}&q=90` : base;
 };
 
 /**
@@ -168,6 +210,10 @@ export const imageCandidates = (raw: string, size: ImageSize = "preview"): strin
       original.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace(/[?&]raw=1/, ""),
     );
   }
+
+  // Dự phòng qua proxy CDN: cùng ảnh gốc, đường truyền khác (chống hotlink-block).
+  const proxied = weservProxy(original, size);
+  if (proxied) out.push(proxied);
 
   // Luôn giữ link gốc làm chốt chặn cuối (phòng khi biến thể resize lỗi)
   out.push(original);

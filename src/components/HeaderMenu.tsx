@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
@@ -7,10 +7,29 @@ import { supabase } from "@/integrations/supabase/client";
 import { displayLogin } from "@/lib/username";
 import { useAdmin } from "@/hooks/useAdmin";
 import { usePendingDealerApplications } from "@/hooks/usePendingDealerApplications";
-import { ChangePassword } from "@/components/ChangePassword";
-import { ThemeManager } from "@/components/admin/ThemeManager";
-import { AdminSettings } from "@/components/admin/AdminSettings";
-import { Dealer1Accounts } from "@/components/admin/Dealer1Accounts";
+
+/**
+ * TỐI ƯU TỐC ĐỘ: các module quản trị (nhập Excel/xlsx, sao lưu, tài khoản, chủ đề màu)
+ * rất nặng và CHỈ người đăng nhập mới dùng — tách khỏi bundle khách vãng lai,
+ * chỉ tải khi mở menu với quyền phù hợp.
+ */
+const AdminSettings = lazy(() =>
+  import("@/components/admin/AdminSettings").then((m) => ({ default: m.AdminSettings })),
+);
+const ThemeManager = lazy(() =>
+  import("@/components/admin/ThemeManager").then((m) => ({ default: m.ThemeManager })),
+);
+const Dealer1Accounts = lazy(() =>
+  import("@/components/admin/Dealer1Accounts").then((m) => ({ default: m.Dealer1Accounts })),
+);
+const ChangePassword = lazy(() =>
+  import("@/components/ChangePassword").then((m) => ({ default: m.ChangePassword })),
+);
+
+/** Ô chờ nhỏ trong lúc tải module quản trị (chỉ admin thấy, thoáng qua). */
+function MenuItemSkeleton() {
+  return <div className="h-9 w-full animate-pulse rounded-md bg-muted" />;
+}
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,10 +57,22 @@ export function HeaderMenu() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Làm ấm module quản trị ở nền SAU khi đã biết quyền — mở menu không phải chờ tải.
+  useEffect(() => {
+    if (!email) return;
+    void import("@/components/ChangePassword");
+    if (canSettings) {
+      void import("@/components/admin/AdminSettings");
+      void import("@/components/admin/ThemeManager");
+    } else if (isDealer1) {
+      void import("@/components/admin/Dealer1Accounts");
+    }
+  }, [email, canSettings, isDealer1]);
+
   const signOut = async () => {
-    await qc.cancelQueries();
-    qc.clear();
+    // Không cancel/clear cache: sẽ làm useSuspenseQuery ném CancelledError (trắng trang).
     await supabase.auth.signOut();
+    await qc.invalidateQueries();
     setOpen(false);
     toast.success("Đã đăng xuất");
     navigate({ to: "/", replace: true });
@@ -98,8 +129,12 @@ export function HeaderMenu() {
                 </div>
                 {canSettings ? (
                   <>
-                    <AdminSettings pendingCount={pendingCount} isAdmin={isAdmin} />
-                    <ThemeManager />
+                    <Suspense fallback={<MenuItemSkeleton />}>
+                      <AdminSettings pendingCount={pendingCount} isAdmin={isAdmin} />
+                    </Suspense>
+                    <Suspense fallback={<MenuItemSkeleton />}>
+                      <ThemeManager />
+                    </Suspense>
                     <Button
                       variant="outline"
                       className="w-full"
@@ -112,9 +147,15 @@ export function HeaderMenu() {
                     </Button>
                   </>
                 ) : null}
-                {!canSettings && isDealer1 ? <Dealer1Accounts /> : null}
+                {!canSettings && isDealer1 ? (
+                  <Suspense fallback={<MenuItemSkeleton />}>
+                    <Dealer1Accounts />
+                  </Suspense>
+                ) : null}
 
-                <ChangePassword />
+                <Suspense fallback={<MenuItemSkeleton />}>
+                  <ChangePassword />
+                </Suspense>
 
                 <Button variant="outline" className="w-full" onClick={signOut}>
                   <LogOut className="size-4" /> Đăng xuất

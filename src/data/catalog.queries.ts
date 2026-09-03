@@ -170,9 +170,20 @@ const fail = (error: { message: string } | null) => {
 /* Fetchers                                                                   */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * QUAN TRỌNG: mọi truy vấn đều sắp xếp `sort` kèm khoá phụ `created_at, id`.
+ * Nếu chỉ order theo `sort` mà có giá trị trùng nhau, Postgres trả thứ tự NGẪU NHIÊN
+ * theo từng lần gọi → khách chưa đăng nhập và admin nhìn thấy thứ tự khác nhau.
+ */
+
 /** Trang chủ: chỉ danh sách hãng xe. */
 export async function fetchCategories(): Promise<Category[]> {
-  const res = await supabase.from("categories").select(CATEGORY_COLS).order("sort");
+  const res = await supabase
+    .from("categories")
+    .select(CATEGORY_COLS)
+    .order("sort")
+    .order("created_at")
+    .order("id");
   fail(res.error);
   return (res.data ?? []).map((c) => toCategory(c as CategoryRowLite));
 }
@@ -193,14 +204,28 @@ export async function fetchCategoryDetail(slug: string): Promise<Category | null
   if (!row) return null;
 
   const [seriesRes, nodesRes, rootProductsRes] = await Promise.all([
-    supabase.from("series").select(SERIES_COLS).eq("category_id", row.id).order("sort"),
-    supabase.from("nodes").select(NODE_COLS).eq("category_id", row.id).order("sort"),
+    supabase
+      .from("series")
+      .select(SERIES_COLS)
+      .eq("category_id", row.id)
+      .order("sort")
+      .order("created_at")
+      .order("id"),
+    supabase
+      .from("nodes")
+      .select(NODE_COLS)
+      .eq("category_id", row.id)
+      .order("sort")
+      .order("created_at")
+      .order("id"),
     supabase
       .from("products")
       .select(PRODUCT_COLS)
       .eq("category_id", row.id)
       .is("node_id", null)
-      .order("sort"),
+      .order("sort")
+      .order("created_at")
+      .order("id"),
   ]);
   fail(seriesRes.error ?? nodesRes.error ?? rootProductsRes.error);
 
@@ -241,7 +266,9 @@ export async function fetchSeriesDetail(
     .from("models")
     .select(MODEL_COLS)
     .eq("series_id", s.id)
-    .order("sort");
+    .order("sort")
+    .order("created_at")
+    .order("id");
   fail(modelsRes.error);
   const modelRows = modelsRes.data ?? [];
   const modelIds = modelRows.map((m) => m.id);
@@ -249,7 +276,13 @@ export async function fetchSeriesDetail(
   // Không N+1: lấy toàn bộ products/videos của các model bằng 2 truy vấn `in(...)`.
   const [productsRes, videosRes] = await Promise.all([
     modelIds.length
-      ? supabase.from("products").select(PRODUCT_COLS).in("model_id", modelIds).order("sort")
+      ? supabase
+          .from("products")
+          .select(PRODUCT_COLS)
+          .in("model_id", modelIds)
+          .order("sort")
+          .order("created_at")
+          .order("id")
       : Promise.resolve({ data: [], error: null }),
     modelIds.length
       ? supabase
@@ -257,6 +290,8 @@ export async function fetchSeriesDetail(
           .select("id, model_id, title, url, sort")
           .in("model_id", modelIds)
           .order("sort")
+          .order("created_at")
+          .order("id")
       : Promise.resolve({ data: [], error: null }),
   ]);
   fail(productsRes.error ?? videosRes.error);
@@ -310,8 +345,20 @@ export async function fetchNodeDetail(
   if (!row) return null;
 
   const [nodesRes, productsRes] = await Promise.all([
-    supabase.from("nodes").select(NODE_COLS).eq("category_id", row.id).order("sort"),
-    supabase.from("products").select(PRODUCT_COLS).eq("node_id", nodeId).order("sort"),
+    supabase
+      .from("nodes")
+      .select(NODE_COLS)
+      .eq("category_id", row.id)
+      .order("sort")
+      .order("created_at")
+      .order("id"),
+    supabase
+      .from("products")
+      .select(PRODUCT_COLS)
+      .eq("node_id", nodeId)
+      .order("sort")
+      .order("created_at")
+      .order("id"),
   ]);
   fail(nodesRes.error ?? productsRes.error);
 

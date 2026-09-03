@@ -69,17 +69,27 @@ const unwrap = <T>(res: { data: T | null; error: { message: string } | null }): 
 };
 
 export const listCategories = async () =>
-  unwrap(await supabase.from("categories").select("*").order("sort")) as CategoryRow[];
+  unwrap(
+    await supabase.from("categories").select("*").order("sort").order("created_at").order("id"),
+  ) as CategoryRow[];
 
 export const listSeries = async () =>
-  unwrap(await supabase.from("series").select("*").order("sort")) as SeriesRow[];
+  unwrap(
+    await supabase.from("series").select("*").order("sort").order("created_at").order("id"),
+  ) as SeriesRow[];
 
 export const listModels = async () =>
-  unwrap(await supabase.from("models").select("*").order("sort")) as ModelRow[];
+  unwrap(
+    await supabase.from("models").select("*").order("sort").order("created_at").order("id"),
+  ) as ModelRow[];
 
 export const listProducts = async () =>
   unwrap(
-    await supabase.from("products").select("*").order("created_at", { ascending: false }),
+    await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .order("id"),
   ) as ProductRow[];
 
 type Table = "categories" | "series" | "models" | "products" | "nodes" | "videos";
@@ -224,6 +234,8 @@ export const ensureDefaultModel = async (seriesDbId: string, seriesName: string)
     .select("id")
     .eq("series_id", seriesDbId)
     .order("sort")
+    .order("created_at")
+    .order("id")
     .limit(1)
     .maybeSingle();
   if (existing.error) throw new Error(existing.error.message);

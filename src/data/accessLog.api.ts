@@ -22,8 +22,10 @@ function primaryRole(roles: string[]) {
 
 /** Ghi một lượt truy cập của người dùng đang đăng nhập (bỏ qua nếu chưa đăng nhập). */
 export const logAccess = async (event: "login" | "view", path: string) => {
-  const { data } = await supabase.auth.getUser();
-  const user = data.user;
+  // getSession() đọc phiên tại chỗ (không gọi mạng) — tránh 1 round-trip /auth/v1/user
+  // cho MỖI lượt xem trang. RLS phía Cloud vẫn xác thực bằng token khi insert.
+  const { data } = await supabase.auth.getSession();
+  const user = data.session?.user;
   if (!user) return;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase.from("access_logs") as any).insert({
