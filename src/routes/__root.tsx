@@ -41,7 +41,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -112,9 +112,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "manifest", href: "/manifest.json" },
-      { rel: "apple-touch-icon", href: "/favicon.ico" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -217,8 +217,8 @@ function RootComponent() {
       ) : (
         <>
           {/* Điện thoại/tablet: khung 480px như cũ. Desktop: khung app nổi trên nền gradient. */}
-          <div className="min-h-screen bg-secondary/40 lg:flex lg:items-start lg:justify-center lg:bg-[radial-gradient(120%_120%_at_50%_0%,color-mix(in_oklab,var(--brand)_18%,var(--background))_0%,var(--background)_60%)] lg:py-8">
-            <div className="mx-auto min-h-screen w-full max-w-[480px] bg-background pb-10 shadow-sm lg:min-h-[calc(100vh-4rem)] lg:overflow-hidden lg:rounded-[28px] lg:border lg:border-border lg:pb-16 lg:shadow-2xl">
+          <div className="min-h-screen lux-ambient lg:flex lg:items-start lg:justify-center lg:bg-[radial-gradient(120%_120%_at_50%_0%,color-mix(in_oklab,var(--brand)_18%,var(--background))_0%,var(--background)_60%)] lg:py-8">
+            <div className="mx-auto min-h-screen w-full max-w-[480px] bg-background pb-10 shadow-sm lg:min-h-[calc(100vh-4rem)] lg:overflow-hidden lg:rounded-[28px] lg:pb-16 lg:lux-frame">
               <Outlet />
             </div>
           </div>

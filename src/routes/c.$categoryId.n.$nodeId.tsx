@@ -37,7 +37,7 @@ export const Route = createFileRoute("/c/$categoryId/n/$nodeId")({
   ),
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-center text-sm text-destructive">
-      {error.message}
+      {error instanceof Error ? error.message : String(error)}
     </div>
   ),
   component: NodePage,

@@ -19,6 +19,9 @@ const AdminSettings = lazy(() =>
 const ThemeManager = lazy(() =>
   import("@/components/admin/ThemeManager").then((m) => ({ default: m.ThemeManager })),
 );
+const GuideLinkManager = lazy(() =>
+  import("@/components/admin/GuideLinkManager").then((m) => ({ default: m.GuideLinkManager })),
+);
 const Dealer1Accounts = lazy(() =>
   import("@/components/admin/Dealer1Accounts").then((m) => ({ default: m.Dealer1Accounts })),
 );
@@ -135,6 +138,11 @@ export function HeaderMenu() {
                     <Suspense fallback={<MenuItemSkeleton />}>
                       <ThemeManager />
                     </Suspense>
+                    {isAdmin ? (
+                      <Suspense fallback={<MenuItemSkeleton />}>
+                        <GuideLinkManager />
+                      </Suspense>
+                    ) : null}
                     <Button
                       variant="outline"
                       className="w-full"

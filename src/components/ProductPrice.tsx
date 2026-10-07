@@ -17,7 +17,7 @@ export function ProductPrice({ price, salePrice, dealerPrice, canViewDealerPrice
 
   return (
     <div className="rounded-lg border border-border bg-secondary/60 p-3">
-      <div className="flex items-end justify-between gap-3">
+      <div className="lux-price flex items-end justify-between gap-3 rounded-xl px-3 py-2.5">
         <div className="min-w-0">
           <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             {onSale ? "Giá khuyến mãi" : "Giá niêm yết"}

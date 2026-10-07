@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { useState } from "react";
+import { BookOpen, ChevronRight } from "lucide-react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { AddTile } from "@/components/admin/AddTile";
 import { SortControls } from "@/components/admin/SortControls";
@@ -76,12 +78,30 @@ function Home() {
     <div>
       <HomeBanner />
 
+
       <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-card/95 px-3 py-2 backdrop-blur">
         <div className="flex-1">
           <SearchBar value={query} onChange={setQuery} />
         </div>
         <HeaderMenu />
       </div>
+
+      {/* Hướng dẫn sử dụng LED: đặt ngay dưới ô tìm kiếm để khách thấy ngay khi mở trang. */}
+      <Link
+        to="/huong-dan-su-dung"
+        className="mx-3 mt-3 flex items-center gap-3 rounded-lg bg-secondary/60 px-3 py-2.5 lux-hairline lux-press"
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-brand">
+          <BookOpen className="size-4" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-foreground">Hướng dẫn sử dụng LED</span>
+          <span className="block truncate text-xs text-muted-foreground">
+            4 bước kích hoạt, tải app và điều khiển LED nội thất
+          </span>
+        </span>
+        <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground" />
+      </Link>
 
       {query ? (
         <section className="p-3">
@@ -145,7 +165,7 @@ function Home() {
                   params={{ categoryId: c.id }}
                   className="flex w-full flex-col items-center gap-1.5"
                 >
-                  <span className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-card text-brand transition-colors hover:border-gold active:border-gold focus-visible:border-gold">
+                  <span className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg lux-hairline lux-press text-brand">
                     {c.image && /^https?:\/\//.test(c.image) ? (
                       <SmartImage
                         src={c.image}

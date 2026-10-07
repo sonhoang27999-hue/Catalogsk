@@ -128,7 +128,15 @@ export const imageUrl = (raw: string | null | undefined, size: ImageSize = "prev
   if (!url) return "";
   const w = targetWidth(size);
 
-  // Ảnh bundle nội bộ (đã được Vite tối ưu), data URI, hoặc yêu cầu ảnh gốc → giữ nguyên
+  // Ảnh gốc: KHÔNG được giới hạn kích thước. Google Drive bị `normalizeImageUrl`
+  // đưa về endpoint thumbnail (mặc định w1600) nên phải chuyển sang endpoint
+  // trả ảnh nguyên bản (lh3 với =s0) — nếu không, "Xem ảnh gốc" chỉ ra bản thu nhỏ.
+  if (size === "original") {
+    const id = driveIdOf(url);
+    return id ? `https://lh3.googleusercontent.com/d/${id}=s0` : url;
+  }
+
+  // Ảnh bundle nội bộ (đã được Vite tối ưu), data URI → giữ nguyên
   if (!w || url.startsWith("/") || url.startsWith("data:")) return url;
 
   // Nguồn không hỗ trợ resize (Dropbox, GitHub raw, Imgur, host tự do...) → dùng ảnh gốc
@@ -198,10 +206,11 @@ export const imageCandidates = (raw: string, size: ImageSize = "preview"): strin
   const driveId = driveIdOf(original);
   if (driveId) {
     out.push(
-      `https://lh3.googleusercontent.com/d/${driveId}${size === "original" ? "" : `=w${targetWidth(size)}`}`,
+      `https://lh3.googleusercontent.com/d/${driveId}${size === "original" ? "=s0" : `=w${targetWidth(size)}`}`,
       `https://drive.google.com/uc?export=view&id=${driveId}`,
-      `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`,
     );
+    // Dự phòng cuối của Drive: KHÔNG dùng bản thu nhỏ khi user yêu cầu ảnh gốc.
+    if (size !== "original") out.push(`https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`);
   }
 
   // Dropbox: thử cả endpoint dl.dropboxusercontent.com

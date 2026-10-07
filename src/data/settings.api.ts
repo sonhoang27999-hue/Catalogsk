@@ -7,6 +7,12 @@ export const HOME_BANNER_KEY = "home_banner_url";
 /** Ghi chú cuối trang danh sách sản phẩm (VAT, liên hệ đại lý). */
 export const PRODUCT_NOTE_KEY = "product_list_note";
 
+/** Đường dẫn trang Hướng dẫn sử dụng LED (chỉ admin sửa). */
+export const GUIDE_SOURCE_KEY = "guide_source_url";
+export const GUIDE_IOS_KEY = "guide_ios_url";
+export const GUIDE_APK_KEY = "guide_apk_url";
+export const GUIDE_LINK_KEYS = [GUIDE_SOURCE_KEY, GUIDE_IOS_KEY, GUIDE_APK_KEY] as const;
+
 export const settingsQueryOptions = queryOptions({
   queryKey: ["site-settings"],
   queryFn: async () => {

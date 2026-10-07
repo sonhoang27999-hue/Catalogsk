@@ -79,7 +79,7 @@ function SeriesPage() {
         ) : null}
         {products.map((p, i) => (
           <div key={p.id} className="space-y-1">
-            <div className="block overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="block overflow-hidden rounded-2xl lux-hairline">
               <div className="bg-secondary px-3 py-3">
                 <h2 className="text-base leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
@@ -88,7 +88,7 @@ function SeriesPage() {
                   </p>
                 ) : null}
               </div>
-              <div className="w-full bg-muted">
+              <div className="relative w-full bg-muted">
                 <ImageZoom src={p.image} alt={p.name}>
                   <SmartImage
                     src={p.image}
@@ -98,6 +98,11 @@ function SeriesPage() {
                     className="block h-auto w-full object-contain"
                   />
                 </ImageZoom>
+                {toEmbedUrl(p.videoUrl) || p.detailUrl ? (
+                  <span className="pointer-events-none absolute top-2 left-2 rounded-full bg-background/75 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-gold ring-1 ring-gold/40 backdrop-blur">
+                    {toEmbedUrl(p.videoUrl) ? "Video thực tế" : "Ảnh thực tế"}
+                  </span>
+                ) : null}
               </div>
 
               {p.detailUrl ? (
@@ -105,7 +110,7 @@ function SeriesPage() {
                   href={p.detailUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 border-t border-border bg-secondary px-3 py-3 text-center text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                  className="flex items-center justify-center gap-1.5 lux-cta px-3 py-3 text-center text-sm font-semibold"
                 >
                   Xem sản phẩm lên xe thực tế
                   <ExternalLink className="size-3.5 shrink-0" />

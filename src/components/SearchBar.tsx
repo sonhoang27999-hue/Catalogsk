@@ -18,7 +18,7 @@ export function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label="Tìm kiếm"
-        className="h-11 w-full rounded-md border border-border bg-card pr-9 pl-9 text-sm outline-none placeholder:text-muted-foreground focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="h-11 w-full rounded-md border border-border bg-card pr-9 pl-9 text-sm outline-none placeholder:text-muted-foreground lux-search"
       />
       {value ? (
         <button

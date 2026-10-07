@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnhLoiRouteImport } from './routes/anh-loi'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DangKyDaiLyRouteImport } from './routes/dang-ky-dai-ly'
+import { Route as HuongDanSuDungRouteImport } from './routes/huong-dan-su-dung'
 import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
 import { Route as CCategoryIdSeriesIdRouteImport } from './routes/c.$categoryId.$seriesId'
 import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n.$nodeId'
@@ -37,6 +38,11 @@ const DangKyDaiLyRoute = DangKyDaiLyRouteImport.update({
   path: '/dang-ky-dai-ly',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HuongDanSuDungRoute = HuongDanSuDungRouteImport.update({
+  id: '/huong-dan-su-dung',
+  path: '/huong-dan-su-dung',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CCategoryIdRoute = CCategoryIdRouteImport.update({
   id: '/c/$categoryId',
   path: '/c/$categoryId',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
+  '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
+  '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
+  '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/anh-loi'
     | '/auth'
     | '/dang-ky-dai-ly'
+    | '/huong-dan-su-dung'
     | '/c/$categoryId'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/anh-loi'
     | '/auth'
     | '/dang-ky-dai-ly'
+    | '/huong-dan-su-dung'
     | '/c/$categoryId'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/anh-loi'
     | '/auth'
     | '/dang-ky-dai-ly'
+    | '/huong-dan-su-dung'
     | '/c/$categoryId'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AnhLoiRoute: typeof AnhLoiRoute
   AuthRoute: typeof AuthRoute
   DangKyDaiLyRoute: typeof DangKyDaiLyRoute
+  HuongDanSuDungRoute: typeof HuongDanSuDungRoute
   CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
 }
 
@@ -147,6 +160,13 @@ declare module '@tanstack/react-router' {
       path: '/dang-ky-dai-ly'
       fullPath: '/dang-ky-dai-ly'
       preLoaderRoute: typeof DangKyDaiLyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/huong-dan-su-dung': {
+      id: '/huong-dan-su-dung'
+      path: '/huong-dan-su-dung'
+      fullPath: '/huong-dan-su-dung'
+      preLoaderRoute: typeof HuongDanSuDungRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/c/$categoryId': {
@@ -192,6 +212,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnhLoiRoute: AnhLoiRoute,
   AuthRoute: AuthRoute,
   DangKyDaiLyRoute: DangKyDaiLyRoute,
+  HuongDanSuDungRoute: HuongDanSuDungRoute,
   CCategoryIdRoute: CCategoryIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport

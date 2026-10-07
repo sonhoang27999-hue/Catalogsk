@@ -63,7 +63,7 @@ export function NodeLevel({
               <Link
                 to="/c/$categoryId/n/$nodeId"
                 params={{ categoryId, nodeId: n.id }}
-                className="overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-gold active:border-gold focus-visible:border-gold"
+                className="overflow-hidden rounded-lg lux-hairline lux-press"
               >
                 <SmartImage
                   src={n.image}
@@ -98,7 +98,7 @@ export function NodeLevel({
       <div className="space-y-4 pb-3">
         {products.map((p, i) => (
           <div key={p.id} className="space-y-1">
-            <div className="block overflow-hidden border-y border-border bg-card">
+            <div className="block overflow-hidden lux-hairline">
               <div className="bg-secondary px-3 py-3">
                 <h2 className="text-base leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
@@ -123,7 +123,7 @@ export function NodeLevel({
                   href={p.detailUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block border-t border-border bg-secondary px-3 py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-gold hover:text-gold-foreground"
+                  className="block lux-cta px-3 py-3 text-center text-sm font-semibold"
                 >
                   Xem sản phẩm hoàn thiện lên xe
                 </a>

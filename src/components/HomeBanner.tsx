@@ -40,7 +40,8 @@ export function HomeBanner() {
   });
 
   return (
-    <div className="relative bg-card px-3 pt-3">
+    <div className="relative bg-transparent px-3 pt-3">
+      <div className="lux-hero-fade relative overflow-hidden rounded-lg">
       <SmartImage
         src={src}
         alt="Phụ kiện ô tô cao cấp"
@@ -54,6 +55,7 @@ export function HomeBanner() {
         fallback={defaultBanner}
         className="aspect-video w-full rounded-lg object-cover"
       />
+      </div>
 
 
       {isAdmin ? (
