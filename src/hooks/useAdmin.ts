@@ -24,6 +24,7 @@ const NO_ROLES = {
   isManager: false,
   isDealer1: false,
   canViewDealerPrice: false,
+  priceMode: "both" as "excl" | "incl" | "both",
 };
 
 export function useAdmin() {
@@ -53,13 +54,17 @@ export function useAdmin() {
     gcTime: 10 * 60_000,
     queryFn: async () => {
       if (!userId) return NO_ROLES;
-      const [isAdmin, isManager, isDealer1, canViewDealerPrice] = await Promise.all([
+      const [isAdmin, isManager, isDealer1, canViewDealerPrice, modeRes] = await Promise.all([
         checkIsAdmin(userId),
         checkIsManager(userId),
         checkIsDealer1(userId),
         checkCanViewDealerPrice(userId),
+        supabase.from("dealer_price_modes").select("mode").eq("user_id", userId).maybeSingle(),
       ]);
-      return { isAdmin, isManager, isDealer1, canViewDealerPrice };
+      // Admin, quản trị viên, đại lý cấp 1 luôn xem cả 2 giá; đại lý theo cấu hình (mặc định cả 2).
+      const raw = (modeRes.data?.mode ?? "both") as "excl" | "incl" | "both";
+      const priceMode = isAdmin || isManager || isDealer1 ? "both" : raw;
+      return { isAdmin, isManager, isDealer1, canViewDealerPrice, priceMode };
     },
   });
 
@@ -85,6 +90,7 @@ export function useAdmin() {
     canManage: data.isAdmin || data.isManager,
     isDealer1: data.isDealer1,
     canViewDealerPrice: data.canViewDealerPrice,
+    priceMode: data.priceMode,
     isAuthenticated: typeof userId === "string",
     ready: userId !== undefined && (userId === null || roles.isSuccess || roles.isError),
   };

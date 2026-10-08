@@ -131,6 +131,24 @@ export type Database = {
         }
         Relationships: []
       }
+      dealer_price_modes: {
+        Row: {
+          mode: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          mode?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          mode?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       models: {
         Row: {
           created_at: string
@@ -227,18 +245,21 @@ export type Database = {
         Row: {
           created_at: string
           dealer_price: number | null
+          dealer_price_vat: number | null
           product_id: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           dealer_price?: number | null
+          dealer_price_vat?: number | null
           product_id: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           dealer_price?: number | null
+          dealer_price_vat?: number | null
           product_id?: string
           updated_at?: string
         }

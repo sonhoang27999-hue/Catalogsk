@@ -71,6 +71,9 @@ export const listAccounts = createServerFn({ method: "GET" })
       .from("account_owners")
       .select("user_id, created_by");
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: modes } = await (supabaseAdmin.from("dealer_price_modes" as any) as any).select("user_id, mode");
+    const modeOf = new Map<string, string>(((modes ?? []) as { user_id: string; mode: string }[]).map((m) => [m.user_id, m.mode]));
     const ownerOf = new Map((owners ?? []).map((o) => [o.user_id, o.created_by]));
 
     return data.users
@@ -80,6 +83,7 @@ export const listAccounts = createServerFn({ method: "GET" })
         email: u.email ?? "",
         createdAt: u.created_at,
         roles: (roles ?? []).filter((r) => r.user_id === u.id).map((r) => r.role as string),
+        priceMode: (modeOf.get(u.id) ?? "both") as PriceMode,
       }));
   });
 
@@ -108,6 +112,7 @@ export const createAccount = createServerFn({ method: "POST" })
       password: string;
       priceViewer: boolean;
       dealer1?: boolean;
+      priceMode?: PriceMode;
       role?: "admin" | "manager" | "dealer1" | "dealer" | "user";
     }) => {
       if (!data.email.includes("@")) throw new Error("Tên đăng nhập không hợp lệ.");
@@ -149,6 +154,11 @@ export const createAccount = createServerFn({ method: "POST" })
         if (rErr && !rErr.message.includes("duplicate")) throw new Error(rErr.message);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabaseAdmin.from("dealer_price_modes" as any) as any).upsert({
+        user_id: created.user.id,
+        mode: data.priceMode ?? "both",
+      });
       const { error: oErr } = await supabaseAdmin
         .from("account_owners")
         .upsert({ user_id: created.user.id, created_by: actor.userId });
@@ -225,6 +235,29 @@ export const setAccountDealer1 = createServerFn({ method: "POST" })
         .eq("role", "dealer1");
       if (error) throw new Error(error.message);
     }
+    return { ok: true as const };
+  });
+
+export type PriceMode = "excl" | "incl" | "both";
+
+/** Đặt chế độ xem giá nhập (chưa VAT / đã gồm VAT / cả 2) cho tài khoản đại lý. */
+export const setAccountPriceMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { userId: string; mode: PriceMode }) => {
+    if (!["excl", "incl", "both"].includes(data.mode)) throw new Error("Chế độ không hợp lệ.");
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const actor = await getManager(context as unknown as Ctx);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await assertCanManageUser(actor, data.userId, supabaseAdmin);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabaseAdmin.from("dealer_price_modes" as any) as any).upsert({
+      user_id: data.userId,
+      mode: data.mode,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) throw new Error(error.message);
     return { ok: true as const };
   });
 

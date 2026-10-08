@@ -27,6 +27,8 @@ import {
   setAccountPassword,
   setAccountPriceViewer,
   setAccountRole,
+  setAccountPriceMode,
+  type PriceMode,
   type AccountRole,
 } from "@/lib/accounts.functions";
 import { displayLogin, toLoginEmail } from "@/lib/username";
@@ -59,6 +61,8 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
   const setViewer = useServerFn(setAccountPriceViewer);
   const setRole = useServerFn(setAccountRole);
   const remove = useServerFn(deleteAccount);
+  const setMode = useServerFn(setAccountPriceMode);
+  const [newMode, setNewMode] = useState<PriceMode>("both");
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -79,6 +83,7 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
           password,
           priceViewer: priceViewer || newRole === "dealer1" || newRole === "dealer",
           role: newRole,
+          priceMode: newMode,
         },
       }),
     onSuccess: async () => {
@@ -109,6 +114,15 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
     onError,
   });
 
+
+  const modeMut = useMutation({
+    mutationFn: (v: { userId: string; mode: PriceMode }) => setMode({ data: v }),
+    onSuccess: async () => {
+      await refresh();
+      toast.success("Đã cập nhật quyền xem giá.");
+    },
+    onError,
+  });
 
   const pwdMut = useMutation({
     mutationFn: (v: { userId: string; password: string }) => setPwd({ data: v }),
@@ -191,6 +205,15 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
           </label>
         )}
 
+        {newRole === "dealer" || (!full && priceViewer) ? (
+          <div className="space-y-1">
+            <Label className="flex items-center gap-1.5 text-xs">
+              <Wallet className="size-3.5" /> Quyền xem giá nhập
+            </Label>
+            <PriceModeSelect value={newMode} onChange={setNewMode} />
+          </div>
+        ) : null}
+
         <Button
           className="w-full"
           disabled={!username.trim() || password.length < 6 || createMut.isPending}
@@ -265,6 +288,16 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
                   </Select>
                 </div>
               ) : null}
+              {rowRole === "dealer" ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <Wallet className="size-3.5 shrink-0 text-muted-foreground" />
+                  <PriceModeSelect
+                    small
+                    value={a.priceMode}
+                    onChange={(m) => modeMut.mutate({ userId: a.id, mode: m })}
+                  />
+                </div>
+              ) : null}
             </li>
           );
         })}
@@ -273,5 +306,28 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
         ) : null}
       </ul>
     </div>
+  );
+}
+
+function PriceModeSelect({
+  value,
+  onChange,
+  small,
+}: {
+  value: PriceMode;
+  onChange: (m: PriceMode) => void;
+  small?: boolean;
+}) {
+  return (
+    <Select value={value} onValueChange={(v) => onChange(v as PriceMode)}>
+      <SelectTrigger className={small ? "h-8 text-[11px]" : undefined}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="both">Xem cả 2 giá</SelectItem>
+        <SelectItem value="excl">Chỉ giá chưa VAT</SelectItem>
+        <SelectItem value="incl">Chỉ giá đã gồm VAT</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }
