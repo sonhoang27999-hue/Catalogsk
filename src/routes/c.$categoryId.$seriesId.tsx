@@ -157,6 +157,7 @@ function SeriesPage() {
                     price: p.price,
                     salePrice: p.salePrice ?? null,
                     dealerPrice: p.dealerPrice ?? null,
+                    dealerPriceVat: dealerPricesVat[p.dbId] ?? null,
                     brand: p.brand,
                     origin: p.origin,
                   }}

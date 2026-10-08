@@ -138,12 +138,17 @@ export function parsePriceWorkbook(buffer: ArrayBuffer): PriceRow[] {
       const price = toNumber(head.price >= 0 ? line[head.price] : null);
       if (!price) continue;
       const productName = detail ? `${base || model} - ${detail} chi tiết` : base || model;
+      const dealerPrice = head.dealer >= 0 ? toNumber(line[head.dealer]) : null;
+      let dealerPriceVat = head.dealerVat >= 0 ? toNumber(line[head.dealerVat]) : null;
+      // Thiếu giá đã gồm VAT trong file → tự tính = giá chưa VAT × 1.08, làm tròn xuống nghìn.
+      if (dealerPriceVat === null && dealerPrice !== null)
+        dealerPriceVat = Math.floor((dealerPrice * 1.08) / 1000) * 1000;
       rows.push({
         brand,
         model,
         productName: productName.slice(0, 160),
-        dealerPrice: head.dealer >= 0 ? toNumber(line[head.dealer]) : null,
-        dealerPriceVat: head.dealerVat >= 0 ? toNumber(line[head.dealerVat]) : null,
+        dealerPrice,
+        dealerPriceVat,
         price,
         salePrice: head.sale >= 0 ? toNumber(line[head.sale]) : null,
       });

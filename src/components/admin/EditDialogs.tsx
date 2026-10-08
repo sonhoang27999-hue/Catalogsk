@@ -52,6 +52,7 @@ export type EditValues = {
   price?: number;
   salePrice?: number | null;
   dealerPrice?: number | null;
+  dealerPriceVat?: number | null;
   brand?: string;
   origin?: string;
 };
@@ -107,7 +108,8 @@ export function EditButton({
           sale_price: String(form.salePrice ?? "").trim() ? num(String(form.salePrice)) : null,
         });
         const dealer = String(form.dealerPrice ?? "").trim();
-        await saveDealerPrice(id, dealer ? num(dealer) : null);
+        const dealerVat = String(form.dealerPriceVat ?? "").trim();
+        await saveDealerPrice(id, dealer ? num(dealer) : null, dealerVat ? num(dealerVat) : null);
         return;
       }
 
@@ -240,14 +242,25 @@ export function EditButton({
                     />
                   </Field>
                 </div>
-                <Field label="Giá nhập (cần quyền mới xem được)">
-                  <Input
-                    value={String(form.dealerPrice ?? "")}
-                    inputMode="numeric"
-                    maxLength={12}
-                    onChange={(e) => set("dealerPrice")(e.target.value)}
-                  />
-                </Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Giá nhập chưa VAT">
+                    <Input
+                      value={String(form.dealerPrice ?? "")}
+                      inputMode="numeric"
+                      maxLength={12}
+                      onChange={(e) => set("dealerPrice")(e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Giá nhập đã gồm VAT">
+                    <Input
+                      value={String(form.dealerPriceVat ?? "")}
+                      inputMode="numeric"
+                      maxLength={12}
+                      placeholder="Để trống nếu chưa có"
+                      onChange={(e) => set("dealerPriceVat")(e.target.value)}
+                    />
+                  </Field>
+                </div>
               </>
             ) : null}
 
