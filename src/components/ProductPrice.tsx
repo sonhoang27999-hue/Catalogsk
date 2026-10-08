@@ -3,15 +3,19 @@
  * Giá nhập chỉ hiển thị với tài khoản được cấp quyền xem giá.
  */
 import { formatPrice } from "@/data/catalog.repository";
+import { setDealerVatMode, useDealerVatMode } from "@/hooks/useDealerVatMode";
 
 type Props = {
   price: number;
   salePrice?: number | null | undefined;
   dealerPrice?: number | null | undefined;
+  /** Giá nhập đã gồm VAT nhập từ file Excel. */
+  dealerPriceVat?: number | null | undefined;
   canViewDealerPrice?: boolean | undefined;
 };
 
-export function ProductPrice({ price, salePrice, dealerPrice, canViewDealerPrice }: Props) {
+export function ProductPrice({ price, salePrice, dealerPrice, dealerPriceVat, canViewDealerPrice }: Props) {
+  const vatMode = useDealerVatMode();
   const onSale = salePrice != null && salePrice > 0 && salePrice < price;
   const off = onSale ? Math.round(((price - salePrice) / price) * 100) : 0;
 
@@ -44,17 +48,45 @@ export function ProductPrice({ price, salePrice, dealerPrice, canViewDealerPrice
         ) : null}
       </div>
 
-      {canViewDealerPrice && dealerPrice != null ? (
+      {canViewDealerPrice && (dealerPrice != null || dealerPriceVat != null) ? (
         <div className="mt-2 border-t border-border pt-2">
+          <div
+            role="radiogroup"
+            aria-label="Chế độ giá nhập"
+            className="mb-2 grid grid-cols-2 gap-1 rounded-md border border-border bg-background/60 p-0.5 text-[11px] font-semibold"
+          >
+            {(
+              [
+                ["excl", "Chưa VAT"],
+                ["incl", "Đã gồm VAT"],
+              ] as const
+            ).map(([m, label]) => (
+              <button
+                key={m}
+                type="button"
+                role="radio"
+                aria-checked={vatMode === m}
+                onClick={() => setDealerVatMode(m)}
+                className={`rounded px-2 py-1 transition-colors ${
+                  vatMode === m
+                    ? "bg-gold text-gold-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="flex items-baseline justify-between gap-2">
             <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              GIÁ NHẬP CHƯA GỒM VAT
+              {vatMode === "incl" ? "GIÁ NHẬP ĐÃ GỒM VAT" : "GIÁ NHẬP CHƯA GỒM VAT"}
             </span>
             <span className="text-base font-bold tabular-nums text-success">
-              {formatPrice(dealerPrice)}
+              {(vatMode === "incl" ? dealerPriceVat : dealerPrice) != null
+                ? formatPrice((vatMode === "incl" ? dealerPriceVat : dealerPrice)!)
+                : "Chưa có giá"}
             </span>
           </div>
-          <p className="mt-0.5 text-right text-[11px] font-medium text-muted-foreground">{"\n"}</p>
         </div>
       ) : null}
     </div>

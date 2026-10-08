@@ -10,6 +10,8 @@ export type PriceRow = {
   model: string;
   productName: string;
   dealerPrice: number | null;
+  /** Giá đại lý đã gồm VAT (lấy nguyên từ file Excel). */
+  dealerPriceVat: number | null;
   price: number;
   salePrice: number | null;
 };
@@ -88,12 +90,14 @@ const findHeader = (grid: unknown[][]) => {
 
     if (!cells.some((c) => c.includes("số chi tiết"))) continue;
     let dealer = -1;
+    let dealerVat = -1;
     let price = -1;
     let sale = -1;
     cells.forEach((c, i) => {
       const noVat = c.includes("chưa gồm vat");
       const vat = c.includes("đã gồm vat");
       if (dealer < 0 && c.includes("giá đại l") && noVat) dealer = i;
+      if (dealerVat < 0 && c.includes("giá đại l") && vat) dealerVat = i;
       if (price < 0 && c.includes("giá niêm yết") && vat) price = i;
       if (sale < 0 && c.includes("lắp đặt khuyến mãi") && vat) sale = i;
     });
@@ -104,6 +108,7 @@ const findHeader = (grid: unknown[][]) => {
     return {
       row: r,
       dealer,
+      dealerVat,
       price,
       sale,
       detail: cells.findIndex((c) => c.includes("số chi tiết")),
@@ -138,6 +143,7 @@ export function parsePriceWorkbook(buffer: ArrayBuffer): PriceRow[] {
         model,
         productName: productName.slice(0, 160),
         dealerPrice: head.dealer >= 0 ? toNumber(line[head.dealer]) : null,
+        dealerPriceVat: head.dealerVat >= 0 ? toNumber(line[head.dealerVat]) : null,
         price,
         salePrice: head.sale >= 0 ? toNumber(line[head.sale]) : null,
       });

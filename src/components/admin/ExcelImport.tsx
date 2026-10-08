@@ -233,6 +233,12 @@ export function ExcelImport() {
                         after={d.row.dealerPrice}
                         isNew={d.status === "new"}
                       />
+                      <PriceLine
+                        label="Giá nhập gồm VAT"
+                        before={d.current?.dealerPriceVat ?? null}
+                        after={d.row.dealerPriceVat}
+                        isNew={d.status === "new"}
+                      />
                     </div>
                   </div>
                 </label>

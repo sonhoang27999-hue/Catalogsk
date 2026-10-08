@@ -64,6 +64,11 @@ function SeriesPage() {
     canViewDealerPrice,
     products.map((p) => p.dbId),
   );
+  const dealerPricesVat = useDealerPrices(
+    canViewDealerPrice,
+    products.map((p) => p.dbId),
+    "vat",
+  );
 
   return (
     <div>
@@ -129,6 +134,7 @@ function SeriesPage() {
                   price={p.price}
                   salePrice={p.salePrice}
                   dealerPrice={dealerPrices[p.dbId] ?? p.dealerPrice}
+                  dealerPriceVat={dealerPricesVat[p.dbId] ?? null}
                   canViewDealerPrice={canViewDealerPrice}
                 />
               </div>

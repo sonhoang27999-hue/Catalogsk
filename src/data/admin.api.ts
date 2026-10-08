@@ -119,10 +119,16 @@ export const checkIsAdmin = async (userId: string) => {
 };
 
 /** Lưu giá nhập vào bảng riêng (chỉ admin ghi được). */
-export const saveDealerPrice = async (productId: string, dealerPrice: number | null) => {
+export const saveDealerPrice = async (
+  productId: string,
+  dealerPrice: number | null,
+  dealerPriceVat?: number | null,
+) => {
+  const row: Record<string, unknown> = { product_id: productId, dealer_price: dealerPrice };
+  if (dealerPriceVat !== undefined) row["dealer_price_vat"] = dealerPriceVat;
   const { error } = await supabase
     .from("product_dealer_prices")
-    .upsert({ product_id: productId, dealer_price: dealerPrice });
+    .upsert(row as { product_id: string; dealer_price: number | null });
   if (error) throw new Error(error.message);
 };
 

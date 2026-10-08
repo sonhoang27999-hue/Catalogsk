@@ -17,7 +17,7 @@ export type PriceDiff = {
   status: DiffStatus;
   productId: string | null;
   /** Giá đang có trên app (null nếu sản phẩm chưa tồn tại). */
-  current: { price: number | null; salePrice: number | null; dealerPrice: number | null } | null;
+  current: { price: number | null; salePrice: number | null; dealerPrice: number | null; dealerPriceVat: number | null } | null;
   /** Danh sách thay đổi dạng chữ để hiển thị cho admin. */
   changes: string[];
 };
@@ -60,6 +60,7 @@ type Caches = {
   /** modelId|tên sản phẩm (thường) -> product id */
   product: Map<string, string>;
   dealer: Map<string, number | null>;
+  dealerVat: Map<string, number | null>;
   price: Map<string, { price: number | null; salePrice: number | null }>;
 };
 
@@ -69,7 +70,7 @@ async function loadCaches(): Promise<Caches> {
     supabase.from("series").select("id, category_id, name, slug"),
     supabase.from("models").select("id, series_id, sort"),
     supabase.from("products").select("id, name, model_id, price, sale_price"),
-    supabase.from("product_dealer_prices").select("product_id, dealer_price"),
+    supabase.from("product_dealer_prices").select("*"),
   ]);
   const err = cats.error ?? sers.error ?? models.error ?? prods.error;
   if (err) throw new Error(err.message);
@@ -82,6 +83,7 @@ async function loadCaches(): Promise<Caches> {
     model: new Map(),
     product: new Map(),
     dealer: new Map(),
+    dealerVat: new Map(),
     price: new Map(),
   };
 
@@ -102,7 +104,14 @@ async function loadCaches(): Promise<Caches> {
     c.product.set(`${p.model_id}|${p.name.toLowerCase()}`, p.id);
     c.price.set(p.id, { price: p.price ?? null, salePrice: p.sale_price ?? null });
   }
-  for (const d of dealers.data ?? []) c.dealer.set(d.product_id, d.dealer_price ?? null);
+  for (const d of (dealers.data ?? []) as Array<{
+    product_id: string;
+    dealer_price: number | null;
+    dealer_price_vat?: number | null;
+  }>) {
+    c.dealer.set(d.product_id, d.dealer_price ?? null);
+    c.dealerVat.set(d.product_id, d.dealer_price_vat ?? null);
+  }
   return c;
 }
 
@@ -133,17 +142,20 @@ export async function analyzePriceRows(rows: PriceRow[]): Promise<PriceDiff[]> {
 
     const cur = c.price.get(productId) ?? { price: null, salePrice: null };
     const dealer = c.dealer.get(productId) ?? null;
+    const dealerVat = c.dealerVat.get(productId) ?? null;
     const changes: string[] = [];
     if (cur.price !== row.price) changes.push("Giá niêm yết");
     if ((cur.salePrice ?? null) !== (row.salePrice ?? null)) changes.push("Giá khuyến mãi");
     if (row.dealerPrice !== null && dealer !== row.dealerPrice) changes.push("Giá nhập");
+    if (row.dealerPriceVat !== null && dealerVat !== row.dealerPriceVat)
+      changes.push("Giá nhập gồm VAT");
 
     out.push({
       key: `${i}`,
       row,
       status: changes.length > 0 ? "changed" : "same",
       productId,
-      current: { price: cur.price, salePrice: cur.salePrice, dealerPrice: dealer },
+      current: { price: cur.price, salePrice: cur.salePrice, dealerPrice: dealer, dealerPriceVat: dealerVat },
       changes,
     });
   });
@@ -208,7 +220,12 @@ export async function applyPriceRows(
     if (existing) {
       const { error } = await supabase.from("products").update(values).eq("id", existing);
       if (error) throw new Error(error.message);
-      if (row.dealerPrice !== null) await saveDealerPrice(existing, row.dealerPrice);
+      if (row.dealerPrice !== null || row.dealerPriceVat !== null)
+        await saveDealerPrice(
+          existing,
+          row.dealerPrice ?? c.dealer.get(existing) ?? null,
+          row.dealerPriceVat ?? c.dealerVat.get(existing) ?? null,
+        );
       result.updated++;
     } else {
       const { data, error } = await supabase
@@ -218,7 +235,12 @@ export async function applyPriceRows(
         .single();
       if (error) throw new Error(error.message);
       c.product.set(`${modelId}|${row.productName.toLowerCase()}`, data.id);
-      if (row.dealerPrice !== null) await saveDealerPrice(data.id, row.dealerPrice);
+      if (row.dealerPrice !== null || row.dealerPriceVat !== null)
+        await saveDealerPrice(
+          data.id,
+          row.dealerPrice ?? c.dealer.get(data.id) ?? null,
+          row.dealerPriceVat ?? c.dealerVat.get(data.id) ?? null,
+        );
       result.created++;
     }
     onProgress?.(i + 1, items.length);

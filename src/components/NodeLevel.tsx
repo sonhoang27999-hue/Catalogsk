@@ -46,6 +46,11 @@ export function NodeLevel({
     canViewDealerPrice,
     products.map((p) => p.dbId),
   );
+  const dealerPricesVat = useDealerPrices(
+    canViewDealerPrice,
+    products.map((p) => p.dbId),
+    "vat",
+  );
   const [nodeOpen, setNodeOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
 
@@ -140,6 +145,7 @@ export function NodeLevel({
                   price={p.price}
                   salePrice={p.salePrice}
                   dealerPrice={dealerPrices[p.dbId] ?? p.dealerPrice}
+                  dealerPriceVat={dealerPricesVat[p.dbId] ?? null}
                   canViewDealerPrice={canViewDealerPrice}
                 />
               </div>

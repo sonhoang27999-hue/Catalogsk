@@ -9,7 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { catalogKeys } from "@/data/catalog.queries";
 
-export function useDealerPrices(enabled: boolean, productIds?: string[]) {
+type PriceMaps = { ex: Record<string, number>; vat: Record<string, number> };
+
+export function useDealerPrices(
+  enabled: boolean,
+  productIds?: string[],
+  which: keyof PriceMaps = "ex",
+) {
   const ids = productIds ? [...new Set(productIds)].sort() : undefined;
 
   const { data } = useQuery({
@@ -17,16 +23,22 @@ export function useDealerPrices(enabled: boolean, productIds?: string[]) {
     enabled: enabled && (ids === undefined || ids.length > 0),
     staleTime: 60_000,
     queryFn: async () => {
-      let query = supabase.from("product_dealer_prices").select("product_id, dealer_price");
+      let query = supabase.from("product_dealer_prices").select("*");
       if (ids) query = query.in("product_id", ids);
       const { data, error } = await query;
       if (error) throw new Error(error.message);
-      const map: Record<string, number> = {};
-      for (const row of data ?? []) {
-        if (row.dealer_price !== null) map[row.product_id] = Number(row.dealer_price);
+      const maps: PriceMaps = { ex: {}, vat: {} };
+      for (const row of (data ?? []) as Array<{
+        product_id: string;
+        dealer_price: number | null;
+        dealer_price_vat?: number | null;
+      }>) {
+        if (row.dealer_price != null) maps.ex[row.product_id] = Number(row.dealer_price);
+        if (row.dealer_price_vat != null) maps.vat[row.product_id] = Number(row.dealer_price_vat);
       }
-      return map;
+      return maps;
     },
+    select: (m: PriceMaps) => m[which],
   });
 
   return data ?? {};
