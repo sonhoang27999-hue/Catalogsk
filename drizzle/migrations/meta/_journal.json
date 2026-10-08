@@ -8,6 +8,13 @@
       "when": 1791457428977,
       "tag": "0000_dealer_price_modes",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791459907026,
+      "tag": "0001_dealer1_read_dealer_prices",
+      "breakpoints": true
     }
   ]
 }

@@ -172,7 +172,7 @@ export const checkCanViewDealerPrice = async (userId: string) => {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
-    .in("role", ["admin", "price_viewer"]);
+    .in("role", ["admin", "manager", "dealer1", "price_viewer"]);
   if (error) return false;
   return (data ?? []).length > 0;
 };

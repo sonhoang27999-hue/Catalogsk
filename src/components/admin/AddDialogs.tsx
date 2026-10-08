@@ -290,6 +290,7 @@ const emptyProduct = {
   videoUrl: "",
   detailUrl: "",
   dealerPrice: "",
+  dealerPriceVat: "",
   price: "",
   salePrice: "",
 };
@@ -346,8 +347,12 @@ export function AddProductDialog({
         sale_price: form.salePrice.trim() ? num(form.salePrice) : null,
         form_code: modelName.slice(0, 80),
       });
-      if (form.dealerPrice.trim()) {
-        await saveDealerPrice(productId, num(form.dealerPrice));
+      if (form.dealerPrice.trim() || form.dealerPriceVat.trim()) {
+        await saveDealerPrice(
+          productId,
+          form.dealerPrice.trim() ? num(form.dealerPrice) : null,
+          form.dealerPriceVat.trim() ? num(form.dealerPriceVat) : null,
+        );
       }
       return vars.keepOpen;
     },
@@ -435,14 +440,26 @@ export function AddProductDialog({
               />
             </Field>
           </div>
-          <Field label="Giá nhập (cần quyền mới xem được)">
-            <Input
-              value={form.dealerPrice}
-              inputMode="numeric"
-              maxLength={12}
-              onChange={(e) => set("dealerPrice")(e.target.value)}
-            />
-          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Giá nhập chưa VAT">
+              <Input
+                value={form.dealerPrice}
+                inputMode="numeric"
+                maxLength={12}
+                placeholder="Để trống nếu chưa có"
+                onChange={(e) => set("dealerPrice")(e.target.value)}
+              />
+            </Field>
+            <Field label="Giá nhập đã gồm VAT">
+              <Input
+                value={form.dealerPriceVat}
+                inputMode="numeric"
+                maxLength={12}
+                placeholder="Để trống nếu chưa có"
+                onChange={(e) => set("dealerPriceVat")(e.target.value)}
+              />
+            </Field>
+          </div>
 
           <div className="grid grid-cols-2 gap-3 pt-1">
             <Button
