@@ -26,8 +26,8 @@ export function ProductMedia({
             src={src}
             alt={name}
             size="preview"
-            sizes="(max-width: 600px) 100vw, 480px"
-            className="sk-product-photo block h-auto max-h-[26rem] min-h-[9rem] w-full object-contain"
+            sizes="(max-width: 639px) 100vw, (max-width: 960px) calc(50vw - 26px), 454px"
+            className="sk-product-photo block h-auto w-full"
             fallbackContent={<ProductPlaceholder />}
           />
         </ImageZoom>

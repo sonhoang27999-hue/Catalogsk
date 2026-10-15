@@ -472,14 +472,14 @@
 .sk-product-card > div:first-child {
   background: transparent;
 }
-/* Khung ảnh sản phẩm: ảnh hiển thị đầy đủ theo tỉ lệ gốc (không cắt),
-   nên phần trống hai bên để lộ nền tối có quầng sáng nhẹ, ảnh luôn căn giữa. */
+/* Full-width photos keep their intrinsic ratio; reserve height only while loading. */
 .sk-product-media {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  margin: 0 1px;
+  width: 100%;
+  border-radius: 0;
+  margin: 0;
   background:
     radial-gradient(
       110% 80% at 50% 0%,
@@ -495,6 +495,18 @@
 }
 .sk-product-photo {
   transition: transform 600ms ease;
+}
+.sk-product-media:has(.sk-product-photo[data-loaded="false"]) {
+  min-height: 9rem;
+}
+@media (max-width: 639px) {
+  .sk-catalog .sk-product-list > .sk-reveal {
+    margin-inline: -0.75rem;
+  }
+  .sk-catalog .sk-product-card {
+    border-inline-width: 0;
+    border-radius: 0;
+  }
 }
 @media (hover: hover) {
   .sk-product-media:hover .sk-product-photo {
@@ -640,5 +652,165 @@
   }
   .sk-public-stage::before {
     filter: none;
+  }
+}
+
+/* ---------- Admin-configurable light effects (see lib/themeEngine.ts) ---------- */
+.sk-public-stage::before {
+  opacity: var(--sk-fx-ambient, 1);
+}
+.sk-shimmer::after {
+  opacity: var(--sk-fx-shimmer, 1);
+}
+.sk-edge {
+  box-shadow: 0 10px 32px -18px
+    color-mix(in oklab, var(--sk-pink) calc(50% * var(--sk-fx-edge, 1)), transparent);
+}
+/* Product card border light runs one lap, then rests (cheap idle frames). */
+.sk-catalog .sk-product-card,
+.sk-theme-preview .sk-product-card {
+  animation: sk-edge-cycle calc(11s * var(--sk-fx-speed, 1)) linear infinite;
+}
+.sk-catalog .sk-reveal:nth-child(2n) .sk-product-card {
+  animation-delay: -3.5s;
+}
+.sk-catalog .sk-reveal:nth-child(3n) .sk-product-card {
+  animation-delay: -6.5s;
+}
+
+/* Occasional metallic light sweep across titles — overlay, no layout change. */
+.sk-title-sweep {
+  position: relative;
+}
+.sk-title-sweep::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  white-space: inherit;
+  text-align: inherit;
+  overflow: hidden;
+  text-overflow: inherit;
+  pointer-events: none;
+  color: transparent;
+  text-shadow: none;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    color-mix(in oklab, white 55%, transparent) 46%,
+    white 50%,
+    color-mix(in oklab, #fff3c4 60%, transparent) 54%,
+    transparent 62%
+  );
+  background-size: 260% 100%;
+  background-position: 160% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: var(--sk-fx-title, 0.8);
+  animation: sk-title-sweep calc(7s * var(--sk-fx-speed, 1)) ease-in-out infinite;
+  animation-delay: var(--sk-sweep-delay, 0.4s);
+}
+
+/* Floating light particles on the home banner (transform/opacity only). */
+.sk-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--sk-fx-particles, 0.6);
+}
+.sk-particles span {
+  position: absolute;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    white 0%,
+    color-mix(in oklab, var(--sk-blue) 70%, transparent) 45%,
+    transparent 70%
+  );
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: sk-float calc(var(--d, 9s) * var(--sk-fx-speed, 1)) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Call / Zalo: soft breathing light via an opacity-only overlay. */
+.sk-contact,
+.sk-contact-zalo {
+  animation: none;
+}
+.sk-contact::before,
+.sk-contact-zalo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 150% at 50% 120%,
+    color-mix(in oklab, white 30%, transparent),
+    transparent 62%
+  );
+  opacity: 0;
+  animation: sk-soft-glow calc(4.5s * var(--sk-fx-speed, 1)) ease-in-out infinite;
+}
+.sk-contact-zalo::before {
+  animation-delay: 2.25s;
+}
+
+@keyframes sk-title-sweep {
+  0% {
+    background-position: 160% 0;
+  }
+  16%,
+  100% {
+    background-position: -60% 0;
+  }
+}
+@keyframes sk-edge-cycle {
+  0% {
+    --sk-border-angle: 0deg;
+  }
+  32%,
+  100% {
+    --sk-border-angle: 360deg;
+  }
+}
+@keyframes sk-float {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(var(--x, 12px), -280px, 0);
+    opacity: 0;
+  }
+}
+@keyframes sk-soft-glow {
+  50% {
+    opacity: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-title-sweep::after,
+  .sk-particles,
+  .sk-contact::before,
+  .sk-contact-zalo::before {
+    display: none !important;
+  }
+  .sk-catalog .sk-product-card,
+  .sk-theme-preview .sk-product-card {
+    animation: none !important;
   }
 }

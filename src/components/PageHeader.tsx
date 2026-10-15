@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 import { HeaderMenu } from "./HeaderMenu";
@@ -25,7 +26,13 @@ export function PageHeader({ title }: { title: string }) {
       >
         <ChevronLeft className="size-6" />
       </Button>
-      <h1 className="truncate px-2 text-base font-bold tracking-tight">{title}</h1>
+      <h1
+        className="sk-title-sweep truncate px-2 text-base font-bold tracking-tight"
+        data-text={title}
+        style={{ "--sk-sweep-delay": "1.1s" } as CSSProperties}
+      >
+        {title}
+      </h1>
       <HeaderMenu />
     </header>
   );

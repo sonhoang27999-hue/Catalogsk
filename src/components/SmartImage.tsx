@@ -127,6 +127,7 @@ export const SmartImage = memo(function SmartImage({
       key={exhausted ? "fallback" : current}
       src={activeSrc}
       alt={alt}
+      data-loaded={loaded}
       {...(width ? { width } : {})}
       {...(height ? { height } : {})}
       {...(srcSet ? { srcSet } : {})}

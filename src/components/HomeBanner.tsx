@@ -2,7 +2,7 @@
  * Ảnh bìa trang chủ. Admin có thể đổi ảnh trực tiếp bằng cách dán URL ảnh (CDN).
  * Ảnh hiển thị full chiều rộng container, giữ tỷ lệ 16:9.
  */
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ImageUp } from "lucide-react";
 import { toast } from "sonner";
@@ -20,6 +20,17 @@ import { Field } from "@/components/admin/AddTile";
 import { HOME_BANNER_KEY, saveSetting, settingsQueryOptions } from "@/data/settings.api";
 import { useAdmin } from "@/hooks/useAdmin";
 import { SmartImage } from "@/components/SmartImage";
+
+const PARTICLES = [
+  { left: "6%", d: "9s", delay: "0s", x: "14px" },
+  { left: "18%", d: "11s", delay: "-4s", x: "-10px" },
+  { left: "31%", d: "8s", delay: "-2s", x: "8px" },
+  { left: "44%", d: "12s", delay: "-7s", x: "-16px" },
+  { left: "57%", d: "10s", delay: "-1s", x: "12px" },
+  { left: "69%", d: "9.5s", delay: "-5s", x: "-8px" },
+  { left: "81%", d: "11.5s", delay: "-3s", x: "10px" },
+  { left: "92%", d: "8.5s", delay: "-6s", x: "-12px" },
+];
 
 export function HomeBanner() {
   const { canManage: isAdmin } = useAdmin();
@@ -55,9 +66,34 @@ export function HomeBanner() {
           fallback={defaultBanner}
           className="sk-hero-image w-full object-cover"
         />
+        <div className="sk-particles" aria-hidden="true">
+          {PARTICLES.map((p, i) => (
+            <span
+              key={i}
+              style={
+                {
+                  left: p.left,
+                  "--d": p.d,
+                  "--delay": p.delay,
+                  "--x": p.x,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </div>
         <div className="sk-hero-copy absolute inset-x-0 bottom-0 z-10 px-5 pb-6 sm:px-8">
-          <p className="sk-gradient-text text-6xl font-extrabold leading-none sm:text-7xl">SK</p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground sm:text-4xl">
+          <p
+            className="sk-gradient-text sk-title-sweep inline-block text-6xl font-extrabold leading-none sm:text-7xl"
+            data-text="SK"
+            style={{ "--sk-sweep-delay": "0.6s" } as CSSProperties}
+          >
+            SK
+          </p>
+          <h1
+            className="sk-title-sweep mt-2 w-fit text-2xl font-bold text-foreground sm:text-4xl"
+            data-text="Ambient Light Luxury"
+            style={{ "--sk-sweep-delay": "1.5s" } as CSSProperties}
+          >
             Ambient Light Luxury
           </h1>
         </div>

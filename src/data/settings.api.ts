@@ -59,3 +59,21 @@ export const saveSettings = async (entries: Record<string, string>) => {
   const { error } = await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
   if (error) throw new Error(error.message);
 };
+
+/** Khóa cài đặt giao diện mở rộng (chế độ, hiệu ứng, gradient tiêu đề...). */
+export const THEME_EXTRA_KEYS = [
+  "theme_mode",
+  "theme_accent",
+  "theme_bg_level",
+  "theme_effects",
+  "theme_fx_speed",
+  "theme_title_gradient",
+  "theme_preset",
+] as const;
+
+/** Danh sách khóa giao diện được phép ghi/nhập từ trình chỉnh giao diện. */
+export const THEME_ALLOWED_KEYS: readonly string[] = [
+  ...THEME_VARS.map((v) => v.key),
+  THEME_RADIUS_KEY,
+  ...THEME_EXTRA_KEYS,
+];

@@ -23,7 +23,6 @@ export function ProductPrice({
 }: Props) {
   const { priceMode: mode } = useAdmin();
   const onSale = salePrice != null && salePrice > 0 && salePrice < price;
-  const off = onSale ? Math.round(((price - salePrice) / price) * 100) : 0;
 
   return (
     <div className="sk-price-panel">
@@ -47,11 +46,6 @@ export function ProductPrice({
           <p className="mt-1 text-[11px] font-medium text-muted-foreground">Giá đã gồm VAT</p>
         </div>
 
-        {onSale && off > 0 ? (
-          <span className="shrink-0 rounded-md bg-gold px-2 py-1 text-sm font-extrabold text-gold-foreground">
-            -{off}%
-          </span>
-        ) : null}
       </div>
 
       {canViewDealerPrice && (dealerPrice != null || dealerPriceVat != null) ? (

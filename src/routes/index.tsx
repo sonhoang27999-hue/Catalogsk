@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { BookOpen, Car, ChevronRight } from "lucide-react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { AddTile } from "@/components/admin/AddTile";
@@ -164,7 +164,13 @@ function Home() {
       ) : (
         <>
           <div className="flex items-end justify-between gap-3 px-4 pt-7 pb-3">
-            <h2 className="sk-gradient-text text-2xl font-bold">Danh mục Sản phẩm</h2>
+            <h2
+              className="sk-gradient-text sk-title-sweep w-fit text-2xl font-bold"
+              data-text="Danh mục Sản phẩm"
+              style={{ "--sk-sweep-delay": "2.8s" } as CSSProperties}
+            >
+              Danh mục Sản phẩm
+            </h2>
             <span className="shrink-0 pb-1 text-xs text-muted-foreground">
               {categories.length} danh mục
             </span>
