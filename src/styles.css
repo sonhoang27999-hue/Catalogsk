@@ -472,10 +472,26 @@
 .sk-product-card > div:first-child {
   background: transparent;
 }
+/* Khung ảnh sản phẩm: ảnh hiển thị đầy đủ theo tỉ lệ gốc (không cắt),
+   nên phần trống hai bên để lộ nền tối có quầng sáng nhẹ, ảnh luôn căn giữa. */
 .sk-product-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
   margin: 0 1px;
-  background: var(--sk-surface);
+  background:
+    radial-gradient(
+      110% 80% at 50% 0%,
+      color-mix(in oklab, var(--sk-blue) 12%, transparent) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      165deg,
+      color-mix(in oklab, var(--sk-surface) 90%, white) 0%,
+      var(--sk-surface) 40%,
+      color-mix(in oklab, var(--sk-surface) 78%, black) 100%
+    );
 }
 .sk-product-photo {
   transition: transform 600ms ease;

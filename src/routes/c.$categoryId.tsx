@@ -103,7 +103,7 @@ function CategoryPage() {
                 alt={s.name}
                 size="thumb"
                 sizes="33vw"
-                className="aspect-square w-full rounded-t-lg object-cover"
+                className="aspect-square w-full rounded-t-lg object-contain p-2"
               />
 
               <p className="px-1 py-2 text-center text-[11px] leading-tight font-medium text-foreground">
