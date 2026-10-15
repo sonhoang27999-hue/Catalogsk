@@ -92,7 +92,7 @@ export const resolveImage = (url?: string | null, key?: string | null): string =
 
 /** Thông tin liên hệ / báo giá. */
 export const CONTACT = {
-  shopName: "AutoDeco Studio",
+  shopName: "SK Ambient Light Luxury",
   hotline: "0909 123 456",
   zalo: "0909123456",
   address: "128 Nguyễn Văn Linh, Quận 7, TP.HCM",

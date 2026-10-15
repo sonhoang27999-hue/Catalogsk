@@ -14,13 +14,13 @@ export const Route = createFileRoute("/dang-ky-dai-ly")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Đăng ký đại lý | AutoDeco" },
+      { title: "Đăng ký đại lý | SK" },
       {
         name: "description",
         content:
           "Gửi thông tin đăng ký làm đại lý phân phối: tên đăng nhập, họ tên và số điện thoại. Quản trị viên sẽ duyệt hồ sơ.",
       },
-      { property: "og:title", content: "Đăng ký đại lý | AutoDeco" },
+      { property: "og:title", content: "Đăng ký đại lý | SK" },
       {
         property: "og:description",
         content: "Đăng ký làm đại lý phân phối để xem giá nhập.",

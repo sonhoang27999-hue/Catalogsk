@@ -11,12 +11,12 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Đăng nhập quản trị | AutoDeco" },
+      { title: "Đăng nhập quản trị | SK" },
       {
         name: "description",
         content: "Đăng nhập để quản lý danh mục hãng xe, đời xe, năm sản xuất và sản phẩm.",
       },
-      { property: "og:title", content: "Đăng nhập quản trị | AutoDeco" },
+      { property: "og:title", content: "Đăng nhập quản trị | SK" },
       { property: "og:description", content: "Đăng nhập đại lý để xem giá nhập." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

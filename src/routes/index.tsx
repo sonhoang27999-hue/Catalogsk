@@ -35,13 +35,13 @@ export const Route = createFileRoute("/")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: "Danh mục Phụ kiện Ô tô | AutoDeco" },
+      { title: "Danh mục Phụ kiện Ô tô | SK" },
       {
         name: "description",
         content:
           "Tra cứu phụ kiện ô tô theo hãng xe, đời xe và năm sản xuất: đèn trần sao, loa treble, nội thất và báo giá lắp đặt.",
       },
-      { property: "og:title", content: "Danh mục Phụ kiện Ô tô | AutoDeco" },
+      { property: "og:title", content: "Danh mục Phụ kiện Ô tô | SK" },
       {
         property: "og:description",
         content: "Catalog phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",

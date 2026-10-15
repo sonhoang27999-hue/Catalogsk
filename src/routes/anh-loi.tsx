@@ -18,9 +18,9 @@ import {
 export const Route = createFileRoute("/anh-loi")({
   head: () => ({
     meta: [
-      { title: "Thống kê ảnh lỗi | AutoDeco" },
+      { title: "Thống kê ảnh lỗi | SK" },
       { name: "description", content: "Theo dõi các ảnh không tải được theo nguồn và thời điểm." },
-      { property: "og:title", content: "Thống kê ảnh lỗi | AutoDeco" },
+      { property: "og:title", content: "Thống kê ảnh lỗi | SK" },
       {
         property: "og:description",
         content: "Biểu đồ ảnh lỗi theo tên miền nguồn và theo giờ để admin sửa nhanh.",

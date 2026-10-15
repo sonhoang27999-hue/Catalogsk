@@ -26,7 +26,7 @@ export const Route = createFileRoute("/c/$categoryId")({
   },
   head: ({ loaderData }) => {
     const name = loaderData?.category.name ?? "Danh mục";
-    const title = `Đời xe ${name} | AutoDeco`;
+    const title = `Đời xe ${name} | SK`;
     const description = `Danh sách đời xe ${name} và phụ kiện tương thích theo từng form xe.`;
     return {
       meta: [

@@ -1,5 +1,5 @@
 /**
- * Service Worker nhẹ cho PWA AutoDeco.
+ * Service Worker nhẹ cho PWA SK.
  *
  * QUAN TRỌNG: KHÔNG cache HTML hay dữ liệu API.
  * Bản cũ dùng chiến lược "cache-first cho mọi GET" khiến khách chưa đăng nhập

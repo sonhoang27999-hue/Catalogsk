@@ -33,7 +33,7 @@ export const Route = createFileRoute("/c/$categoryId/$seriesId")({
   },
   head: ({ loaderData }) => {
     const name = loaderData?.series.name ?? "Đời xe";
-    const title = `Phụ kiện ${name} | AutoDeco`;
+    const title = `Phụ kiện ${name} | SK`;
     const description = `Danh sách phụ kiện, báo giá và video lắp đặt thực tế cho ${name}.`;
     return {
       meta: [
