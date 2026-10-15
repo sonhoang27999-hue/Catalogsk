@@ -1,5 +1,5 @@
 /**
- * Service Worker nhẹ cho PWA AutoDeco.
+ * Service Worker nhẹ cho PWA SK.
  *
  * QUAN TRỌNG: KHÔNG cache HTML hay dữ liệu API.
  * Bản cũ dùng chiến lược "cache-first cho mọi GET" khiến khách chưa đăng nhập
@@ -61,7 +61,9 @@ self.addEventListener("fetch", (event) => {
           }
           return cached;
         }
-        return refresh.catch(() => cached);
+        // Chưa có cache: trả trực tiếp promise fetch → request đi thẳng ra mạng,
+        // lỗi mạng trả lỗi mạng bình thường thay vì undefined.
+        return refresh;
       }),
     );
     return;

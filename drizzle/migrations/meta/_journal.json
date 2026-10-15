@@ -15,6 +15,13 @@
       "when": 1791459907026,
       "tag": "0001_dealer1_read_dealer_prices",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792042776187,
+      "tag": "0002_add_dealer_price_vat_column",
+      "breakpoints": true
     }
   ]
 }

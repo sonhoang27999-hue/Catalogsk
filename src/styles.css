@@ -67,7 +67,6 @@
   --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
 }
 
-
 :root {
   --radius: 0.625rem;
   --brand: oklch(0.55 0.16 258);
@@ -160,7 +159,10 @@
     letter-spacing: 0.005em;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-weight: 700;
     letter-spacing: -0.01em;
   }
@@ -185,28 +187,63 @@
 /* ===== Luxury Ambient UI ===== */
 @utility lux-ambient {
   background:
-    radial-gradient(60% 40% at 0% 0%, color-mix(in oklab, var(--gold) 14%, transparent), transparent 70%),
-    radial-gradient(55% 35% at 100% 30%, color-mix(in oklab, var(--brand) 16%, transparent), transparent 70%),
+    radial-gradient(
+      60% 40% at 0% 0%,
+      color-mix(in oklab, var(--gold) 14%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 35% at 100% 30%,
+      color-mix(in oklab, var(--brand) 16%, transparent),
+      transparent 70%
+    ),
     var(--color-background);
 }
 @utility lux-hairline {
   border: 1px solid transparent;
   background:
     linear-gradient(var(--color-card), var(--color-card)) padding-box,
-    linear-gradient(135deg, color-mix(in oklab, var(--gold) 55%, transparent), var(--color-border) 45%, color-mix(in oklab, var(--gold) 30%, transparent)) border-box;
+    linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--gold) 55%, transparent),
+        var(--color-border) 45%,
+        color-mix(in oklab, var(--gold) 30%, transparent)
+      )
+      border-box;
 }
 @utility lux-press {
-  transition: transform 160ms ease, box-shadow 200ms ease, border-color 200ms ease;
-  &:hover { box-shadow: 0 0 0 1px color-mix(in oklab, var(--gold) 60%, transparent), 0 8px 24px -10px color-mix(in oklab, var(--gold) 45%, transparent); }
-  &:active { transform: scale(0.97); }
+  transition:
+    transform 160ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+  &:hover {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--gold) 60%, transparent),
+      0 8px 24px -10px color-mix(in oklab, var(--gold) 45%, transparent);
+  }
+  &:active {
+    transform: scale(0.97);
+  }
 }
 @utility lux-cta {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--gold) 14%, var(--color-secondary)), var(--color-secondary));
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--gold) 14%, var(--color-secondary)),
+    var(--color-secondary)
+  );
   color: var(--gold);
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold) 35%, transparent);
-  transition: box-shadow 200ms ease, background 200ms ease;
-  &:hover { box-shadow: inset 0 0 0 1px var(--gold), 0 0 18px -4px color-mix(in oklab, var(--gold) 60%, transparent); }
-  &:active { transform: scale(0.99); }
+  transition:
+    box-shadow 200ms ease,
+    background 200ms ease;
+  &:hover {
+    box-shadow:
+      inset 0 0 0 1px var(--gold),
+      0 0 18px -4px color-mix(in oklab, var(--gold) 60%, transparent);
+  }
+  &:active {
+    transform: scale(0.99);
+  }
 }
 @utility lux-hero-fade {
   &::after {
@@ -220,8 +257,15 @@
   }
 }
 @utility lux-search {
-  transition: box-shadow 200ms ease, border-color 200ms ease;
-  &:focus { border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in oklab, var(--gold) 22%, transparent), 0 0 24px -6px color-mix(in oklab, var(--gold) 55%, transparent); }
+  transition:
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+  &:focus {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 3px color-mix(in oklab, var(--gold) 22%, transparent),
+      0 0 24px -6px color-mix(in oklab, var(--gold) 55%, transparent);
+  }
 }
 @utility lux-frame {
   box-shadow:
@@ -232,6 +276,353 @@
     0 0 120px -30px color-mix(in oklab, var(--gold) 35%, transparent);
 }
 @utility lux-price {
-  background: linear-gradient(135deg, color-mix(in oklab, var(--gold) 10%, var(--color-secondary)), var(--color-secondary));
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--gold) 10%, var(--color-secondary)),
+    var(--color-secondary)
+  );
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold) 25%, transparent);
+}
+
+/* Public catalog only; admin dialogs retain the existing design system. */
+@property --sk-border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+:root {
+  --sk-pink: oklch(0.72 0.21 350);
+  --sk-violet: oklch(0.67 0.22 305);
+  --sk-blue: oklch(0.72 0.17 245);
+  --sk-orange: oklch(0.78 0.17 55);
+  --sk-red: oklch(0.65 0.23 27);
+  --sk-surface: oklch(0.185 0.008 285);
+  --sk-glow: 0 10px 32px -18px color-mix(in oklab, var(--sk-pink) 50%, transparent);
+  --sk-spectrum: linear-gradient(
+    110deg,
+    var(--sk-pink),
+    var(--sk-violet),
+    var(--sk-blue),
+    var(--sk-orange),
+    var(--sk-pink)
+  );
+}
+.sk-catalog {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: var(--background);
+  letter-spacing: 0;
+  --fab-bottom: calc(116px + env(safe-area-inset-bottom));
+}
+.sk-catalog h1,
+.sk-catalog h2,
+.sk-catalog h3 {
+  letter-spacing: 0;
+}
+.sk-public-stage::before {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 15%,
+    color-mix(in oklab, var(--sk-pink) 9%, transparent) 27%,
+    transparent 40%,
+    color-mix(in oklab, var(--sk-blue) 9%, transparent) 64%,
+    transparent 78%
+  );
+  filter: blur(45px);
+  mix-blend-mode: screen;
+  animation: sk-ambient-drift 22s ease-in-out infinite alternate;
+}
+.sk-catalog-content {
+  position: relative;
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+}
+.sk-page-enter {
+  animation: sk-enter 350ms ease both;
+}
+.sk-gradient-text {
+  background: var(--sk-spectrum);
+  background-size: 260% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: sk-spectrum-shift 14s linear infinite;
+}
+.sk-hero {
+  background: var(--sk-surface);
+}
+.sk-hero-image {
+  height: 300px;
+}
+.sk-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--background), transparent 80%);
+  pointer-events: none;
+}
+.sk-hero-copy {
+  text-shadow: 0 2px 20px var(--background);
+}
+.sk-hero-copy .sk-gradient-text {
+  text-shadow: none;
+}
+.sk-edge {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--sk-surface), var(--sk-surface)) padding-box,
+    conic-gradient(
+        from var(--sk-border-angle),
+        var(--border),
+        var(--sk-violet),
+        var(--border),
+        var(--sk-blue),
+        var(--border),
+        var(--sk-pink),
+        var(--border)
+      )
+      border-box;
+  box-shadow: var(--sk-glow);
+  transition:
+    box-shadow 240ms ease,
+    transform 240ms ease;
+}
+.sk-edge:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.sk-edge:hover,
+.sk-edge:active {
+  box-shadow:
+    0 0 22px -8px color-mix(in oklab, var(--sk-blue) 55%, transparent),
+    0 0 18px -7px color-mix(in oklab, var(--sk-pink) 45%, transparent);
+  animation: sk-border-spin 8s linear infinite;
+}
+.sk-brand-tile {
+  animation: sk-border-spin 16s linear infinite;
+}
+.sk-brand-tile img {
+  transition: transform 400ms ease;
+}
+.sk-brand-tile:hover img {
+  transform: scale(1.06);
+}
+.sk-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.sk-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    color-mix(in oklab, var(--foreground) 12%, transparent) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+}
+.sk-shimmer:hover::after,
+.sk-shimmer:active::after {
+  animation: sk-shimmer-pass 950ms ease;
+}
+.sk-glass,
+.sk-catalog header {
+  border: 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--sk-violet) 40%, var(--border));
+  background: color-mix(in oklab, var(--background) 85%, transparent);
+  backdrop-filter: blur(18px);
+}
+.sk-catalog header h1 {
+  font-size: 1.125rem;
+}
+.sk-consultation {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  width: 100%;
+  max-width: 960px;
+  border-top: 1px solid color-mix(in oklab, var(--sk-violet) 45%, var(--border));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.sk-contact {
+  background: linear-gradient(110deg, var(--sk-violet), var(--brand));
+  color: var(--primary-foreground);
+  animation: sk-contact-pulse 5s ease-in-out infinite;
+}
+.sk-contact-zalo {
+  border: 1px solid color-mix(in oklab, var(--sk-blue) 60%, var(--border));
+  background: color-mix(in oklab, var(--sk-blue) 12%, var(--sk-surface));
+  color: var(--foreground);
+  animation: sk-contact-pulse 5s 2.5s ease-in-out infinite;
+}
+.sk-product-card {
+  border-radius: 8px;
+}
+.sk-product-card > div:first-child {
+  background: transparent;
+}
+.sk-product-media {
+  border-radius: 8px;
+  margin: 0 1px;
+  background: var(--sk-surface);
+}
+.sk-product-photo {
+  transition: transform 600ms ease;
+}
+@media (hover: hover) {
+  .sk-product-media:hover .sk-product-photo {
+    transform: scale(1.035);
+  }
+}
+.sk-discount {
+  background: linear-gradient(110deg, var(--sk-red), var(--sk-orange));
+  box-shadow: 0 3px 18px -6px var(--sk-red);
+  animation: sk-discount-pulse 4s ease-in-out infinite;
+}
+.sk-price-panel {
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+.sk-price-panel .sk-gradient-text {
+  font-size: 2rem;
+}
+.sk-catalog .sk-price-panel > div:first-child {
+  flex-wrap: wrap;
+}
+.sk-catalog .sk-price-panel p.tabular-nums {
+  overflow-wrap: anywhere;
+}
+.sk-catalog .sk-price-panel > div:last-child > div {
+  flex-wrap: wrap;
+}
+.sk-placeholder {
+  background: linear-gradient(
+    145deg,
+    var(--sk-surface),
+    color-mix(in oklab, var(--sk-blue) 10%, var(--background)),
+    var(--background)
+  );
+}
+.sk-car-outline {
+  stroke: color-mix(in oklab, var(--foreground) 20%, var(--sk-blue));
+}
+.sk-led-glow {
+  stroke: var(--sk-violet);
+  filter: blur(8px);
+  opacity: 0.6;
+}
+.sk-led-line {
+  stroke: var(--sk-pink);
+  filter: drop-shadow(0 0 4px var(--sk-blue));
+}
+.sk-reveal-pending {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.sk-revealed {
+  animation: sk-enter 550ms ease both;
+}
+.sk-revealed[data-stagger="1"] {
+  animation-delay: 55ms;
+}
+.sk-revealed[data-stagger="2"] {
+  animation-delay: 110ms;
+}
+.sk-revealed[data-stagger="3"] {
+  animation-delay: 165ms;
+}
+@keyframes sk-border-spin {
+  to {
+    --sk-border-angle: 360deg;
+  }
+}
+@keyframes sk-spectrum-shift {
+  to {
+    background-position: 260% 0;
+  }
+}
+@keyframes sk-ambient-drift {
+  to {
+    transform: translate3d(3%, 3%, 0) rotate(3deg);
+  }
+}
+@keyframes sk-shimmer-pass {
+  to {
+    transform: translateX(120%);
+  }
+}
+@keyframes sk-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sk-contact-pulse {
+  50% {
+    box-shadow: 0 0 20px -10px var(--sk-blue);
+  }
+}
+@keyframes sk-discount-pulse {
+  50% {
+    box-shadow: 0 0 24px -8px var(--sk-orange);
+  }
+}
+@media (min-width: 640px) {
+  .sk-hero-image {
+    height: 380px;
+  }
+  .sk-product-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+  .sk-product-list > * {
+    margin-top: 0;
+    min-width: 0;
+  }
+  .sk-product-list > section {
+    grid-column: 1 / -1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-catalog *,
+  .sk-catalog::before,
+  .sk-catalog *::before,
+  .sk-catalog *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .sk-reveal-pending {
+    opacity: 1;
+    transform: none;
+  }
+  .sk-product-photo,
+  .sk-brand-tile img {
+    transform: none !important;
+  }
+}
+@media (max-width: 639px) {
+  .sk-brand-tile {
+    animation: none;
+  }
+  .sk-public-stage::before {
+    filter: none;
+  }
 }

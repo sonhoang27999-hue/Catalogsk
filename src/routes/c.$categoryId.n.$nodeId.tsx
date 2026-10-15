@@ -19,10 +19,12 @@ export const Route = createFileRoute("/c/$categoryId/n/$nodeId")({
   },
   head: ({ loaderData }) => {
     const name = loaderData?.node.name ?? "Danh mục";
-    const title = `${name} | AutoDeco`;
+    const title = `${name} | SK`;
     const description = `Danh mục con và sản phẩm phụ kiện ô tô thuộc ${name}.`;
     return {
       meta: [
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },

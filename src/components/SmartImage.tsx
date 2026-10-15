@@ -13,7 +13,7 @@
  *   dứt khoát sang trạng thái rõ nét ngay khi decode xong.
  * - Ghi nhật ký khi mọi link đều hỏng và rơi về ảnh mặc định.
  */
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { imageCandidates, imageSrcSet, type ImageSize } from "@/lib/imageUrl";
 import { IMG } from "@/data/images";
 import { logImageError } from "@/lib/imageErrors";
@@ -25,6 +25,7 @@ type Props = {
   className?: string;
   /** Ảnh hiển thị khi mọi link đều lỗi. */
   fallback?: string;
+  fallbackContent?: ReactNode;
   width?: number;
   height?: number;
   eager?: boolean;
@@ -42,6 +43,7 @@ export const SmartImage = memo(function SmartImage({
   alt,
   className,
   fallback = IMG.car,
+  fallbackContent,
   width,
   height,
   eager,
@@ -117,7 +119,9 @@ export const SmartImage = memo(function SmartImage({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- handleError đổi theo index/candidates, đã bao phủ bởi activeSrc
   }, [activeSrc, mounted]);
 
-  return (
+  return fallbackContent && (!src?.trim() || exhausted) ? (
+    <>{fallbackContent}</>
+  ) : (
     <img
       ref={imgRef}
       key={exhausted ? "fallback" : current}

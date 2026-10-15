@@ -10,6 +10,8 @@ import { memo, useState, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SmartImage } from "@/components/SmartImage";
 import { supportsResize } from "@/lib/imageUrl";
+import { Button } from "@/components/ui/button";
+import { ProductPlaceholder } from "@/components/catalog/ProductPlaceholder";
 
 type Props = { src: string | null | undefined; alt: string; children: ReactNode };
 
@@ -20,17 +22,18 @@ export const ImageZoom = memo(function ImageZoom({ src, alt, children }: Props) 
 
   return (
     <>
-      <button
+      <Button
+        variant="ghost"
         type="button"
         aria-label={`Phóng to ảnh ${alt}`}
         onClick={() => {
           setShowOriginal(false);
           setOpen(true);
         }}
-        className="block w-full cursor-zoom-in"
+        className="block h-auto w-full cursor-zoom-in rounded-none p-0 hover:bg-transparent"
       >
         {children}
-      </button>
+      </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="w-[calc(100vw-16px)] max-w-[900px] overflow-hidden rounded-2xl bg-card p-0 sm:rounded-2xl">
@@ -42,18 +45,20 @@ export const ImageZoom = memo(function ImageZoom({ src, alt, children }: Props) 
                 alt={alt}
                 size={showOriginal ? "original" : "detail"}
                 eager
+                fallbackContent={<ProductPlaceholder />}
                 className="block h-auto w-full object-contain"
               />
             </div>
           ) : null}
           {canUpgrade && !showOriginal ? (
-            <button
+            <Button
+              variant="secondary"
               type="button"
               onClick={() => setShowOriginal(true)}
-              className="border-t border-border bg-secondary px-3 py-3 text-center text-sm font-semibold text-foreground transition-colors hover:bg-gold hover:text-gold-foreground"
+              className="h-auto rounded-none border-t border-border px-3 py-3 text-center text-sm font-semibold hover:bg-gold hover:text-gold-foreground"
             >
               Xem ảnh gốc
-            </button>
+            </Button>
           ) : null}
         </DialogContent>
       </Dialog>

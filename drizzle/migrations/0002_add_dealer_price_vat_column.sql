@@ -1,0 +1,1 @@
+ALTER TABLE public.product_dealer_prices ADD COLUMN IF NOT EXISTS dealer_price_vat numeric;

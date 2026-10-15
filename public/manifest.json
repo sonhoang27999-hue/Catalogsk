@@ -1,6 +1,6 @@
 {
-  "name": "AutoDeco - Phụ kiện Ô tô",
-  "short_name": "AutoDeco",
+  "name": "SK - Phụ kiện Ô tô",
+  "short_name": "SK",
   "description": "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
   "start_url": "/",
   "display": "standalone",

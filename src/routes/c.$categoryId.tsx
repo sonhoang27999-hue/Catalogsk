@@ -26,10 +26,12 @@ export const Route = createFileRoute("/c/$categoryId")({
   },
   head: ({ loaderData }) => {
     const name = loaderData?.category.name ?? "Danh mục";
-    const title = `Đời xe ${name} | AutoDeco`;
+    const title = `Đời xe ${name} | SK`;
     const description = `Danh sách đời xe ${name} và phụ kiện tương thích theo từng form xe.`;
     return {
       meta: [
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
@@ -81,20 +83,20 @@ function CategoryPage() {
   return (
     <div>
       <PageHeader title={`Đời xe ${category.name}`} />
-      <div className="px-3 pt-3">
+      <div className="sk-glass sticky top-14 z-20 px-3 py-3">
         <SearchBar
           value={query}
           onChange={setQuery}
           placeholder={`Tìm đời xe ${category.name}...`}
         />
       </div>
-      <div className="grid grid-cols-3 gap-3 p-3">
+      <div className="grid grid-cols-2 gap-4 p-3 sm:grid-cols-3 lg:grid-cols-4">
         {series.map((s) => (
-          <div key={s.id} className="flex flex-col gap-1">
+          <div key={s.id} className="sk-reveal flex flex-col gap-1">
             <Link
               to="/c/$categoryId/$seriesId"
               params={{ categoryId: category.id, seriesId: s.id }}
-              className="overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-gold active:border-gold focus-visible:border-gold"
+              className="sk-edge sk-shimmer overflow-hidden rounded-lg"
             >
               <SmartImage
                 src={s.image}

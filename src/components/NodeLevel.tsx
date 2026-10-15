@@ -20,7 +20,7 @@ import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { toEmbedUrl } from "@/lib/video";
 import { LazyEmbed } from "@/components/LazyEmbed";
 import { SmartImage } from "@/components/SmartImage";
-import { ImageZoom } from "@/components/ImageZoom";
+import { ProductMedia } from "@/components/catalog/ProductMedia";
 
 export function NodeLevel({
   categoryId,
@@ -55,20 +55,20 @@ export function NodeLevel({
   const [productOpen, setProductOpen] = useState(false);
 
   return (
-    <div className="pb-32">
+    <div className="pb-8">
       {isAdmin ? (
         <div className="pt-3">
           <PasteBar nodeDbId={parentNodeId} categoryDbId={categoryDbId} targetName={parentName} />
         </div>
       ) : null}
       {nodes.length > 0 || isAdmin ? (
-        <div className="grid grid-cols-3 gap-3 p-3">
+        <div className="grid grid-cols-2 gap-4 p-3 sm:grid-cols-3 lg:grid-cols-4">
           {nodes.map((n, i) => (
             <div key={n.id} className="flex flex-col gap-1">
               <Link
                 to="/c/$categoryId/n/$nodeId"
                 params={{ categoryId, nodeId: n.id }}
-                className="overflow-hidden rounded-lg lux-hairline lux-press"
+                className="sk-edge sk-shimmer overflow-hidden rounded-lg"
               >
                 <SmartImage
                   src={n.image}
@@ -100,42 +100,33 @@ export function NodeLevel({
         </div>
       ) : null}
 
-      <div className="space-y-4 pb-3">
+      <div className="sk-product-list space-y-6 px-3 pb-3">
         {products.map((p, i) => (
-          <div key={p.id} className="space-y-1">
-            <div className="block overflow-hidden lux-hairline">
+          <div key={p.id} className="sk-reveal space-y-2">
+            <div className="sk-edge sk-product-card block overflow-hidden rounded-lg">
               <div className="bg-secondary px-3 py-3">
-                <h2 className="text-base leading-snug font-bold text-foreground">{p.name}</h2>
+                <h2 className="text-xl leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {p.description}
                   </p>
                 ) : null}
               </div>
-              <div className="w-full bg-muted">
-                <ImageZoom src={p.image} alt={p.name}>
-                  <SmartImage
-                    src={p.image}
-                    alt={p.name}
-                    size="preview"
-                    sizes="(max-width: 480px) 100vw, 480px"
-                    className="block h-auto w-full object-contain"
-                  />
-                </ImageZoom>
-              </div>
+              <ProductMedia src={p.image} name={p.name} price={p.price} salePrice={p.salePrice} />
+
               {p.detailUrl ? (
                 <a
                   href={p.detailUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block lux-cta px-3 py-3 text-center text-sm font-semibold"
+                  className="sk-shimmer block lux-cta px-3 py-3 text-center text-sm font-semibold"
                 >
                   Xem sản phẩm hoàn thiện lên xe
                 </a>
               ) : null}
               {toEmbedUrl(p.videoUrl) ? (
                 <LazyEmbed
-                  src={toEmbedUrl(p.videoUrl)!}
+                  src={toEmbedUrl(p.videoUrl) ?? ""}
                   title={`Video ${p.name}`}
                   className="border-t border-border"
                 />

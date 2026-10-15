@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useState } from "react";
-import { BookOpen, ChevronRight } from "lucide-react";
+import { BookOpen, Car, ChevronRight } from "lucide-react";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { AddTile } from "@/components/admin/AddTile";
 import { SortControls } from "@/components/admin/SortControls";
@@ -9,7 +9,6 @@ import { DeleteButton } from "@/components/admin/DeleteButton";
 import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { AddCategoryDialog } from "@/components/admin/AddDialogs";
 import { useAdmin } from "@/hooks/useAdmin";
-import { CategoryIcon } from "@/components/CategoryIcon";
 import { HomeBanner } from "@/components/HomeBanner";
 import { HeaderMenu } from "@/components/HeaderMenu";
 import { SearchBar } from "@/components/SearchBar";
@@ -20,6 +19,8 @@ import { SmartImage } from "@/components/SmartImage";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
 import { HOME_BANNER_KEY, settingsQueryOptions } from "@/data/settings.api";
 import { imageUrl } from "@/lib/imageUrl";
+import { IMG } from "@/data/images";
+import { ProductPlaceholder } from "@/components/catalog/ProductPlaceholder";
 
 export const Route = createFileRoute("/")({
   // Trang chủ chỉ cần danh sách hãng xe (không nạp sản phẩm/video/giá nhập).
@@ -35,13 +36,21 @@ export const Route = createFileRoute("/")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: "Danh mục Phụ kiện Ô tô | AutoDeco" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      ...(loaderData?.bannerHref?.startsWith("https://")
+        ? [
+            { property: "og:image", content: loaderData.bannerHref },
+            { name: "twitter:image", content: loaderData.bannerHref },
+          ]
+        : []),
+      { title: "Danh mục Phụ kiện Ô tô | SK" },
       {
         name: "description",
         content:
           "Tra cứu phụ kiện ô tô theo hãng xe, đời xe và năm sản xuất: đèn trần sao, loa treble, nội thất và báo giá lắp đặt.",
       },
-      { property: "og:title", content: "Danh mục Phụ kiện Ô tô | AutoDeco" },
+      { property: "og:title", content: "Danh mục Phụ kiện Ô tô | SK" },
       {
         property: "og:description",
         content: "Catalog phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
@@ -72,14 +81,10 @@ function Home() {
   const results = query.trim() === debouncedQuery.trim() ? (searchData ?? []) : [];
   const tooShort = query.trim().length > 0 && query.trim().length < SEARCH_MIN_LENGTH;
 
-  const filtered = categories;
-
   return (
     <div>
       <HomeBanner />
-
-
-      <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-card/95 px-3 py-2 backdrop-blur">
+      <div className="sk-glass sticky top-0 z-20 flex items-center gap-2 px-3 py-3">
         <div className="flex-1">
           <SearchBar value={query} onChange={setQuery} />
         </div>
@@ -89,7 +94,7 @@ function Home() {
       {/* Hướng dẫn sử dụng LED: đặt ngay dưới ô tìm kiếm để khách thấy ngay khi mở trang. */}
       <Link
         to="/huong-dan-su-dung"
-        className="mx-3 mt-3 flex items-center gap-3 rounded-lg bg-secondary/60 px-3 py-2.5 lux-hairline lux-press"
+        className="sk-edge sk-shimmer mx-3 mt-4 flex items-center gap-3 rounded-lg px-3 py-3"
       >
         <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-brand">
           <BookOpen className="size-4" />
@@ -127,12 +132,17 @@ function Home() {
                 className="flex items-center gap-3 rounded-md border border-border bg-card p-2"
               >
                 <SmartImage
-                  src={r.image}
+                  src={r.level === "product" && r.image === IMG.car ? "" : r.image}
                   alt={r.title}
                   size="thumb"
                   width={48}
                   height={48}
                   className="size-12 rounded-md bg-muted object-contain"
+                  fallbackContent={
+                    r.level === "product" ? (
+                      <ProductPlaceholder className="size-12 shrink-0 rounded-md [&_svg]:w-10 [&_span]:hidden" />
+                    ) : undefined
+                  }
                 />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold">{r.title}</span>
@@ -153,34 +163,38 @@ function Home() {
         </section>
       ) : (
         <>
-          <div className="bg-secondary px-4 py-3">
-            <h1 className="text-base font-bold tracking-wide uppercase">Danh mục Sản phẩm</h1>
+          <div className="flex items-end justify-between gap-3 px-4 pt-7 pb-3">
+            <h2 className="sk-gradient-text text-2xl font-bold">Danh mục Sản phẩm</h2>
+            <span className="shrink-0 pb-1 text-xs text-muted-foreground">
+              {categories.length} danh mục
+            </span>
           </div>
 
-          <div className="grid grid-cols-4 items-start gap-x-2 gap-y-4 px-3 py-4">
-            {filtered.map((c, tileIndex) => (
-              <div key={c.id} className="flex flex-col items-center gap-1">
+          <div className="grid grid-cols-2 items-start gap-4 px-3 py-4 sm:grid-cols-3 lg:grid-cols-4">
+            {categories.map((c, tileIndex) => (
+              <div key={c.id} className="sk-reveal flex flex-col items-center gap-1">
                 <Link
                   to="/c/$categoryId"
                   params={{ categoryId: c.id }}
                   className="flex w-full flex-col items-center gap-1.5"
                 >
-                  <span className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg lux-hairline lux-press text-brand">
+                  <span className="sk-edge sk-brand-tile sk-shimmer flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg text-brand">
                     {c.image && /^https?:\/\//.test(c.image) ? (
                       <SmartImage
                         src={c.image}
                         alt={c.name}
                         size="thumb"
-                        sizes="25vw"
+                        sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 240px"
                         // 2 hàng đầu nằm trong viewport ngay khi mở trang → tải sớm cho rõ nét
-                        eager={tileIndex < 8}
-                        className="size-full object-contain p-1"
+                        eager={tileIndex < 4}
+                        fallbackContent={<Car className="size-12 text-brand" />}
+                        className="size-full object-contain p-6"
                       />
                     ) : (
-                      <CategoryIcon name={c.icon} className="size-7" />
+                      <Car className="size-12" />
                     )}
                   </span>
-                  <span className="line-clamp-2 h-8 text-center text-xs leading-4 font-semibold text-foreground">
+                  <span className="line-clamp-2 h-10 pt-1 text-center text-sm leading-5 font-semibold text-foreground">
                     {c.name}
                   </span>
                 </Link>

@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCatalogRealtime } from "@/data/catalog.realtime";
 import { useAccessLog } from "@/hooks/useAccessLog";
 import { settingsQueryOptions } from "@/data/settings.api";
+import { PublicCatalogShell } from "@/components/catalog/PublicCatalogShell";
 
 function NotFoundComponent() {
   return (
@@ -91,21 +92,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#09090b" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "AutoDeco" },
-      { title: "AutoDeco - Danh mục Phụ kiện Ô tô" },
+      { name: "apple-mobile-web-app-title", content: "SK" },
+      { title: "SK - Danh mục Phụ kiện Ô tô" },
       {
         name: "description",
         content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
       },
-      { name: "author", content: "AutoDeco" },
-      { property: "og:title", content: "AutoDeco - Danh mục Phụ kiện Ô tô" },
+      { name: "author", content: "SK" },
+      { property: "og:title", content: "SK - Danh mục Phụ kiện Ô tô" },
       {
         property: "og:description",
         content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@autodeco" },
+      { name: "twitter:site", content: "@skambientlight" },
     ],
     links: [
       {
@@ -153,6 +154,7 @@ function RootComponent() {
   useAccessLog();
   // Trang quản trị dùng toàn bộ chiều rộng màn hình (desktop), không dùng khung mobile 480px.
   const isFullWidth = pathname.startsWith("/admin") || pathname.startsWith("/auth");
+  const isCatalog = pathname === "/" || pathname.startsWith("/c/");
 
   // Đăng nhập/đăng xuất làm thay đổi quyền xem giá nhập → nạp lại dữ liệu catalog.
   useEffect(() => {
@@ -203,13 +205,18 @@ function RootComponent() {
         // Không cần báo lỗi nếu trình duyệt không hỗ trợ hoặc môi trường dev.
       });
 
-    return () => navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+    return () =>
+      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeApplier />
-      {isFullWidth ? (
+      {isCatalog ? (
+        <PublicCatalogShell pathname={pathname}>
+          <Outlet />
+        </PublicCatalogShell>
+      ) : isFullWidth ? (
         <div className="min-h-screen bg-background">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />

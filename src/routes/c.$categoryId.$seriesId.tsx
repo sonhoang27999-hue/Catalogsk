@@ -18,8 +18,7 @@ import { ProductPrice } from "@/components/ProductPrice";
 import { ProductListNote } from "@/components/ProductListNote";
 import { isVerticalUrl, toEmbedUrl } from "@/lib/video";
 import { LazyEmbed } from "@/components/LazyEmbed";
-import { SmartImage } from "@/components/SmartImage";
-import { ImageZoom } from "@/components/ImageZoom";
+import { ProductMedia } from "@/components/catalog/ProductMedia";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
 
 export const Route = createFileRoute("/c/$categoryId/$seriesId")({
@@ -33,10 +32,12 @@ export const Route = createFileRoute("/c/$categoryId/$seriesId")({
   },
   head: ({ loaderData }) => {
     const name = loaderData?.series.name ?? "Đời xe";
-    const title = `Phụ kiện ${name} | AutoDeco`;
+    const title = `Phụ kiện ${name} | SK`;
     const description = `Danh sách phụ kiện, báo giá và video lắp đặt thực tế cho ${name}.`;
     return {
       meta: [
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
@@ -74,7 +75,7 @@ function SeriesPage() {
     <div>
       <PageHeader title={series.name} />
 
-      <div className="space-y-4 p-3 pb-32">
+      <div className="sk-product-list space-y-6 p-3 pb-8">
         {isAdmin ? (
           <PasteBar
             modelDbId={targetModel?.dbId ?? null}
@@ -83,39 +84,24 @@ function SeriesPage() {
           />
         ) : null}
         {products.map((p, i) => (
-          <div key={p.id} className="space-y-1">
-            <div className="block overflow-hidden rounded-2xl lux-hairline">
+          <div key={p.id} className="sk-reveal space-y-2">
+            <div className="sk-edge sk-product-card block overflow-hidden rounded-lg">
               <div className="bg-secondary px-3 py-3">
-                <h2 className="text-base leading-snug font-bold text-foreground">{p.name}</h2>
+                <h2 className="text-xl leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {p.description}
                   </p>
                 ) : null}
               </div>
-              <div className="relative w-full bg-muted">
-                <ImageZoom src={p.image} alt={p.name}>
-                  <SmartImage
-                    src={p.image}
-                    alt={p.name}
-                    size="preview"
-                    sizes="(max-width: 480px) 100vw, 480px"
-                    className="block h-auto w-full object-contain"
-                  />
-                </ImageZoom>
-                {toEmbedUrl(p.videoUrl) || p.detailUrl ? (
-                  <span className="pointer-events-none absolute top-2 left-2 rounded-full bg-background/75 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-gold ring-1 ring-gold/40 backdrop-blur">
-                    {toEmbedUrl(p.videoUrl) ? "Video thực tế" : "Ảnh thực tế"}
-                  </span>
-                ) : null}
-              </div>
+              <ProductMedia src={p.image} name={p.name} price={p.price} salePrice={p.salePrice} />
 
               {p.detailUrl ? (
                 <a
                   href={p.detailUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 lux-cta px-3 py-3 text-center text-sm font-semibold"
+                  className="flex items-center justify-center gap-1.5 sk-shimmer lux-cta px-3 py-3 text-center text-sm font-semibold"
                 >
                   Xem sản phẩm lên xe thực tế
                   <ExternalLink className="size-3.5 shrink-0" />
@@ -123,7 +109,7 @@ function SeriesPage() {
               ) : null}
               {toEmbedUrl(p.videoUrl) ? (
                 <LazyEmbed
-                  src={toEmbedUrl(p.videoUrl)!}
+                  src={toEmbedUrl(p.videoUrl) ?? ""}
                   title={`Video ${p.name}`}
                   vertical={isVerticalUrl(p.videoUrl)}
                   className="border-t border-border"
@@ -180,7 +166,11 @@ function SeriesPage() {
             <h2 className="text-base font-bold text-foreground">Video lắp đặt thực tế</h2>
             {videos.map((v) => (
               <div key={v.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                <LazyEmbed src={toEmbedUrl(v.url) ?? v.url} title={v.title} vertical={isVerticalUrl(v.url)} />
+                <LazyEmbed
+                  src={toEmbedUrl(v.url) ?? v.url}
+                  title={v.title}
+                  vertical={isVerticalUrl(v.url)}
+                />
                 <div className="flex items-center justify-between gap-2 px-3 py-2">
                   <p className="text-sm font-medium">{v.title}</p>
                   {isAdmin ? <DeleteButton table="videos" id={v.dbId} name={v.title} /> : null}
