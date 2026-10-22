@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DangKyDaiLyRouteImport } from './routes/dang-ky-dai-ly'
 import { Route as HuongDanSuDungRouteImport } from './routes/huong-dan-su-dung'
 import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
+import { Route as ApiBotTaiKhoanDaiLyRouteImport } from './routes/api.bot.tai-khoan-dai-ly'
 import { Route as CCategoryIdSeriesIdRouteImport } from './routes/c.$categoryId.$seriesId'
 import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n.$nodeId'
 
@@ -48,6 +49,11 @@ const CCategoryIdRoute = CCategoryIdRouteImport.update({
   path: '/c/$categoryId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBotTaiKhoanDaiLyRoute = ApiBotTaiKhoanDaiLyRouteImport.update({
+  id: '/api/bot/tai-khoan-dai-ly',
+  path: '/api/bot/tai-khoan-dai-ly',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CCategoryIdSeriesIdRoute = CCategoryIdSeriesIdRouteImport.update({
   id: '/$seriesId',
   path: '/$seriesId',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+  '/api/bot/tai-khoan-dai-ly': typeof ApiBotTaiKhoanDaiLyRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+  '/api/bot/tai-khoan-dai-ly': typeof ApiBotTaiKhoanDaiLyRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+  '/api/bot/tai-khoan-dai-ly': typeof ApiBotTaiKhoanDaiLyRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/dang-ky-dai-ly'
     | '/huong-dan-su-dung'
     | '/c/$categoryId'
+    | '/api/bot/tai-khoan-dai-ly'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/dang-ky-dai-ly'
     | '/huong-dan-su-dung'
     | '/c/$categoryId'
+    | '/api/bot/tai-khoan-dai-ly'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/dang-ky-dai-ly'
     | '/huong-dan-su-dung'
     | '/c/$categoryId'
+    | '/api/bot/tai-khoan-dai-ly'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   DangKyDaiLyRoute: typeof DangKyDaiLyRoute
   HuongDanSuDungRoute: typeof HuongDanSuDungRoute
   CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
+  ApiBotTaiKhoanDaiLyRoute: typeof ApiBotTaiKhoanDaiLyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CCategoryIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bot/tai-khoan-dai-ly': {
+      id: '/api/bot/tai-khoan-dai-ly'
+      path: '/api/bot/tai-khoan-dai-ly'
+      fullPath: '/api/bot/tai-khoan-dai-ly'
+      preLoaderRoute: typeof ApiBotTaiKhoanDaiLyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/c/$categoryId/$seriesId': {
       id: '/c/$categoryId/$seriesId'
       path: '/$seriesId'
@@ -214,6 +234,7 @@ const rootRouteChildren: RootRouteChildren = {
   DangKyDaiLyRoute: DangKyDaiLyRoute,
   HuongDanSuDungRoute: HuongDanSuDungRoute,
   CCategoryIdRoute: CCategoryIdRouteWithChildren,
+  ApiBotTaiKhoanDaiLyRoute: ApiBotTaiKhoanDaiLyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
