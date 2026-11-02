@@ -13,6 +13,9 @@ export const GUIDE_IOS_KEY = "guide_ios_url";
 export const GUIDE_APK_KEY = "guide_apk_url";
 export const GUIDE_LINK_KEYS = [GUIDE_SOURCE_KEY, GUIDE_IOS_KEY, GUIDE_APK_KEY] as const;
 
+/** APK của catalog, tách riêng app điều khiển LED. */
+export const CATALOG_APK_KEY = "catalog_apk_url";
+
 export const settingsQueryOptions = queryOptions({
   queryKey: ["site-settings"],
   queryFn: async () => {
@@ -35,9 +38,9 @@ export const saveSetting = async (key: string, value: string) => {
 
 /** Các biến giao diện admin có thể tuỳ chỉnh (lưu dạng chuỗi CSS hợp lệ). */
 export const THEME_VARS = [
-  { key: "theme_background", cssVar: "--background", label: "Nền trang", fallback: "#0a0a0b" },
-  { key: "theme_card", cssVar: "--card", label: "Nền thẻ / ô", fallback: "#18181b" },
-  { key: "theme_foreground", cssVar: "--foreground", label: "Màu chữ chính", fallback: "#fafafa" },
+  { key: "theme_background", cssVar: "--background", label: "Nền trang", fallback: "#09090b" },
+  { key: "theme_card", cssVar: "--card", label: "Nền thẻ / ô", fallback: "#262629" },
+  { key: "theme_foreground", cssVar: "--foreground", label: "Màu chữ chính", fallback: "#ffffff" },
   {
     key: "theme_muted_foreground",
     cssVar: "--muted-foreground",
@@ -45,9 +48,9 @@ export const THEME_VARS = [
     fallback: "#d4d4d8",
   },
   { key: "theme_border", cssVar: "--border", label: "Màu viền", fallback: "#3f3f46" },
-  { key: "theme_gold", cssVar: "--gold", label: "Màu nhấn (Gold)", fallback: "#d4af37" },
-  { key: "theme_brand", cssVar: "--brand", label: "Màu thương hiệu", fallback: "#3f6fd8" },
-  { key: "theme_primary", cssVar: "--primary", label: "Màu nút chính", fallback: "#3f6fd8" },
+  { key: "theme_gold", cssVar: "--gold", label: "Màu nhấn (Gold)", fallback: "#d9a514" },
+  { key: "theme_brand", cssVar: "--brand", label: "Màu thương hiệu", fallback: "#2d6fcd" },
+  { key: "theme_primary", cssVar: "--primary", label: "Màu nút chính", fallback: "#2d6fcd" },
 ] as const;
 
 export const THEME_RADIUS_KEY = "theme_radius";
@@ -69,7 +72,12 @@ export const THEME_EXTRA_KEYS = [
   "theme_fx_speed",
   "theme_title_gradient",
   "theme_preset",
+  "theme_texture",
+  "theme_light_style",
 ] as const;
+
+/** Mẫu giao diện admin lưu sẵn (JSON) — không thuộc giao diện đang dùng. */
+export const THEME_SLOTS_KEY = "theme_slots";
 
 /** Danh sách khóa giao diện được phép ghi/nhập từ trình chỉnh giao diện. */
 export const THEME_ALLOWED_KEYS: readonly string[] = [

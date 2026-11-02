@@ -49,9 +49,10 @@ import {
   saveSettings,
   settingsQueryOptions,
   THEME_RADIUS_KEY,
+  THEME_SLOTS_KEY,
   THEME_VARS,
 } from "@/data/settings.api";
-import { hexToOklch, toHex } from "@/lib/color";
+import { toHex } from "@/lib/color";
 import {
   buildThemeCss,
   contrast,
@@ -59,8 +60,14 @@ import {
   EFFECT_LIST,
   generatePalette,
   lchToHex,
+  LIGHT_STYLES,
   parseEffects,
+  parseLightStyle,
   parseMode,
+  parseTexture,
+  TEXTURES,
+  THEME_LIGHT_STYLE_KEY,
+  THEME_TEXTURE_KEY,
   parseSpeed,
   parseTitleGradient,
   THEME_ACCENT_KEY,
@@ -71,6 +78,7 @@ import {
   THEME_MODE_KEY,
   THEME_PRESET_KEY,
   THEME_TITLE_GRADIENT_KEY,
+  themeDraftPayload,
   type EffectId,
   type FxSpeed,
   type ThemeMode,
@@ -78,7 +86,7 @@ import {
 
 type Preset = {
   name: string;
-  group: "dark" | "light" | "vivid";
+  group: "car" | "dark" | "light" | "vivid";
   mode: "dark" | "light";
   values: Record<string, string>;
 };
@@ -88,6 +96,7 @@ const p = (
   group: Preset["group"],
   mode: Preset["mode"],
   [bg, card, fg, muted, border, gold, brand]: string[],
+  title?: string[],
 ): Preset => ({
   name,
   group,
@@ -101,8 +110,161 @@ const p = (
     theme_gold: gold!,
     theme_brand: brand!,
     theme_primary: brand!,
+    ...(title ? { theme_title_gradient: JSON.stringify(title) } : {}),
   },
 });
+
+/** Bộ màu mô phỏng đèn LED khoang lái các dòng xe sang (kèm gradient tiêu đề). */
+const CAR_PRESETS: Preset[] = [
+  p("Ocean Drive", "car", "dark",
+    ["#060b14", "#0f1726", "#eef6ff", "#a8bdd6", "#1f2d44", "#2ee6f0", "#c03cff"],
+    ["#22e3f0", "#7a5cff", "#e03cff"]),
+  p("GT Acid", "car", "dark",
+    ["#0b0c0d", "#1a1c1e", "#f2f4f2", "#b7bdb8", "#33373a", "#b6ff3c", "#6fcf2a"],
+    ["#d8ff5c", "#7be22e", "#e8ffd0"]),
+  p("M-Performance", "car", "dark",
+    ["#070a12", "#121827", "#f4f7ff", "#b0bccf", "#26324a", "#5fb6ff", "#1c4fd6"],
+    ["#7cc6ff", "#1c4fd6", "#e5262f"]),
+  p("Dynamic RS", "car", "dark",
+    ["#0c0c0d", "#1b1b1d", "#f6f6f6", "#bdbdc0", "#38383b", "#ff3b3b", "#c41d24"],
+    ["#ff5a4d", "#c41d24", "#ffd2cc"]),
+  p("Champagne", "car", "dark",
+    ["#120d0a", "#211812", "#fbf4ea", "#cdbba5", "#3d2e22", "#e6c58a", "#a87b4a"],
+    ["#fff1cf", "#e6c58a", "#b08350"]),
+];
+
+type ThemeSlot = { name: string; values: Record<string, string> };
+const MAX_SLOTS = 5;
+function parseSlots(raw?: string): ThemeSlot[] {
+  try {
+    const v = JSON.parse(raw || "[]");
+    if (!Array.isArray(v)) return [];
+    return v
+      .filter((s) => s && typeof s.name === "string" && s.values && typeof s.values === "object")
+      .map((s) => ({
+        name: String(s.name).slice(0, 40),
+        values: Object.fromEntries(
+          THEME_ALL_KEYS.filter((k) => typeof s.values[k] === "string").map((k) => [k, s.values[k]]),
+        ),
+      }))
+      .slice(0, MAX_SLOTS);
+  } catch {
+    return [];
+  }
+}
+
+function ThemeSlots({
+  slots,
+  busy,
+  onSaveCurrent,
+  onApply,
+  onDelete,
+}: {
+  slots: ThemeSlot[];
+  busy: boolean;
+  onSaveCurrent: (name: string) => void;
+  onApply: (s: ThemeSlot) => void;
+  onDelete: (i: number) => void;
+}) {
+  const [name, setName] = useState("");
+  const full = slots.length >= MAX_SLOTS;
+  return (
+    <section>
+      <SectionLabel>Mẫu giao diện đã lưu ({slots.length}/{MAX_SLOTS})</SectionLabel>
+      {slots.length > 0 && (
+        <div className="mb-2.5 space-y-1.5">
+          {slots.map((s, i) => (
+            <div key={i} className="flex items-center gap-2 rounded-xl border border-border px-2.5 py-2">
+              <span
+                className="size-6 shrink-0 rounded-md border border-border"
+                style={{
+                  background: `linear-gradient(135deg, ${s.values["theme_background"] ?? "#000"} 50%, ${toHex(s.values["theme_brand"] ?? "", "#3f6fd8")} 50%)`,
+                }}
+              />
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{s.name}</span>
+              <Button type="button" size="sm" variant="outline" className="h-7 text-xs" disabled={busy} onClick={() => onApply(s)}>
+                Áp dụng
+              </Button>
+              <Button type="button" size="sm" variant="ghost" className="h-7 text-xs text-destructive" disabled={busy} onClick={() => onDelete(i)}>
+                Xóa
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={40}
+          placeholder={full ? "Đã đủ 5 mẫu — xóa bớt để lưu" : "Tên mẫu, vd: Theme Tết"}
+          disabled={full || busy}
+          className="h-9 min-w-0 flex-1 rounded-xl border border-border bg-background px-3 text-sm text-foreground"
+        />
+        <Button
+          type="button"
+          size="sm"
+          className="h-9"
+          disabled={full || busy || !name.trim()}
+          onClick={() => {
+            onSaveCurrent(name.trim());
+            setName("");
+          }}
+        >
+          Lưu mẫu
+        </Button>
+      </div>
+      <p className="mt-1.5 text-[11px] text-muted-foreground">
+        Lưu giao diện đang xem thành mẫu. "Áp dụng" xem trước ngay, bấm "Lưu giao diện" để dùng cho mọi người.
+      </p>
+    </section>
+  );
+}
+
+function ChoiceGrid<T extends string>({
+  options,
+  value,
+  onChange,
+  swatch,
+}: {
+  options: { id: T; label: string; hint: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  swatch?: boolean;
+}) {
+  const swatchStyle: Record<string, CSSProperties> = {
+    none: { background: "var(--background)" },
+    carbon: {
+      background:
+        "repeating-linear-gradient(45deg,#2a2a2e 0 2px,#151517 2px 6px),#151517",
+    },
+    oled: { background: "#000" },
+    smoked: { background: "linear-gradient(135deg,#3a3f47aa,#0b0d10)" },
+  };
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {options.map((o) => {
+        const active = o.id === value;
+        return (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => onChange(o.id)}
+            className={`flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-transform active:scale-[0.97] ${
+              active ? "border-gold ring-2 ring-gold" : "border-border"
+            }`}
+          >
+            {swatch && <span className="size-7 shrink-0 rounded-lg border border-border" style={swatchStyle[o.id]} />}
+            <span className="min-w-0">
+              <span className="block text-xs font-semibold text-foreground">{o.label}</span>
+              <span className="block truncate text-[10px] text-muted-foreground">{o.hint}</span>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 const LIBRARY: Preset[] = [
   p("Tối + Gold", "dark", "dark", [
@@ -249,9 +411,11 @@ const LIBRARY: Preset[] = [
     "#3ee6a5",
     "#17a877",
   ]),
+  ...CAR_PRESETS,
 ];
 
 const GROUPS: { id: Preset["group"]; label: string }[] = [
+  { id: "car", label: "LED khoang lái xe sang" },
   { id: "dark", label: "Tối sang trọng" },
   { id: "light", label: "Sáng" },
   { id: "vivid", label: "Rực rỡ" },
@@ -445,7 +609,7 @@ export function ThemeManager() {
       if (v !== undefined && v !== "") out[key] = v;
     }
     for (const v of THEME_VARS) {
-      out[v.key] = draft[v.key] ?? toHex(base[v.key] ?? "", v.fallback);
+      out[v.key] = toHex(draft[v.key] ?? base[v.key] ?? "", v.fallback);
     }
     out[THEME_RADIUS_KEY] = draft[THEME_RADIUS_KEY] ?? base[THEME_RADIUS_KEY] ?? "0.625rem";
     return out;
@@ -455,14 +619,18 @@ export function ThemeManager() {
   const effects = parseEffects(current[THEME_EFFECTS_KEY]);
   const speed = parseSpeed(current[THEME_FX_SPEED_KEY]);
   const gradient = parseTitleGradient(current[THEME_TITLE_GRADIENT_KEY]);
-  const accent = HEX.test(current[THEME_ACCENT_KEY] ?? "")
-    ? current[THEME_ACCENT_KEY]!
+  const accentValue = current[THEME_ACCENT_KEY] ?? "";
+  const accent = HEX.test(accentValue)
+    ? accentValue
     : (current["theme_brand"] ?? "#3f6fd8");
   const bgLevel = Number(current[THEME_BG_LEVEL_KEY] ?? 20) || 0;
   const activePreset = LIBRARY.find((pr) => isActivePreset(current, pr.values));
+  const texture = parseTexture(current[THEME_TEXTURE_KEY]);
+  const lightStyle = parseLightStyle(current[THEME_LIGHT_STYLE_KEY]);
+  const slots = parseSlots(base[THEME_SLOTS_KEY]);
 
   /* ----- Xem trước trực tiếp ----- */
-  const previewCss = open && dirty ? buildThemeCss(current) : "";
+  const previewCss = open && dirty ? buildThemeCss({ ...base, ...draft }) : "";
   useEffect(() => {
     if (!previewCss) return;
     const el = document.getElementById("sk-theme") as HTMLStyleElement | null;
@@ -496,6 +664,7 @@ export function ThemeManager() {
     patch({ [THEME_TITLE_GRADIENT_KEY]: JSON.stringify(colors) });
 
   const close = () => {
+    if (save.isPending || reset.isPending) return;
     setDraft({});
     setImportOpen(false);
     setOpen(false);
@@ -503,13 +672,8 @@ export function ThemeManager() {
 
   const save = useMutation({
     mutationFn: async () => {
-      const payload: Record<string, string> = {};
-      for (const v of THEME_VARS) payload[v.key] = hexToOklch(current[v.key] ?? "") ?? "";
-      payload[THEME_RADIUS_KEY] = current[THEME_RADIUS_KEY] ?? "";
-      for (const key of Object.keys(draft)) {
-        if (!(key in payload) && THEME_ALL_KEYS.includes(key)) payload[key] = draft[key] ?? "";
-      }
-      await saveSettings(payload);
+      if (reset.isPending) return;
+      await saveSettings(themeDraftPayload(draft));
     },
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: settingsQueryOptions.queryKey });
@@ -522,6 +686,7 @@ export function ThemeManager() {
 
   const reset = useMutation({
     mutationFn: async () => {
+      if (save.isPending) return;
       const payload: Record<string, string> = {};
       for (const key of THEME_ALL_KEYS) payload[key] = "";
       await saveSettings(payload);
@@ -534,10 +699,33 @@ export function ThemeManager() {
     },
     onError: (e: Error) => toast.error(e.message || "Không khôi phục được."),
   });
+  const slotsMut = useMutation({
+    mutationFn: (next: ThemeSlot[]) =>
+      saveSettings({ [THEME_SLOTS_KEY]: JSON.stringify(next) }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: settingsQueryOptions.queryKey });
+      toast.success("Đã cập nhật mẫu giao diện.");
+    },
+    onError: (e: Error) => toast.error(e.message || "Không lưu được mẫu."),
+  });
+  const saveSlots = (next: ThemeSlot[]) => slotsMut.mutate(next.slice(0, MAX_SLOTS));
+  const busy = save.isPending || reset.isPending || slotsMut.isPending;
+
+  /** Ảnh chụp giao diện hiện hành (đã lưu + nháp) để lưu thành mẫu. */
+  const snapshot = () => {
+    const values = { ...base, ...draft };
+    const out: Record<string, string> = {};
+    for (const key of THEME_ALL_KEYS) if (values[key]) out[key] = values[key]!;
+    return out;
+  };
 
   const exportJson = async () => {
     const out: Record<string, string> = {};
-    for (const key of THEME_ALL_KEYS) if (current[key]) out[key] = current[key]!;
+    const values = { ...base, ...draft };
+    for (const key of THEME_ALL_KEYS) {
+      const value = values[key];
+      if (value) out[key] = value;
+    }
     const text = JSON.stringify({ type: "sk-theme", version: 1, values: out }, null, 2);
     try {
       await navigator.clipboard.writeText(text);
@@ -551,7 +739,7 @@ export function ThemeManager() {
 
   const importJson = () => {
     try {
-      const parsed = JSON.parse(importText) as { values?: Record<string, unknown> };
+      const parsed = JSON.parse(importText) as { type?: string; values?: Record<string, unknown> };
       const src = (parsed?.values ?? parsed) as Record<string, unknown>;
       const next: Record<string, string> = {};
       for (const key of THEME_ALL_KEYS) {
@@ -560,8 +748,12 @@ export function ThemeManager() {
           next[key] = THEME_VARS.some((t) => t.key === key) ? toHex(v, "") || v : v;
         }
       }
-      if (!Object.keys(next).length) throw new Error();
-      patch(next);
+      if (!Object.keys(next).length && !(parsed.type === "sk-theme" && parsed.values)) throw new Error();
+      if (parsed.type === "sk-theme" && parsed.values) {
+        setDraft({ ...Object.fromEntries(THEME_ALL_KEYS.map((key) => [key, ""])), ...next });
+      } else {
+        patch(next);
+      }
       setImportOpen(false);
       setImportText("");
       toast.success("Đã nạp giao diện — kiểm tra rồi bấm Lưu.");
@@ -629,6 +821,20 @@ export function ThemeManager() {
             </div>
 
             <div className="flex-1 space-y-5 overflow-y-auto px-5 py-4">
+              {tab === "library" && (
+                <ThemeSlots
+                  slots={slots}
+                  busy={busy}
+                  onSaveCurrent={(name) => saveSlots([...slots, { name, values: snapshot() }])}
+                  onApply={(s) =>
+                    setDraft({
+                      ...Object.fromEntries(THEME_ALL_KEYS.map((key) => [key, ""])),
+                      ...s.values,
+                    })
+                  }
+                  onDelete={(i) => saveSlots(slots.filter((_, j) => j !== i))}
+                />
+              )}
               {tab === "library" &&
                 GROUPS.map((g) => (
                   <section key={g.id}>
@@ -790,6 +996,25 @@ export function ThemeManager() {
                     />
                   </section>
 
+                  <section>
+                    <SectionLabel>Kiểu nhịp sáng LED</SectionLabel>
+                    <ChoiceGrid
+                      options={LIGHT_STYLES}
+                      value={lightStyle}
+                      onChange={(v) => patch({ [THEME_LIGHT_STYLE_KEY]: v })}
+                    />
+                  </section>
+
+                  <section>
+                    <SectionLabel>Chất liệu nền</SectionLabel>
+                    <ChoiceGrid
+                      options={TEXTURES}
+                      value={texture}
+                      onChange={(v) => patch({ [THEME_TEXTURE_KEY]: v })}
+                      swatch
+                    />
+                  </section>
+
                   <section className="space-y-2">
                     <SectionLabel>Hiệu ứng ánh sáng</SectionLabel>
                     {EFFECT_LIST.map((e) => (
@@ -895,6 +1120,11 @@ export function ThemeManager() {
 
               {tab === "details" && (
                 <>
+                  {mode === "auto" && (
+                    <p className="text-xs text-muted-foreground">
+                      Chọn Sáng hoặc Tối để chỉnh từng màu; Tự động dùng bộ màu theo thiết bị.
+                    </p>
+                  )}
                   <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
                     <CollapsibleTrigger asChild>
                       <button
@@ -919,6 +1149,7 @@ export function ThemeManager() {
                           <span className="text-sm text-foreground">{v.label}</span>
                           <input
                             type="color"
+                            disabled={mode === "auto"}
                             value={current[v.key] ?? v.fallback}
                             onChange={(e) =>
                               patch({ [v.key]: e.target.value, [THEME_PRESET_KEY]: "" })
@@ -1015,7 +1246,7 @@ export function ThemeManager() {
                     type="button"
                     variant="secondary"
                     className="w-full rounded-xl"
-                    disabled={reset.isPending}
+                    disabled={busy}
                     onClick={() => setConfirmReset(true)}
                   >
                     <RotateCcw className="size-4" /> Khôi phục mặc định
@@ -1025,11 +1256,11 @@ export function ThemeManager() {
             </div>
 
             <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-border bg-background/95 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
-              <Button variant="secondary" onClick={close} className="rounded-xl py-5 font-semibold">
+              <Button variant="secondary" disabled={busy} onClick={close} className="rounded-xl py-5 font-semibold">
                 Hủy
               </Button>
               <Button
-                disabled={save.isPending || !dirty}
+                disabled={busy || !dirty}
                 onClick={() => save.mutate()}
                 className="rounded-xl bg-primary py-5 font-semibold text-primary-foreground shadow-lg hover:bg-primary/90"
               >
@@ -1040,7 +1271,7 @@ export function ThemeManager() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
+      <AlertDialog open={confirmReset} onOpenChange={(next) => { if (!busy) setConfirmReset(next); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Khôi phục giao diện mặc định?</AlertDialogTitle>
@@ -1050,8 +1281,8 @@ export function ThemeManager() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Không</AlertDialogCancel>
-            <AlertDialogAction onClick={() => reset.mutate()}>Khôi phục</AlertDialogAction>
+            <AlertDialogCancel disabled={busy}>Không</AlertDialogCancel>
+            <AlertDialogAction disabled={busy} onClick={() => reset.mutate()}>Khôi phục</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

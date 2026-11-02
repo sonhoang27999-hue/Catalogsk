@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "SK - Phụ kiện Ô tô",
   "short_name": "SK",
   "description": "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
@@ -9,12 +10,11 @@
   "orientation": "portrait",
   "scope": "/",
   "lang": "vi",
+  "categories": ["shopping", "business"],
   "icons": [
-    {
-      "src": "/favicon.png",
-      "sizes": "64x64",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/favicon.png", "sizes": "64x64", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

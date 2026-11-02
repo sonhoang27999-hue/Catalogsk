@@ -118,7 +118,7 @@ function AuthPage() {
             onChange={(e) => setRemember(e.target.checked)}
             className="size-4 accent-[var(--brand)]"
           />
-          Ghi nhớ đăng nhập trên thiết bị này
+          Ghi nhớ tên đăng nhập trên thiết bị này
         </label>
         <Button type="submit" className="w-full" disabled={loading}>
           {mode === "signin" ? "Đăng nhập" : "Tạo tài khoản"}

@@ -20,6 +20,7 @@ import { useDealerPrices } from "@/hooks/useDealerPrices";
 import { toEmbedUrl } from "@/lib/video";
 import { LazyEmbed } from "@/components/LazyEmbed";
 import { SmartImage } from "@/components/SmartImage";
+import { ProductActions } from "@/components/catalog/WorkflowProvider";
 import { ProductMedia } from "@/components/catalog/ProductMedia";
 
 export function NodeLevel({
@@ -56,6 +57,11 @@ export function NodeLevel({
 
   return (
     <div className="pb-8">
+      {products.length > 0 ? (
+        <p className="px-3 text-center text-xs text-muted-foreground">
+          Giá niêm yết đã gồm VAT
+        </p>
+      ) : null}
       {isAdmin ? (
         <div className="pt-3">
           <PasteBar nodeDbId={parentNodeId} categoryDbId={categoryDbId} targetName={parentName} />
@@ -112,6 +118,7 @@ export function NodeLevel({
                   </p>
                 ) : null}
               </div>
+              <ProductActions id={p.dbId} name={p.name} />
               <ProductMedia src={p.image} name={p.name} price={p.price} salePrice={p.salePrice} />
 
               {p.detailUrl ? (
@@ -155,7 +162,7 @@ export function NodeLevel({
                     detailUrl: p.detailUrl ?? "",
                     price: p.price,
                     salePrice: p.salePrice ?? null,
-                    dealerPrice: p.dealerPrice ?? null,
+                    dealerPrice: dealerPrices[p.dbId] ?? p.dealerPrice ?? null,
                     dealerPriceVat: dealerPricesVat[p.dbId] ?? null,
                     brand: p.brand,
                     origin: p.origin,

@@ -7,6 +7,7 @@ import { useMemo, useRef, useState } from "react";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
+import { confirmWarnings } from "@/lib/productChecks";
 import { parsePriceWorkbook } from "@/lib/priceSheet";
 import { analyzePriceRows, applyPriceRows, type DiffStatus, type PriceDiff } from "@/data/import.api";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
@@ -104,7 +105,11 @@ export function ExcelImport() {
   const willUpdate = chosen.length - willCreate;
 
   const run = useMutation({
-    mutationFn: async () => applyPriceRows(chosen, (done) => setProgress(done)),
+    mutationFn: async () => {
+      const warnings = chosen.flatMap(d => d.warnings.map(w => `${d.row.brand} / ${d.row.model} / ${d.row.productName}: ${w}`));
+      if (!confirmWarnings(warnings)) throw new Error("Đã hủy nhập dữ liệu.");
+      return applyPriceRows(chosen, (done) => setProgress(done));
+    },
     onSuccess: async (r) => {
       await refresh();
       toast.success(`Thêm mới ${r.created} • Cập nhật ${r.updated}`);
@@ -214,6 +219,7 @@ export function ExcelImport() {
                       </span>
                     </div>
                     <p className="mt-0.5 truncate text-muted-foreground">{d.row.productName}</p>
+                    {d.warnings.map((warning,i) => <p key={i} className="mt-1 text-gold">⚠ {warning}</p>)}
                     <div className="mt-1 space-y-0.5 tabular-nums text-muted-foreground">
                       <PriceLine
                         label="Niêm yết"

@@ -28,9 +28,16 @@ export function ProductPrice({
     <div className="sk-price-panel">
       <div className="flex items-end justify-between gap-3 py-2.5">
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            {onSale ? "Giá khuyến mãi" : "Giá niêm yết"}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              {onSale ? "Giá khuyến mãi" : "Giá niêm yết"}
+            </p>
+            {onSale ? (
+              <span className="sk-discount rounded-md px-2 py-0.5 text-xs font-extrabold text-primary-foreground">
+                -{Math.round(((price - salePrice) / price) * 100)}%
+              </span>
+            ) : null}
+          </div>
           <p
             className={`mt-0.5 text-3xl leading-tight font-extrabold tabular-nums ${
               onSale ? "sk-gradient-text" : "text-foreground"
@@ -43,7 +50,6 @@ export function ProductPrice({
               {formatPrice(price)}
             </p>
           ) : null}
-          <p className="mt-1 text-[11px] font-medium text-muted-foreground">Giá đã gồm VAT</p>
         </div>
 
       </div>

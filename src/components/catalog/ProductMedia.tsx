@@ -6,6 +6,8 @@ import { ProductPlaceholder } from "./ProductPlaceholder";
 export function ProductMedia({
   src,
   name,
+  // price/salePrice giữ nguyên chữ ký để các nơi gọi không phải đổi; nhãn giảm
+  // giá hiển thị trong khối giá (ProductPrice) thay vì đè lên ảnh.
   price,
   salePrice,
 }: {
@@ -15,7 +17,6 @@ export function ProductMedia({
   salePrice?: number | null | undefined;
 }) {
   const missing = !src?.trim() || src === IMG.car;
-  const discounted = salePrice != null && salePrice > 0 && salePrice < price;
   return (
     <div className="sk-product-media relative overflow-hidden">
       {missing ? (
@@ -32,11 +33,6 @@ export function ProductMedia({
           />
         </ImageZoom>
       )}
-      {discounted ? (
-        <span className="sk-discount absolute right-3 top-3 rounded-md px-3 py-1.5 text-sm font-extrabold text-primary-foreground">
-          -{Math.round(((price - salePrice) / price) * 100)}%
-        </span>
-      ) : null}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, Outlet, useChildMatches } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { RememberVehicle } from "@/components/catalog/RememberVehicle";
 import { PageHeader } from "@/components/PageHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { categoryQueryOptions } from "@/data/catalog.queries";
@@ -66,6 +67,7 @@ function CategoryPage() {
   if (category.layout === "tree") {
     return (
       <div>
+        <RememberVehicle path={`/c/${category.id}`} name={category.name} />
         <PageHeader title={category.name} />
         <NodeLevel
           categoryId={category.id}
@@ -82,6 +84,7 @@ function CategoryPage() {
 
   return (
     <div>
+      <RememberVehicle path={`/c/${category.id}`} name={category.name} />
       <PageHeader title={`Đời xe ${category.name}`} />
       <div className="sk-glass sticky top-14 z-20 px-3 py-3">
         <SearchBar

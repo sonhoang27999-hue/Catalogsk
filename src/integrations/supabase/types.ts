@@ -59,6 +59,87 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_change_history: {
+        Row: {
+          actor_email: string
+          actor_id: string | null
+          after_row: Json | null
+          before_row: Json | null
+          created_at: string
+          entity_id: string
+          id: string
+          operation: string
+          table_name: string
+        }
+        Insert: {
+          actor_email?: string
+          actor_id?: string | null
+          after_row?: Json | null
+          before_row?: Json | null
+          created_at?: string
+          entity_id: string
+          id?: string
+          operation: string
+          table_name: string
+        }
+        Update: {
+          actor_email?: string
+          actor_id?: string | null
+          after_row?: Json | null
+          before_row?: Json | null
+          created_at?: string
+          entity_id?: string
+          id?: string
+          operation?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
+      catalog_preferences: {
+        Row: {
+          favorite_ids: string[]
+          recent_vehicles: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          favorite_ids?: string[]
+          recent_vehicles?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          favorite_ids?: string[]
+          recent_vehicles?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      catalog_share_lists: {
+        Row: {
+          created_at: string
+          id: string
+          product_ids: string[]
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_ids?: string[]
+          title?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_ids?: string[]
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -517,6 +598,8 @@ export type Database = {
           email: string
         }[]
       }
+      read_catalog_share: { Args: { _id: string }; Returns: Json }
+      restore_catalog_edit: { Args: { _event_id: string }; Returns: undefined }
       set_admin: {
         Args: { _email: string; _enabled: boolean }
         Returns: string
@@ -525,6 +608,7 @@ export type Database = {
         Args: { _email: string; _enabled: boolean }
         Returns: string
       }
+      toggle_catalog_favorite: { Args: { _id: string }; Returns: string[] }
     }
     Enums: {
       app_role: "admin" | "user" | "price_viewer" | "dealer1" | "manager"

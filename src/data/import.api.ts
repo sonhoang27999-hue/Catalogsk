@@ -5,6 +5,7 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { ensureDefaultModel, saveDealerPrice, toSlug } from "@/data/admin.api";
+import { priceWarnings, normalizedProductName } from "@/lib/productChecks";
 import type { PriceRow } from "@/lib/priceSheet";
 
 export type ImportResult = { created: number; updated: number; skipped: number };
@@ -20,6 +21,7 @@ export type PriceDiff = {
   current: { price: number | null; salePrice: number | null; dealerPrice: number | null; dealerPriceVat: number | null } | null;
   /** Danh sách thay đổi dạng chữ để hiển thị cho admin. */
   changes: string[];
+  warnings: string[];
 };
 
 const uniqueSlug = (base: string, taken: Set<string>) => {
@@ -119,8 +121,13 @@ async function loadCaches(): Promise<Caches> {
 export async function analyzePriceRows(rows: PriceRow[]): Promise<PriceDiff[]> {
   const c = await loadCaches();
   const out: PriceDiff[] = [];
+  const seen = new Set<string>();
 
   rows.forEach((row, i) => {
+    const warnings = priceWarnings(row.price, row.salePrice);
+    const duplicateKey = `${brandKey(row.brand)}|${brandKey(row.model)}|${normalizedProductName(row.productName)}`;
+    if (seen.has(duplicateKey)) warnings.push("Dòng sản phẩm trùng trong file; dòng sau có thể ghi đè dòng trước.");
+    seen.add(duplicateKey);
     const catId = c.cat.get(brandKey(row.brand));
     const serId = catId ? c.ser.get(`${catId}|${brandKey(row.model)}`) : undefined;
     const modelId = serId ? c.model.get(serId) : undefined;
@@ -136,6 +143,7 @@ export async function analyzePriceRows(rows: PriceRow[]): Promise<PriceDiff[]> {
         productId: null,
         current: null,
         changes: [],
+        warnings,
       });
       return;
     }
@@ -157,6 +165,7 @@ export async function analyzePriceRows(rows: PriceRow[]): Promise<PriceDiff[]> {
       productId,
       current: { price: cur.price, salePrice: cur.salePrice, dealerPrice: dealer, dealerPriceVat: dealerVat },
       changes,
+      warnings,
     });
   });
 
@@ -200,7 +209,9 @@ export async function applyPriceRows(
   const result: ImportResult = { created: 0, updated: 0, skipped: 0 };
 
   for (let i = 0; i < items.length; i++) {
-    const { row } = items[i]!;
+    const item = items[i];
+    if (!item) continue;
+    const { row } = item;
     const categoryId = await ensureCategory(row.brand, c);
     const seriesId = await ensureSeries(categoryId, row.model, c);
     let modelId = c.model.get(seriesId);

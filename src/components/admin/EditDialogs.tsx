@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { checkProduct, confirmWarnings } from "@/lib/productChecks";
 import { saveDealerPrice, saveRow, toSlug } from "@/data/admin.api";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
 import { ImageUrlPreview } from "./ImageUrlPreview";
@@ -97,6 +98,8 @@ export function EditButton({
       const image = (form.imageUrl ?? "").trim() || null;
 
       if (kind === "product") {
+        const warnings = await checkProduct({name, price: num(String(form.price ?? 0)), sale_price: String(form.salePrice ?? "").trim() ? num(String(form.salePrice)) : null, image_url: image, video_url: form.videoUrl, detail_url: form.detailUrl}, id);
+        if (!confirmWarnings(warnings)) throw new Error("Đã hủy lưu.");
         await saveRow("products", id, {
           name: name.slice(0, 160) || "Sản phẩm",
 

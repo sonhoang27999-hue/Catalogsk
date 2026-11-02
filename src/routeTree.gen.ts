@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnhLoiRouteImport } from './routes/anh-loi'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CaiAppRouteImport } from './routes/cai-app'
 import { Route as DangKyDaiLyRouteImport } from './routes/dang-ky-dai-ly'
 import { Route as HuongDanSuDungRouteImport } from './routes/huong-dan-su-dung'
+import { Route as YeuThichRouteImport } from './routes/yeu-thich'
 import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
+import { Route as ChiaSeShareIdRouteImport } from './routes/chia-se.$shareId'
 import { Route as CCategoryIdSeriesIdRouteImport } from './routes/c.$categoryId.$seriesId'
 import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n.$nodeId'
 
@@ -33,6 +36,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CaiAppRoute = CaiAppRouteImport.update({
+  id: '/cai-app',
+  path: '/cai-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DangKyDaiLyRoute = DangKyDaiLyRouteImport.update({
   id: '/dang-ky-dai-ly',
   path: '/dang-ky-dai-ly',
@@ -43,9 +51,19 @@ const HuongDanSuDungRoute = HuongDanSuDungRouteImport.update({
   path: '/huong-dan-su-dung',
   getParentRoute: () => rootRouteImport,
 } as any)
+const YeuThichRoute = YeuThichRouteImport.update({
+  id: '/yeu-thich',
+  path: '/yeu-thich',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CCategoryIdRoute = CCategoryIdRouteImport.update({
   id: '/c/$categoryId',
   path: '/c/$categoryId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChiaSeShareIdRoute = ChiaSeShareIdRouteImport.update({
+  id: '/chia-se/$shareId',
+  path: '/chia-se/$shareId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CCategoryIdSeriesIdRoute = CCategoryIdSeriesIdRouteImport.update({
@@ -63,9 +81,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
+  '/cai-app': typeof CaiAppRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
+  '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+  '/chia-se/$shareId': typeof ChiaSeShareIdRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -73,9 +94,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
+  '/cai-app': typeof CaiAppRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
+  '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+  '/chia-se/$shareId': typeof ChiaSeShareIdRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -84,9 +108,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/anh-loi': typeof AnhLoiRoute
   '/auth': typeof AuthRoute
+  '/cai-app': typeof CaiAppRoute
   '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
+  '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+  '/chia-se/$shareId': typeof ChiaSeShareIdRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -96,9 +123,12 @@ export interface FileRouteTypes {
     | '/'
     | '/anh-loi'
     | '/auth'
+    | '/cai-app'
     | '/dang-ky-dai-ly'
     | '/huong-dan-su-dung'
+    | '/yeu-thich'
     | '/c/$categoryId'
+    | '/chia-se/$shareId'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   fileRoutesByTo: FileRoutesByTo
@@ -106,9 +136,12 @@ export interface FileRouteTypes {
     | '/'
     | '/anh-loi'
     | '/auth'
+    | '/cai-app'
     | '/dang-ky-dai-ly'
     | '/huong-dan-su-dung'
+    | '/yeu-thich'
     | '/c/$categoryId'
+    | '/chia-se/$shareId'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   id:
@@ -116,9 +149,12 @@ export interface FileRouteTypes {
     | '/'
     | '/anh-loi'
     | '/auth'
+    | '/cai-app'
     | '/dang-ky-dai-ly'
     | '/huong-dan-su-dung'
+    | '/yeu-thich'
     | '/c/$categoryId'
+    | '/chia-se/$shareId'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   fileRoutesById: FileRoutesById
@@ -127,9 +163,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnhLoiRoute: typeof AnhLoiRoute
   AuthRoute: typeof AuthRoute
+  CaiAppRoute: typeof CaiAppRoute
   DangKyDaiLyRoute: typeof DangKyDaiLyRoute
   HuongDanSuDungRoute: typeof HuongDanSuDungRoute
+  YeuThichRoute: typeof YeuThichRoute
   CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
+  ChiaSeShareIdRoute: typeof ChiaSeShareIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cai-app': {
+      id: '/cai-app'
+      path: '/cai-app'
+      fullPath: '/cai-app'
+      preLoaderRoute: typeof CaiAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dang-ky-dai-ly': {
       id: '/dang-ky-dai-ly'
       path: '/dang-ky-dai-ly'
@@ -169,11 +215,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HuongDanSuDungRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/yeu-thich': {
+      id: '/yeu-thich'
+      path: '/yeu-thich'
+      fullPath: '/yeu-thich'
+      preLoaderRoute: typeof YeuThichRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/c/$categoryId': {
       id: '/c/$categoryId'
       path: '/c/$categoryId'
       fullPath: '/c/$categoryId'
       preLoaderRoute: typeof CCategoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chia-se/$shareId': {
+      id: '/chia-se/$shareId'
+      path: '/chia-se/$shareId'
+      fullPath: '/chia-se/$shareId'
+      preLoaderRoute: typeof ChiaSeShareIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/c/$categoryId/$seriesId': {
@@ -211,9 +271,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnhLoiRoute: AnhLoiRoute,
   AuthRoute: AuthRoute,
+  CaiAppRoute: CaiAppRoute,
   DangKyDaiLyRoute: DangKyDaiLyRoute,
   HuongDanSuDungRoute: HuongDanSuDungRoute,
+  YeuThichRoute: YeuThichRoute,
   CCategoryIdRoute: CCategoryIdRouteWithChildren,
+  ChiaSeShareIdRoute: ChiaSeShareIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

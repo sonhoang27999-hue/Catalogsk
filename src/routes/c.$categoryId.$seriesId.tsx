@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ExternalLink } from "lucide-react";
 import { seriesQueryOptions } from "@/data/catalog.queries";
+import { RememberVehicle } from "@/components/catalog/RememberVehicle";
 import { PageHeader } from "@/components/PageHeader";
 import { AddFab, AddTile } from "@/components/admin/AddTile";
 import { AddProductDialog, AddVideoDialog } from "@/components/admin/AddDialogs";
@@ -13,11 +14,11 @@ import { DeleteButton } from "@/components/admin/DeleteButton";
 import { CutProductButton, PasteBar } from "@/components/admin/CutPaste";
 
 import { EditButton, externalImage } from "@/components/admin/EditDialogs";
-import { formatPrice } from "@/data/catalog.repository";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductListNote } from "@/components/ProductListNote";
 import { isVerticalUrl, toEmbedUrl } from "@/lib/video";
 import { LazyEmbed } from "@/components/LazyEmbed";
+import { ProductActions } from "@/components/catalog/WorkflowProvider";
 import { ProductMedia } from "@/components/catalog/ProductMedia";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
 
@@ -73,7 +74,13 @@ function SeriesPage() {
 
   return (
     <div>
+      <RememberVehicle path={`/c/${params.categoryId}/${params.seriesId}`} name={series.name} />
       <PageHeader title={series.name} />
+      {products.length > 0 ? (
+        <p className="px-3 text-center text-xs text-muted-foreground">
+          Giá niêm yết đã gồm VAT
+        </p>
+      ) : null}
 
       <div className="sk-product-list space-y-6 p-3 pb-8">
         {isAdmin ? (
@@ -94,6 +101,7 @@ function SeriesPage() {
                   </p>
                 ) : null}
               </div>
+              <ProductActions id={p.dbId} name={p.name} />
               <ProductMedia src={p.image} name={p.name} price={p.price} salePrice={p.salePrice} />
 
               {p.detailUrl ? (
@@ -124,9 +132,6 @@ function SeriesPage() {
                   canViewDealerPrice={canViewDealerPrice}
                 />
               </div>
-              <p className="px-3 pb-3 text-xs text-muted-foreground">
-                {p.installPrice ? `Công lắp đặt: ${formatPrice(p.installPrice)}` : p.priceNote}
-              </p>
             </div>
             {isAdmin ? (
               <div className="flex items-center justify-end gap-1">
@@ -142,7 +147,7 @@ function SeriesPage() {
                     detailUrl: p.detailUrl ?? "",
                     price: p.price,
                     salePrice: p.salePrice ?? null,
-                    dealerPrice: p.dealerPrice ?? null,
+                    dealerPrice: dealerPrices[p.dbId] ?? p.dealerPrice ?? null,
                     dealerPriceVat: dealerPricesVat[p.dbId] ?? null,
                     brand: p.brand,
                     origin: p.origin,

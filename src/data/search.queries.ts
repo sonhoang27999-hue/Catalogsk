@@ -48,6 +48,7 @@ type ProdRow = {
   image_key: string | null;
   image_url: string | null;
   node_id: string | null;
+  nodes: { categories: { slug: string } | null } | null;
   categories: { slug: string } | null;
   models: {
     slug: string;
@@ -102,7 +103,7 @@ export async function searchCatalogServer(query: string): Promise<SearchResult[]
       .from("products")
       .select(
         sel(
-          "id, name, brand, form_code, image_key, image_url, node_id, categories(slug), models(slug, series(slug, name, categories(slug)))",
+          "id, name, brand, form_code, image_key, image_url, node_id, categories(slug), nodes(categories(slug)), models(slug, series(slug, name, categories(slug)))",
         ),
       )
       .or(`name.ilike.${p},brand.ilike.${p},form_code.ilike.${p}`)
@@ -156,7 +157,7 @@ export async function searchCatalogServer(query: string): Promise<SearchResult[]
 
   for (const pr of prodsRes.data ?? []) {
     const viaModel = pr.models?.series;
-    const catSlug = viaModel?.categories?.slug ?? pr.categories?.slug;
+    const catSlug = viaModel?.categories?.slug ?? pr.categories?.slug ?? pr.nodes?.categories?.slug;
     if (!catSlug) continue;
     out.push({
       id: `p-${pr.id}`,

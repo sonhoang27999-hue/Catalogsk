@@ -5,6 +5,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
 import { nodeQueryOptions } from "@/data/catalog.queries";
+import { RememberVehicle } from "@/components/catalog/RememberVehicle";
 import { PageHeader } from "@/components/PageHeader";
 import { NodeLevel } from "@/components/NodeLevel";
 
@@ -54,6 +55,7 @@ function NodePage() {
 
   return (
     <div>
+      <RememberVehicle path={`/c/${params.categoryId}/n/${params.nodeId}`} name={node.name} />
       <PageHeader title={node.name} />
       <NodeLevel
         categoryId={category.id}

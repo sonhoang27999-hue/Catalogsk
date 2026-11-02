@@ -208,6 +208,19 @@ function pack(
 const isSafeCssValue = (value: string) => /^[a-zA-Z0-9#(),.%\s/-]+$/.test(value);
 const SPEED_FACTOR: Record<FxSpeed, number> = { slow: 1.6, medium: 1, fast: 0.6 };
 
+/** Persist only intentional edits; effect changes must not overwrite palette defaults. */
+export function themeDraftPayload(draft: Record<string, string>): Record<string, string> {
+  const payload: Record<string, string> = {};
+  for (const key of THEME_ALL_KEYS) {
+    const value = draft[key];
+    if (value === undefined) continue;
+    payload[key] = THEME_VARS.some((v) => v.key === key)
+      ? hexToOklch(value) ?? value
+      : value;
+  }
+  return payload;
+}
+
 /** Palette declarations (+ derived surfaces for light palettes). */
 function paletteDecls(values: Record<string, string>): string[] {
   const decls: string[] = [];
@@ -279,9 +292,55 @@ export function buildThemeCss(data: Record<string, string> | undefined): string 
   if (!fx.ambient.on) off.push(".sk-public-stage::before{display:none!important}");
   if (!fx.edge.on)
     off.push(
-      ".sk-catalog .sk-product-card,.sk-theme-preview .sk-product-card{animation:none!important}",
+      ".sk-catalog .sk-edge,.sk-theme-preview .sk-edge{animation:none!important}",
     );
   if (!fx.shimmer.on) off.push(".sk-shimmer::after{display:none!important}");
   if (!fx.particles.on) off.push(".sk-particles{display:none!important}");
-  return css + off.join("");
+  return css + textureCss(parseTexture(s[THEME_TEXTURE_KEY])) + lightStyleCss(parseLightStyle(s[THEME_LIGHT_STYLE_KEY])) + off.join("");
+}
+
+/* ---------- Chất liệu nền & kiểu nhịp sáng ---------- */
+
+export const THEME_TEXTURE_KEY = "theme_texture";
+export const THEME_LIGHT_STYLE_KEY = "theme_light_style";
+export type Texture = "none" | "carbon" | "oled" | "smoked";
+export type LightStyle = "comet" | "breathing" | "static";
+
+export const TEXTURES: { id: Texture; label: string; hint: string }[] = [
+  { id: "none", label: "Mặc định", hint: "Nền theo bộ màu" },
+  { id: "carbon", label: "Vân Carbon", hint: "Sợi carbon đan chìm" },
+  { id: "oled", label: "Đen OLED", hint: "Đen tuyệt đối #000" },
+  { id: "smoked", label: "Kính hun khói", hint: "Mờ sâu, trong suốt" },
+];
+export const LIGHT_STYLES: { id: LightStyle; label: string; hint: string }[] = [
+  { id: "comet", label: "Sao quét", hint: "Vệt sáng chạy vòng viền thẻ" },
+  { id: "breathing", label: "Nhịp thở", hint: "Viền sáng co giãn êm" },
+  { id: "static", label: "Tĩnh lặng", hint: "Chỉ sáng khi chạm" },
+];
+
+export function parseTexture(raw?: string): Texture {
+  return TEXTURES.some((t) => t.id === raw) ? (raw as Texture) : "none";
+}
+export function parseLightStyle(raw?: string): LightStyle {
+  return LIGHT_STYLES.some((t) => t.id === raw) ? (raw as LightStyle) : "comet";
+}
+
+const SCOPE = ".sk-catalog,.sk-theme-preview";
+
+export function textureCss(t: Texture): string {
+  if (t === "carbon")
+    return `:is(${SCOPE}){background-image:repeating-linear-gradient(45deg,color-mix(in oklab,var(--foreground) 4%,transparent) 0 2px,transparent 2px 6px),repeating-linear-gradient(-45deg,color-mix(in oklab,var(--foreground) 3%,transparent) 0 2px,transparent 2px 6px);background-attachment:fixed}`;
+  if (t === "oled")
+    return `:root.dark,:root{--background:#000;--card:#0a0a0a;--sk-surface:#0a0a0a;--popover:#0a0a0a}`;
+  if (t === "smoked")
+    return `:is(${SCOPE}) .sk-glass{backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);background:color-mix(in oklab,var(--background) 55%,transparent)}:root.dark,:root{--sk-surface:color-mix(in oklab,var(--card) 78%,transparent)}`;
+  return "";
+}
+
+export function lightStyleCss(l: LightStyle): string {
+  const card = ".sk-catalog .sk-product-card,.sk-theme-preview .sk-product-card";
+  if (l === "static") return `${card}{animation:none}`;
+  if (l === "breathing")
+    return `${card}{animation:sk-edge-breathe calc(6s * var(--sk-fx-speed,1)) ease-in-out infinite}`;
+  return "";
 }

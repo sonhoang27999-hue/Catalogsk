@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCatalogRealtime } from "@/data/catalog.realtime";
 import { useAccessLog } from "@/hooks/useAccessLog";
 import { settingsQueryOptions } from "@/data/settings.api";
+import { WorkflowProvider } from "@/components/catalog/WorkflowProvider";
 import { PublicCatalogShell } from "@/components/catalog/PublicCatalogShell";
 
 function NotFoundComponent() {
@@ -115,7 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "manifest", href: "/manifest.json" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/icon-192.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -154,7 +155,7 @@ function RootComponent() {
   useAccessLog();
   // Trang quản trị dùng toàn bộ chiều rộng màn hình (desktop), không dùng khung mobile 480px.
   const isFullWidth = pathname.startsWith("/admin") || pathname.startsWith("/auth");
-  const isCatalog = pathname === "/" || pathname.startsWith("/c/");
+  const isCatalog = pathname === "/" || pathname.startsWith("/c/") || pathname.startsWith("/chia-se/") || pathname === "/yeu-thich";
 
   // Đăng nhập/đăng xuất làm thay đổi quyền xem giá nhập → nạp lại dữ liệu catalog.
   useEffect(() => {
@@ -211,6 +212,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <WorkflowProvider>
       <ThemeApplier />
       {isCatalog ? (
         <PublicCatalogShell pathname={pathname}>
@@ -234,6 +236,7 @@ function RootComponent() {
           </footer>
         </>
       )}
+      </WorkflowProvider>
       <Toaster position="top-center" />
     </QueryClientProvider>
   );

@@ -20,6 +20,7 @@ import { PageSkeleton } from "@/components/CatalogSkeleton";
 import { HOME_BANNER_KEY, settingsQueryOptions } from "@/data/settings.api";
 import { imageUrl } from "@/lib/imageUrl";
 import { IMG } from "@/data/images";
+import { PersonalShortcuts } from "@/components/catalog/PersonalShortcuts";
 import { ProductPlaceholder } from "@/components/catalog/ProductPlaceholder";
 
 export const Route = createFileRoute("/")({
@@ -90,6 +91,8 @@ function Home() {
         </div>
         <HeaderMenu />
       </div>
+
+      <PersonalShortcuts />
 
       {/* Hướng dẫn sử dụng LED: đặt ngay dưới ô tìm kiếm để khách thấy ngay khi mở trang. */}
       <Link

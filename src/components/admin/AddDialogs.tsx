@@ -24,6 +24,8 @@ import {
   saveRow,
   toSlug,
 } from "@/data/admin.api";
+import { checkProduct, confirmWarnings } from "@/lib/productChecks";
+import { supabase } from "@/integrations/supabase/client";
 import { toEmbedUrl } from "@/lib/video";
 import { useRefreshCatalog } from "@/hooks/useRefreshCatalog";
 import { Field } from "./AddTile";
@@ -324,6 +326,14 @@ export function AddProductDialog({
 
   const save = useMutation({
     mutationFn: async (vars: { keepOpen: boolean }) => {
+      let checkModel = modelDbId;
+      if (!checkModel && seriesDbId) {
+        const { data, error } = await supabase.from("models").select("id").eq("series_id", seriesDbId).order("sort").limit(1).maybeSingle();
+        if (error) throw new Error(error.message);
+        checkModel = data?.id;
+      }
+      const warnings = await checkProduct({name: form.name, price: num(form.price), sale_price: form.salePrice.trim() ? num(form.salePrice) : null, image_url: form.imageUrl, video_url: form.videoUrl, detail_url: form.detailUrl, model_id: checkModel, node_id: nodeDbId, category_id: categoryDbId});
+      if (!confirmWarnings(warnings)) throw new Error("Đã hủy lưu.");
       let target: Record<string, string> = {};
       if (nodeDbId) {
         target = { node_id: nodeDbId };

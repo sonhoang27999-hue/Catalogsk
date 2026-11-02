@@ -22,6 +22,13 @@
       "when": 1792042776187,
       "tag": "0002_add_dealer_price_vat_column",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793104068976,
+      "tag": "0003_dealer_workflows_and_catalog_history",
+      "breakpoints": true
     }
   ]
 }

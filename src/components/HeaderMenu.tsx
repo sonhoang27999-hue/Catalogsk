@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, UserRound } from "lucide-react";
+import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, Smartphone, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ const GuideLinkManager = lazy(() =>
 const Dealer1Accounts = lazy(() =>
   import("@/components/admin/Dealer1Accounts").then((m) => ({ default: m.Dealer1Accounts })),
 );
+const ChangeHistory = lazy(() => import("@/components/admin/ChangeHistory").then(m => ({default:m.ChangeHistory})));
 const ChangePassword = lazy(() =>
   import("@/components/ChangePassword").then((m) => ({ default: m.ChangePassword })),
 );
@@ -74,7 +75,11 @@ export function HeaderMenu() {
 
   const signOut = async () => {
     // Không cancel/clear cache: sẽ làm useSuspenseQuery ném CancelledError (trắng trang).
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message || "Không đăng xuất được. Vui lòng thử lại.");
+      return;
+    }
     await qc.invalidateQueries();
     setOpen(false);
     toast.success("Đã đăng xuất");
@@ -107,6 +112,16 @@ export function HeaderMenu() {
           </SheetHeader>
 
           <div className="mt-4 space-y-3 pb-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                setOpen(false);
+                navigate({ to: "/cai-app" });
+              }}
+            >
+              <Smartphone className="size-4" /> Cài APP
+            </Button>
             {email ? (
               <>
                 <div className="flex items-center gap-3 rounded-xl border border-border p-3">
@@ -133,6 +148,7 @@ export function HeaderMenu() {
                 {canSettings ? (
                   <>
                     <Suspense fallback={<MenuItemSkeleton />}>
+                      <ChangeHistory />
                       <AdminSettings pendingCount={pendingCount} isAdmin={isAdmin} />
                     </Suspense>
                     <Suspense fallback={<MenuItemSkeleton />}>

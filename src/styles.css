@@ -336,7 +336,7 @@
   );
   filter: blur(45px);
   mix-blend-mode: screen;
-  animation: sk-ambient-drift 22s ease-in-out infinite alternate;
+  animation: sk-ambient-drift calc(22s * var(--sk-fx-speed, 1)) ease-in-out infinite alternate;
 }
 .sk-catalog-content {
   position: relative;
@@ -380,11 +380,11 @@
     conic-gradient(
         from var(--sk-border-angle),
         var(--border),
-        var(--sk-violet),
+        color-mix(in oklab, var(--sk-violet) calc(100% * var(--sk-fx-edge, 1)), var(--border)),
         var(--border),
-        var(--sk-blue),
+        color-mix(in oklab, var(--sk-blue) calc(100% * var(--sk-fx-edge, 1)), var(--border)),
         var(--border),
-        var(--sk-pink),
+        color-mix(in oklab, var(--sk-pink) calc(100% * var(--sk-fx-edge, 1)), var(--border)),
         var(--border)
       )
       border-box;
@@ -811,6 +811,22 @@
   }
   .sk-catalog .sk-product-card,
   .sk-theme-preview .sk-product-card {
+    animation: none !important;
+  }
+}
+@keyframes sk-edge-breathe {
+  0%,
+  100% {
+    --sk-border-angle: 0deg;
+    box-shadow: 0 10px 32px -20px color-mix(in oklab, var(--sk-pink) calc(30% * var(--sk-fx-edge, 1)), transparent);
+  }
+  50% {
+    --sk-border-angle: 180deg;
+    box-shadow: 0 10px 36px -14px color-mix(in oklab, var(--sk-blue) calc(65% * var(--sk-fx-edge, 1)), transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-catalog .sk-product-card {
     animation: none !important;
   }
 }

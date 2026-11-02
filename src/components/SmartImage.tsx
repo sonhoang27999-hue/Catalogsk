@@ -63,7 +63,7 @@ export const SmartImage = memo(function SmartImage({
     // Không lọc ở lần render đầu (tránh lệch SSR/client); chỉ bỏ link đã hỏng khi đã ở trình duyệt.
     const all = imageCandidates(src ?? "", size);
     const list = mounted ? all.filter((u) => !brokenUrls.has(u)) : all;
-    return list.length > 0 ? list : [fallback];
+    return list;
   }, [src, size, fallback, mounted]);
 
   // Chỉ reset con trỏ khi NỘI DUNG danh sách link thực sự đổi (đổi ảnh),
@@ -81,7 +81,10 @@ export const SmartImage = memo(function SmartImage({
 
   // srcset 1x/2x CHỈ cho link chính (nguồn hỗ trợ resize): retina nét như cũ,
   // máy thường tải bản nhẹ. Link dự phòng dùng src đơn để không lệch biến thể.
-  const srcSet = index === 0 && !exhausted ? imageSrcSet(src ?? "", size) : undefined;
+  const srcSet =
+    index === 0 && !exhausted && current === imageCandidates(src ?? "", size)[0]
+      ? imageSrcSet(src ?? "", size)
+      : undefined;
 
   const handleError = () => {
     if (!exhausted) brokenUrls.add(current);
