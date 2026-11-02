@@ -17,7 +17,11 @@ import { Route as DangKyDaiLyRouteImport } from './routes/dang-ky-dai-ly'
 import { Route as HuongDanSuDungRouteImport } from './routes/huong-dan-su-dung'
 import { Route as YeuThichRouteImport } from './routes/yeu-thich'
 import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
+<<<<<<< HEAD
 import { Route as ChiaSeShareIdRouteImport } from './routes/chia-se.$shareId'
+=======
+import { Route as ApiBotTaiKhoanDaiLyRouteImport } from './routes/api.bot.tai-khoan-dai-ly'
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
 import { Route as CCategoryIdSeriesIdRouteImport } from './routes/c.$categoryId.$seriesId'
 import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n.$nodeId'
 
@@ -61,9 +65,15 @@ const CCategoryIdRoute = CCategoryIdRouteImport.update({
   path: '/c/$categoryId',
   getParentRoute: () => rootRouteImport,
 } as any)
+<<<<<<< HEAD
 const ChiaSeShareIdRoute = ChiaSeShareIdRouteImport.update({
   id: '/chia-se/$shareId',
   path: '/chia-se/$shareId',
+=======
+const ApiBotTaiKhoanDaiLyRoute = ApiBotTaiKhoanDaiLyRouteImport.update({
+  id: '/api/bot/tai-khoan-dai-ly',
+  path: '/api/bot/tai-khoan-dai-ly',
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
   getParentRoute: () => rootRouteImport,
 } as any)
 const CCategoryIdSeriesIdRoute = CCategoryIdSeriesIdRouteImport.update({
@@ -86,7 +96,11 @@ export interface FileRoutesByFullPath {
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+<<<<<<< HEAD
   '/chia-se/$shareId': typeof ChiaSeShareIdRoute
+=======
+  '/api/bot/tai-khoan-dai-ly': typeof ApiBotTaiKhoanDaiLyRoute
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -99,7 +113,11 @@ export interface FileRoutesByTo {
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+<<<<<<< HEAD
   '/chia-se/$shareId': typeof ChiaSeShareIdRoute
+=======
+  '/api/bot/tai-khoan-dai-ly': typeof ApiBotTaiKhoanDaiLyRoute
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -113,7 +131,11 @@ export interface FileRoutesById {
   '/huong-dan-su-dung': typeof HuongDanSuDungRoute
   '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
+<<<<<<< HEAD
   '/chia-se/$shareId': typeof ChiaSeShareIdRoute
+=======
+  '/api/bot/tai-khoan-dai-ly': typeof ApiBotTaiKhoanDaiLyRoute
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
 }
@@ -128,7 +150,11 @@ export interface FileRouteTypes {
     | '/huong-dan-su-dung'
     | '/yeu-thich'
     | '/c/$categoryId'
+<<<<<<< HEAD
     | '/chia-se/$shareId'
+=======
+    | '/api/bot/tai-khoan-dai-ly'
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   fileRoutesByTo: FileRoutesByTo
@@ -141,7 +167,11 @@ export interface FileRouteTypes {
     | '/huong-dan-su-dung'
     | '/yeu-thich'
     | '/c/$categoryId'
+<<<<<<< HEAD
     | '/chia-se/$shareId'
+=======
+    | '/api/bot/tai-khoan-dai-ly'
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   id:
@@ -154,7 +184,11 @@ export interface FileRouteTypes {
     | '/huong-dan-su-dung'
     | '/yeu-thich'
     | '/c/$categoryId'
+<<<<<<< HEAD
     | '/chia-se/$shareId'
+=======
+    | '/api/bot/tai-khoan-dai-ly'
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
   fileRoutesById: FileRoutesById
@@ -168,7 +202,11 @@ export interface RootRouteChildren {
   HuongDanSuDungRoute: typeof HuongDanSuDungRoute
   YeuThichRoute: typeof YeuThichRoute
   CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
+<<<<<<< HEAD
   ChiaSeShareIdRoute: typeof ChiaSeShareIdRoute
+=======
+  ApiBotTaiKhoanDaiLyRoute: typeof ApiBotTaiKhoanDaiLyRoute
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
 }
 
 declare module '@tanstack/react-router' {
@@ -229,11 +267,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CCategoryIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+<<<<<<< HEAD
     '/chia-se/$shareId': {
       id: '/chia-se/$shareId'
       path: '/chia-se/$shareId'
       fullPath: '/chia-se/$shareId'
       preLoaderRoute: typeof ChiaSeShareIdRouteImport
+=======
+    '/api/bot/tai-khoan-dai-ly': {
+      id: '/api/bot/tai-khoan-dai-ly'
+      path: '/api/bot/tai-khoan-dai-ly'
+      fullPath: '/api/bot/tai-khoan-dai-ly'
+      preLoaderRoute: typeof ApiBotTaiKhoanDaiLyRouteImport
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
       parentRoute: typeof rootRouteImport
     }
     '/c/$categoryId/$seriesId': {
@@ -276,7 +322,11 @@ const rootRouteChildren: RootRouteChildren = {
   HuongDanSuDungRoute: HuongDanSuDungRoute,
   YeuThichRoute: YeuThichRoute,
   CCategoryIdRoute: CCategoryIdRouteWithChildren,
+<<<<<<< HEAD
   ChiaSeShareIdRoute: ChiaSeShareIdRoute,
+=======
+  ApiBotTaiKhoanDaiLyRoute: ApiBotTaiKhoanDaiLyRoute,
+>>>>>>> a49ff0c42b8f6debed2cb14fb64d98e7e688ded0
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
