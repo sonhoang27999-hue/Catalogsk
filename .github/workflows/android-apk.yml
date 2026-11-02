@@ -1,0 +1,81 @@
+# Builds the SK Translate Android APK on GitHub, with the whole app bundled inside it.
+# No web hosting is needed: the APK carries its own copy of the app.
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   ANDROID_KEYSTORE_B64  base64 of your .jks keystore
+#   ANDROID_KEYSTORE_PASS keystore + key password
+#   ANDROID_KEY_ALIAS     key alias inside the keystore
+# Run: Actions → "Android APK" → Run workflow. Download the APK from the run's artifacts.
+name: Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: "Android versionCode (increase each release)"
+        required: true
+        default: "3"
+      version_name:
+        description: "Version name"
+        required: true
+        default: "1.0.3"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: latest }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: android-actions/setup-android@v3
+
+      - name: Build the app
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+          test -f dist/client/index.html || { echo "dist/client/index.html missing"; exit 1; }
+
+      - name: Wrap the app in Android
+        run: |
+          mkdir -p wrapper/www && cd wrapper
+          npm init -y >/dev/null
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          cp -r ../dist/client/. www/
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "app.sktranslate.mobile",
+            "appName": "SK Translate",
+            "webDir": "www"
+          }
+          EOF
+          npx cap add android
+          JAVA_DIR=android/app/src/main/java/app/sktranslate/mobile
+          mkdir -p $JAVA_DIR android/app/src/main/assets
+          cp ../native/android/MainActivity.java ../native/android/OfflineSpeechPlugin.java $JAVA_DIR/
+          cp ../native/android/speech-bridge.js android/app/src/main/assets/
+          M=android/app/src/main/AndroidManifest.xml
+          sed -i 's#</manifest>#  <uses-permission android:name="android.permission.RECORD_AUDIO" />\n  <uses-permission android:name="android.permission.CAMERA" />\n  <queries><intent><action android:name="android.speech.RecognitionService" /></intent></queries>\n</manifest>#' $M
+          G=android/app/build.gradle
+          sed -i "s/versionCode [0-9]*/versionCode ${{ inputs.version_code }}/; s/versionName \"[^\"]*\"/versionName \"${{ inputs.version_name }}\"/" $G
+
+      - name: Build signed APK
+        working-directory: wrapper/android
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          echo "$KS_B64" | base64 -d > release.jks
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          $BT/zipalign -f 4 app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+          $BT/apksigner sign --ks release.jks --ks-pass env:KS_PASS --key-pass env:KS_PASS \
+            --ks-key-alias "$KS_ALIAS" --out SK-Translate.apk aligned.apk
+          rm release.jks
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SK-Translate-${{ inputs.version_name }}
+          path: wrapper/android/SK-Translate.apk
