@@ -4,23 +4,17 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeApplier } from "@/components/ThemeApplier";
-import { supabase } from "@/integrations/supabase/client";
-import { useCatalogRealtime } from "@/data/catalog.realtime";
-import { useAccessLog } from "@/hooks/useAccessLog";
-import { settingsQueryOptions } from "@/data/settings.api";
-import { WorkflowProvider } from "@/components/catalog/WorkflowProvider";
-import { PublicCatalogShell } from "@/components/catalog/PublicCatalogShell";
-import { HomeScreenInvite } from "@/components/HomeScreenInvite";
+import { store, useStore, textSizePx } from "@/lib/store";
+import { registerPwa } from "@/lib/pwa";
+import { BottomNav, TopNav } from "@/components/sk/BottomNav";
 
 function NotFoundComponent() {
   return (
@@ -44,7 +38,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -83,47 +77,33 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  // Nạp cấu hình giao diện (ảnh bìa, màu sắc) ngay từ server để khách và admin
-  // thấy giao diện GIỐNG HỆT NHAU ở lần vẽ đầu tiên. Lỗi mạng không làm sập trang.
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(settingsQueryOptions).catch(() => null),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#09090b" },
+      { name: "theme-color", content: "#fbfaf7" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "SK" },
-      { title: "SK - Danh mục Phụ kiện Ô tô" },
-      {
-        name: "description",
-        content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
-      },
-      { name: "author", content: "SK" },
-      { property: "og:title", content: "SK - Danh mục Phụ kiện Ô tô" },
-      {
-        property: "og:description",
-        content: "Danh mục phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
-      },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "SK Translate" },
+      { title: "SK Translate — Việt ↔ 中文" },
+      { name: "description", content: "Trình dịch Việt ↔ Trung lưu dữ liệu trên thiết bị, dành cho công tác tại Trung Quốc." },
+      { property: "og:title", content: "SK Translate — Việt ↔ 中文" },
+      { property: "og:description", content: "Trình dịch Việt ↔ Trung lưu dữ liệu trên thiết bị." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@skambientlight" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "manifest", href: "/manifest.json" },
-      { rel: "apple-touch-icon", href: "/icon-192.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap",
       },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -134,7 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="vi" className="dark">
+    <html lang="vi">
       <head>
         <HeadContent />
       </head>
@@ -146,68 +126,25 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // Đồng bộ thời gian thực: khi dữ liệu catalog đổi, chỉ làm mới đúng phần bị ảnh hưởng.
-  useCatalogRealtime(queryClient);
-  // Ghi nhật ký truy cập của tài khoản đã đăng nhập (quản trị viên xem trong Cài đặt chuyên sâu).
-  useAccessLog();
-  // Trang quản trị dùng toàn bộ chiều rộng màn hình (desktop), không dùng khung mobile 480px.
-  const isFullWidth = pathname.startsWith("/admin") || pathname.startsWith("/auth");
-  const isCatalog = pathname === "/" || pathname.startsWith("/c/") || pathname.startsWith("/chia-se/") || pathname === "/yeu-thich";
-
-  // Đăng nhập/đăng xuất làm thay đổi quyền xem giá nhập → nạp lại dữ liệu catalog.
+  const textSize = useStore((s) => s.settings.textSize);
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      // queryClient.clear() huỷ các truy vấn đang chạy → useSuspenseQuery ném
-      // CancelledError và làm trắng trang. Chỉ cần đánh dấu dữ liệu cũ và nạp lại.
-      queryClient.invalidateQueries();
-      void router.invalidate();
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [queryClient, router]);
-
-  // Nếu người dùng KHÔNG chọn "ghi nhớ đăng nhập", phiên chỉ tồn tại trong lần mở trình duyệt này.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (localStorage.getItem("autodeco.remember") !== "0") return;
-    if (sessionStorage.getItem("autodeco.session") === "1") return;
-    sessionStorage.setItem("autodeco.session", "1");
-    void supabase.auth.signOut();
+    store.hydrate();
+    registerPwa();
   }, []);
+  useEffect(() => {
+    document.documentElement.style.setProperty("--app-font-size", textSizePx(textSize));
+  }, [textSize]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WorkflowProvider>
-      <ThemeApplier />
-      <HomeScreenInvite />
-      {isCatalog ? (
-        <PublicCatalogShell pathname={pathname}>
-          <Outlet />
-        </PublicCatalogShell>
-      ) : isFullWidth ? (
-        <div className="min-h-screen bg-background">
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </div>
-      ) : (
-        <>
-          {/* Điện thoại/tablet: khung 480px như cũ. Desktop: khung app nổi trên nền gradient. */}
-          <div className="min-h-screen lux-ambient lg:flex lg:items-start lg:justify-center lg:bg-[radial-gradient(120%_120%_at_50%_0%,color-mix(in_oklab,var(--brand)_18%,var(--background))_0%,var(--background)_60%)] lg:py-8">
-            <div className="mx-auto min-h-screen w-full max-w-[480px] bg-background pb-10 shadow-sm lg:min-h-[calc(100vh-4rem)] lg:overflow-hidden lg:rounded-[28px] lg:pb-16 lg:lux-frame">
-              <Outlet />
-            </div>
-          </div>
-          <footer className="fixed bottom-0 left-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 border-t border-border bg-background py-2.5 text-center text-[11px] font-medium tracking-wide text-muted-foreground lg:bottom-8 lg:rounded-b-[28px] lg:border-x">
-            ~ Sản phẩm do SK Ambient Light Luxury phát triển ~
-          </footer>
-        </>
-      )}
-      </WorkflowProvider>
-      <Toaster position="top-center" />
+      <TopNav />
+      <main className="mx-auto min-h-[100dvh] max-w-xl md:min-h-[calc(100dvh-4rem)] px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-[env(safe-area-inset-top)] md:max-w-3xl md:px-8 md:pb-12 md:pt-4">
+        <Outlet />
+      </main>
+      <BottomNav />
     </QueryClientProvider>
   );
 }

@@ -10,152 +10,154 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AnhLoiRouteImport } from './routes/anh-loi'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as DangKyDaiLyRouteImport } from './routes/dang-ky-dai-ly'
-import { Route as HuongDanSuDungRouteImport } from './routes/huong-dan-su-dung'
-import { Route as YeuThichRouteImport } from './routes/yeu-thich'
-import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
-import { Route as ChiaSeShareIdRouteImport } from './routes/chia-se.$shareId'
-import { Route as CCategoryIdSeriesIdRouteImport } from './routes/c.$categoryId.$seriesId'
-import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n.$nodeId'
+import { Route as BusinessRouteImport } from './routes/business'
+import { Route as CameraRouteImport } from './routes/camera'
+import { Route as ConversationRouteImport } from './routes/conversation'
+import { Route as DictionaryRouteImport } from './routes/dictionary'
+import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ApiTranslateStreamRouteImport } from './routes/api/translate-stream'
+import { Route as HistoryConversationIdRouteImport } from './routes/history_.$conversationId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AnhLoiRoute = AnhLoiRouteImport.update({
-  id: '/anh-loi',
-  path: '/anh-loi',
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const CameraRoute = CameraRouteImport.update({
+  id: '/camera',
+  path: '/camera',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DangKyDaiLyRoute = DangKyDaiLyRouteImport.update({
-  id: '/dang-ky-dai-ly',
-  path: '/dang-ky-dai-ly',
+const ConversationRoute = ConversationRouteImport.update({
+  id: '/conversation',
+  path: '/conversation',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HuongDanSuDungRoute = HuongDanSuDungRouteImport.update({
-  id: '/huong-dan-su-dung',
-  path: '/huong-dan-su-dung',
+const DictionaryRoute = DictionaryRouteImport.update({
+  id: '/dictionary',
+  path: '/dictionary',
   getParentRoute: () => rootRouteImport,
 } as any)
-const YeuThichRoute = YeuThichRouteImport.update({
-  id: '/yeu-thich',
-  path: '/yeu-thich',
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CCategoryIdRoute = CCategoryIdRouteImport.update({
-  id: '/c/$categoryId',
-  path: '/c/$categoryId',
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChiaSeShareIdRoute = ChiaSeShareIdRouteImport.update({
-  id: '/chia-se/$shareId',
-  path: '/chia-se/$shareId',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CCategoryIdSeriesIdRoute = CCategoryIdSeriesIdRouteImport.update({
-  id: '/$seriesId',
-  path: '/$seriesId',
-  getParentRoute: () => CCategoryIdRoute,
+const ApiTranslateStreamRoute = ApiTranslateStreamRouteImport.update({
+  id: '/api/translate-stream',
+  path: '/api/translate-stream',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const CCategoryIdNNodeIdRoute = CCategoryIdNNodeIdRouteImport.update({
-  id: '/n/$nodeId',
-  path: '/n/$nodeId',
-  getParentRoute: () => CCategoryIdRoute,
+const HistoryConversationIdRoute = HistoryConversationIdRouteImport.update({
+  id: '/history_/$conversationId',
+  path: '/history/$conversationId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/anh-loi': typeof AnhLoiRoute
-  '/auth': typeof AuthRoute
-  '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
-  '/huong-dan-su-dung': typeof HuongDanSuDungRoute
-  '/yeu-thich': typeof YeuThichRoute
-  '/c/$categoryId': typeof CCategoryIdRouteWithChildren
-  '/chia-se/$shareId': typeof ChiaSeShareIdRoute
-  '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
-  '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
+  '/business': typeof BusinessRoute
+  '/camera': typeof CameraRoute
+  '/conversation': typeof ConversationRoute
+  '/dictionary': typeof DictionaryRoute
+  '/emergency': typeof EmergencyRoute
+  '/history': typeof HistoryRoute
+  '/settings': typeof SettingsRoute
+  '/api/translate-stream': typeof ApiTranslateStreamRoute
+  '/history/$conversationId': typeof HistoryConversationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/anh-loi': typeof AnhLoiRoute
-  '/auth': typeof AuthRoute
-  '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
-  '/huong-dan-su-dung': typeof HuongDanSuDungRoute
-  '/yeu-thich': typeof YeuThichRoute
-  '/c/$categoryId': typeof CCategoryIdRouteWithChildren
-  '/chia-se/$shareId': typeof ChiaSeShareIdRoute
-  '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
-  '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
+  '/business': typeof BusinessRoute
+  '/camera': typeof CameraRoute
+  '/conversation': typeof ConversationRoute
+  '/dictionary': typeof DictionaryRoute
+  '/emergency': typeof EmergencyRoute
+  '/history': typeof HistoryRoute
+  '/settings': typeof SettingsRoute
+  '/api/translate-stream': typeof ApiTranslateStreamRoute
+  '/history/$conversationId': typeof HistoryConversationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/anh-loi': typeof AnhLoiRoute
-  '/auth': typeof AuthRoute
-  '/dang-ky-dai-ly': typeof DangKyDaiLyRoute
-  '/huong-dan-su-dung': typeof HuongDanSuDungRoute
-  '/yeu-thich': typeof YeuThichRoute
-  '/c/$categoryId': typeof CCategoryIdRouteWithChildren
-  '/chia-se/$shareId': typeof ChiaSeShareIdRoute
-  '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
-  '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
+  '/business': typeof BusinessRoute
+  '/camera': typeof CameraRoute
+  '/conversation': typeof ConversationRoute
+  '/dictionary': typeof DictionaryRoute
+  '/emergency': typeof EmergencyRoute
+  '/history': typeof HistoryRoute
+  '/settings': typeof SettingsRoute
+  '/api/translate-stream': typeof ApiTranslateStreamRoute
+  '/history_/$conversationId': typeof HistoryConversationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/anh-loi'
-    | '/auth'
-    | '/dang-ky-dai-ly'
-    | '/huong-dan-su-dung'
-    | '/yeu-thich'
-    | '/c/$categoryId'
-    | '/chia-se/$shareId'
-    | '/c/$categoryId/$seriesId'
-    | '/c/$categoryId/n/$nodeId'
+    | '/business'
+    | '/camera'
+    | '/conversation'
+    | '/dictionary'
+    | '/emergency'
+    | '/history'
+    | '/settings'
+    | '/api/translate-stream'
+    | '/history/$conversationId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/anh-loi'
-    | '/auth'
-    | '/dang-ky-dai-ly'
-    | '/huong-dan-su-dung'
-    | '/yeu-thich'
-    | '/c/$categoryId'
-    | '/chia-se/$shareId'
-    | '/c/$categoryId/$seriesId'
-    | '/c/$categoryId/n/$nodeId'
+    | '/business'
+    | '/camera'
+    | '/conversation'
+    | '/dictionary'
+    | '/emergency'
+    | '/history'
+    | '/settings'
+    | '/api/translate-stream'
+    | '/history/$conversationId'
   id:
     | '__root__'
     | '/'
-    | '/anh-loi'
-    | '/auth'
-    | '/dang-ky-dai-ly'
-    | '/huong-dan-su-dung'
-    | '/yeu-thich'
-    | '/c/$categoryId'
-    | '/chia-se/$shareId'
-    | '/c/$categoryId/$seriesId'
-    | '/c/$categoryId/n/$nodeId'
+    | '/business'
+    | '/camera'
+    | '/conversation'
+    | '/dictionary'
+    | '/emergency'
+    | '/history'
+    | '/settings'
+    | '/api/translate-stream'
+    | '/history_/$conversationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnhLoiRoute: typeof AnhLoiRoute
-  AuthRoute: typeof AuthRoute
-  DangKyDaiLyRoute: typeof DangKyDaiLyRoute
-  HuongDanSuDungRoute: typeof HuongDanSuDungRoute
-  YeuThichRoute: typeof YeuThichRoute
-  CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
-  ChiaSeShareIdRoute: typeof ChiaSeShareIdRoute
+  BusinessRoute: typeof BusinessRoute
+  CameraRoute: typeof CameraRoute
+  ConversationRoute: typeof ConversationRoute
+  DictionaryRoute: typeof DictionaryRoute
+  EmergencyRoute: typeof EmergencyRoute
+  HistoryRoute: typeof HistoryRoute
+  SettingsRoute: typeof SettingsRoute
+  ApiTranslateStreamRoute: typeof ApiTranslateStreamRoute
+  HistoryConversationIdRoute: typeof HistoryConversationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -167,95 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/anh-loi': {
-      id: '/anh-loi'
-      path: '/anh-loi'
-      fullPath: '/anh-loi'
-      preLoaderRoute: typeof AnhLoiRouteImport
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/camera': {
+      id: '/camera'
+      path: '/camera'
+      fullPath: '/camera'
+      preLoaderRoute: typeof CameraRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dang-ky-dai-ly': {
-      id: '/dang-ky-dai-ly'
-      path: '/dang-ky-dai-ly'
-      fullPath: '/dang-ky-dai-ly'
-      preLoaderRoute: typeof DangKyDaiLyRouteImport
+    '/conversation': {
+      id: '/conversation'
+      path: '/conversation'
+      fullPath: '/conversation'
+      preLoaderRoute: typeof ConversationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/huong-dan-su-dung': {
-      id: '/huong-dan-su-dung'
-      path: '/huong-dan-su-dung'
-      fullPath: '/huong-dan-su-dung'
-      preLoaderRoute: typeof HuongDanSuDungRouteImport
+    '/dictionary': {
+      id: '/dictionary'
+      path: '/dictionary'
+      fullPath: '/dictionary'
+      preLoaderRoute: typeof DictionaryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/yeu-thich': {
-      id: '/yeu-thich'
-      path: '/yeu-thich'
-      fullPath: '/yeu-thich'
-      preLoaderRoute: typeof YeuThichRouteImport
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/c/$categoryId': {
-      id: '/c/$categoryId'
-      path: '/c/$categoryId'
-      fullPath: '/c/$categoryId'
-      preLoaderRoute: typeof CCategoryIdRouteImport
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/chia-se/$shareId': {
-      id: '/chia-se/$shareId'
-      path: '/chia-se/$shareId'
-      fullPath: '/chia-se/$shareId'
-      preLoaderRoute: typeof ChiaSeShareIdRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/c/$categoryId/$seriesId': {
-      id: '/c/$categoryId/$seriesId'
-      path: '/$seriesId'
-      fullPath: '/c/$categoryId/$seriesId'
-      preLoaderRoute: typeof CCategoryIdSeriesIdRouteImport
-      parentRoute: typeof CCategoryIdRoute
+    '/api/translate-stream': {
+      id: '/api/translate-stream'
+      path: '/api/translate-stream'
+      fullPath: '/api/translate-stream'
+      preLoaderRoute: typeof ApiTranslateStreamRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/c/$categoryId/n/$nodeId': {
-      id: '/c/$categoryId/n/$nodeId'
-      path: '/n/$nodeId'
-      fullPath: '/c/$categoryId/n/$nodeId'
-      preLoaderRoute: typeof CCategoryIdNNodeIdRouteImport
-      parentRoute: typeof CCategoryIdRoute
+    '/history_/$conversationId': {
+      id: '/history_/$conversationId'
+      path: '/history/$conversationId'
+      fullPath: '/history/$conversationId'
+      preLoaderRoute: typeof HistoryConversationIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface CCategoryIdRouteChildren {
-  CCategoryIdSeriesIdRoute: typeof CCategoryIdSeriesIdRoute
-  CCategoryIdNNodeIdRoute: typeof CCategoryIdNNodeIdRoute
-}
-
-const CCategoryIdRouteChildren: CCategoryIdRouteChildren = {
-  CCategoryIdSeriesIdRoute: CCategoryIdSeriesIdRoute,
-  CCategoryIdNNodeIdRoute: CCategoryIdNNodeIdRoute,
-}
-
-const CCategoryIdRouteWithChildren = CCategoryIdRoute._addFileChildren(
-  CCategoryIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnhLoiRoute: AnhLoiRoute,
-  AuthRoute: AuthRoute,
-  DangKyDaiLyRoute: DangKyDaiLyRoute,
-  HuongDanSuDungRoute: HuongDanSuDungRoute,
-  YeuThichRoute: YeuThichRoute,
-  CCategoryIdRoute: CCategoryIdRouteWithChildren,
-  ChiaSeShareIdRoute: ChiaSeShareIdRoute,
+  BusinessRoute: BusinessRoute,
+  CameraRoute: CameraRoute,
+  ConversationRoute: ConversationRoute,
+  DictionaryRoute: DictionaryRoute,
+  EmergencyRoute: EmergencyRoute,
+  HistoryRoute: HistoryRoute,
+  SettingsRoute: SettingsRoute,
+  ApiTranslateStreamRoute: ApiTranslateStreamRoute,
+  HistoryConversationIdRoute: HistoryConversationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
