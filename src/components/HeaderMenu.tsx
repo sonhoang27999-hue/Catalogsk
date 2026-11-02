@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, Smartphone, UserRound } from "lucide-react";
+import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -112,16 +112,6 @@ export function HeaderMenu() {
           </SheetHeader>
 
           <div className="mt-4 space-y-3 pb-4">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                setOpen(false);
-                navigate({ to: "/cai-app" });
-              }}
-            >
-              <Smartphone className="size-4" /> Cài APP
-            </Button>
             {email ? (
               <>
                 <div className="flex items-center gap-3 rounded-xl border border-border p-3">

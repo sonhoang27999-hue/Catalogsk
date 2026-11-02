@@ -22,4 +22,4 @@
 - Customer share reads use read_catalog_share with an explicit public-field projection and no dealer-price joins; shared cards never load dealer prices even for staff.
 - Catalog history is captured by append-only database triggers for every catalog write path; restoration only reverses updates after a locked equality check against the saved after-state, to avoid overwriting newer edits or cascading deletions.
 - Product warnings are confirmable at add/edit and Excel review boundaries; they never change entered prices or silently block valid exceptions.
-- Catalog app installation uses a separate catalog_apk_url setting from LED controller downloads; relative internal navigation and hosting-neutral links keep Vercel exports portable.
+- Catalog installation is manifest-only with an account-gated HomeScreenInvite using WorkflowProvider identity; native browser prompts and platform instructions replace APK downloads without new auth subscriptions or offline caches.

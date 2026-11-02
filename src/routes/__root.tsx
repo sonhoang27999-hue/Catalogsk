@@ -20,6 +20,7 @@ import { useAccessLog } from "@/hooks/useAccessLog";
 import { settingsQueryOptions } from "@/data/settings.api";
 import { WorkflowProvider } from "@/components/catalog/WorkflowProvider";
 import { PublicCatalogShell } from "@/components/catalog/PublicCatalogShell";
+import { HomeScreenInvite } from "@/components/HomeScreenInvite";
 
 function NotFoundComponent() {
   return (
@@ -178,42 +179,11 @@ function RootComponent() {
     void supabase.auth.signOut();
   }, []);
 
-  // Đăng ký service worker để app chạy như PWA; khi ở standalone, nút/swipe back của điện thoại
-  // sẽ điều hướng theo lịch sử router thay vì thoát trình duyệt.
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-
-    // Người dùng còn kẹt service worker CŨ (cache-first HTML): khi bản SW mới
-    // tiếp quản (controllerchange), reload MỘT LẦN để trang hiện tại là bản mới
-    // từ mạng thay vì HTML cũ trong cache. Chỉ reload nếu trước đó đã có SW
-    // điều khiển trang (tránh reload thừa cho khách lần đầu) và chỉ một lần
-    // (tránh vòng lặp reload).
-    const hadController = Boolean(navigator.serviceWorker.controller);
-    let refreshed = false;
-    const onControllerChange = () => {
-      if (!hadController || refreshed) return;
-      refreshed = true;
-      window.location.reload();
-    };
-    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
-
-    void navigator.serviceWorker
-      // updateViaCache: "none" để trình duyệt luôn lấy sw.js mới, tránh kẹt bản cũ cache HTML.
-      .register("/sw.js", { updateViaCache: "none" })
-      .then((reg) => reg.update())
-      .catch(() => {
-        // Không cần báo lỗi nếu trình duyệt không hỗ trợ hoặc môi trường dev.
-      });
-
-    return () =>
-      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <WorkflowProvider>
       <ThemeApplier />
+      <HomeScreenInvite />
       {isCatalog ? (
         <PublicCatalogShell pathname={pathname}>
           <Outlet />

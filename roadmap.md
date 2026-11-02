@@ -29,6 +29,6 @@
 - [x] Verify the public series list on mobile; node and share pages use the same markup and were confirmed in source plus clean TypeScript/build.
 
 # App installation
-- [x] Add a public Cài APP menu entry with Android APK download and iOS home-screen instructions.
-- [x] Keep the catalog APK link separate from the LED controller app, editable by admin.
-- [x] Verify the public installation page and menu on a phone-sized viewport; no overflow or runtime errors, and automatic build is clean.
+- [x] Replace the APK menu/page with a signed-in-only floating phone home-screen invitation; keep manifest/icons and retire the legacy app-shell worker.
+- [x] Verify guest hiding, real signed-in Android/iOS instructions, dismissal/new visit, simulated native prompt and appinstalled events; 14 tests passed and automatic build is clean.
+- Native installation on a physical phone remains unverified; the browser controls availability and the final installation confirmation.
