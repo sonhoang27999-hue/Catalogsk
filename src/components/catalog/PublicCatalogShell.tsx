@@ -49,6 +49,67 @@ export function PublicCatalogShell({
     };
   }, [pathname, children]);
 
+  // 3D tilt: one delegated pointer handler for brand tiles and product cards.
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let active: HTMLElement | null = null;
+    let frame = 0;
+    const reset = () => {
+      if (!active) return;
+      const el = active;
+      el.classList.remove("sk-tilting");
+      el.style.setProperty("--sk-rx", "0deg");
+      el.style.setProperty("--sk-ry", "0deg");
+      active = null;
+    };
+    const move = (e: PointerEvent) => {
+      const target = (e.target as HTMLElement | null)?.closest<HTMLElement>(
+        ".sk-brand-tile, .sk-product-card",
+      );
+      if (target !== active) reset();
+      if (!target) return;
+      active = target;
+      if (!target.querySelector(":scope > .sk-tilt-glare")) {
+        const glare = document.createElement("span");
+        glare.className = "sk-tilt-glare";
+        glare.setAttribute("aria-hidden", "true");
+        target.appendChild(glare);
+      }
+      const r = target.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      const max = target.classList.contains("sk-product-card") ? 4 : 10;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        target.classList.add("sk-tilting");
+        target.style.setProperty("--sk-ry", `${((x - 0.5) * 2 * max).toFixed(2)}deg`);
+        target.style.setProperty("--sk-rx", `${((0.5 - y) * 2 * max).toFixed(2)}deg`);
+        target.style.setProperty("--sk-gx", `${(x * 100).toFixed(1)}%`);
+        target.style.setProperty("--sk-gy", `${(y * 100).toFixed(1)}%`);
+      });
+    };
+    const end = () => {
+      cancelAnimationFrame(frame);
+      reset();
+    };
+    root.addEventListener("pointermove", move, { passive: true });
+    root.addEventListener("pointerdown", move, { passive: true });
+    root.addEventListener("pointerleave", end);
+    root.addEventListener("pointerup", end);
+    root.addEventListener("pointercancel", end);
+    window.addEventListener("scroll", end, { passive: true });
+    return () => {
+      end();
+      root.removeEventListener("pointermove", move);
+      root.removeEventListener("pointerdown", move);
+      root.removeEventListener("pointerleave", end);
+      root.removeEventListener("pointerup", end);
+      root.removeEventListener("pointercancel", end);
+      window.removeEventListener("scroll", end);
+    };
+  }, []);
+
   return (
     <div ref={ref} className="sk-catalog sk-public-stage">
       <div className="sk-catalog-content mx-auto min-h-screen w-full max-w-[960px]">

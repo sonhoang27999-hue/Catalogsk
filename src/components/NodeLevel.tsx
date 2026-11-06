@@ -22,6 +22,7 @@ import { LazyEmbed } from "@/components/LazyEmbed";
 import { SmartImage } from "@/components/SmartImage";
 import { ProductActions } from "@/components/catalog/WorkflowProvider";
 import { ProductMedia } from "@/components/catalog/ProductMedia";
+import { ImmersiveSection } from "@/components/immersive/ImmersiveSection";
 
 export function NodeLevel({
   categoryId,
@@ -181,6 +182,14 @@ export function NodeLevel({
           </p>
         ) : null}
       </div>
+
+      {parentNodeId ? (
+        <ImmersiveSection
+          scope={{ nodeId: parentNodeId }}
+          targetName={parentName}
+          products={products.map((p) => ({ dbId: p.dbId, name: p.name }))}
+        />
+      ) : null}
 
       <ProductListNote />
 

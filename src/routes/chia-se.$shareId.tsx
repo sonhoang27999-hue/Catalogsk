@@ -1,18 +1,10 @@
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { asProduct, type SafeProductRow } from '@/data/workflow.api';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { asProduct } from '@/data/workflow.api';
+import { shareOptions } from '@/data/share.query';
 import { SafeProductCard } from '@/components/catalog/SafeProductCard';
 import { PageHeader } from '@/components/PageHeader';
 
-type SharedList = { id:string;title:string;created_at:string;products:SafeProductRow[] };
-const shareOptions = (id:string) => queryOptions({queryKey:['public-share',id],queryFn:async () => {
-  if (!/^[0-9a-f-]{36}$/i.test(id)) throw notFound();
-  const {data,error} = await supabase.rpc('read_catalog_share',{_id:id});
-  if(error) throw new Error(error.message);
-  if(!data) throw notFound();
-  return data as unknown as SharedList;
-}});
 export const Route = createFileRoute('/chia-se/$shareId')({
   loader: ({params,context}) => context.queryClient.ensureQueryData(shareOptions(params.shareId)),
   head: ({loaderData}) => {const title = `${loaderData?.title ?? 'Danh sách tư vấn'} | SK`; const description = 'Danh sách phụ kiện ô tô và giá bán dành cho khách hàng SK Ambient Light Luxury.';return {meta:[{title},{name:'description',content:description},{property:'og:title',content:title},{property:'og:description',content:description},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]};},

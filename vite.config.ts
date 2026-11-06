@@ -5,47 +5,28 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { VitePWA } from "vite-plugin-pwa";
+import { existsSync, rmSync } from "node:fs";
+import { resolve } from "node:path";
+
+// Build production (Vercel hoặc VITE_IMMERSIVE_DEMO=off): loại file demo khỏi bản build.
+const stripDemo = process.env["VERCEL"] === "1" || process.env["VITE_IMMERSIVE_DEMO"] === "off";
+const demoStripPlugin = {
+  name: "sk-strip-immersive-demo",
+  apply: "build" as const,
+  closeBundle() {
+    if (!stripDemo) return;
+    for (const dir of ["dist", "dist/client", ".output/public", ".vercel/output/static"]) {
+      const p = resolve(process.cwd(), dir, "demo");
+      if (existsSync(p)) rmSync(p, { recursive: true, force: true });
+    }
+  },
+};
 
 export default defineConfig({
+  vite: { plugins: [demoStripPlugin] },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
-    // Static HTML per route in dist/client: the packaged Android app boots straight from disk.
-    prerender: { enabled: true, crawlLinks: true },
-  },
-  vite: {
-    plugins: [
-      // Offline support: generated service worker, registered only by src/lib/pwa.ts
-      // (never in dev or Lovable preview). Manifest stays hand-written in public/.
-      VitePWA({
-        registerType: "autoUpdate",
-        injectRegister: null,
-        devOptions: { enabled: false },
-        manifest: false,
-        workbox: {
-          globPatterns: ["**/*.{js,css,png,svg,ico,webmanifest,dat}"],
-          // On-demand OCR/ML bundles stay out of the precache; they download when used.
-          globIgnores: ["**/tesseract-core*", "**/ort-wasm*", "**/cedict.dat"],
-          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
-          navigateFallback: null,
-          runtimeCaching: [
-            {
-              // HTML navigations: network first, cached page when offline.
-              urlPattern: ({ request }: { request: Request }) => request.mode === "navigate",
-              handler: "NetworkFirst",
-              options: { cacheName: "pages", networkTimeoutSeconds: 5 },
-            },
-            {
-              // Same-origin hashed build assets.
-              urlPattern: ({ url }: { url: URL }) => url.origin === self.location.origin && url.pathname.startsWith("/assets/"),
-              handler: "CacheFirst",
-              options: { cacheName: "build-assets" },
-            },
-          ],
-        },
-      }),
-    ],
   },
 });

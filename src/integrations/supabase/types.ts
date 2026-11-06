@@ -230,6 +230,69 @@ export type Database = {
         }
         Relationships: []
       }
+      immersive_scenes: {
+        Row: {
+          caption: string | null
+          created_at: string
+          created_by: string | null
+          draft_media: Json
+          hotspots: Json
+          id: string
+          kind: string
+          led_presets: Json
+          meta: Json
+          node_id: string | null
+          product_id: string | null
+          published_media: Json
+          series_id: string | null
+          sort: number
+          status: string
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          created_by?: string | null
+          draft_media?: Json
+          hotspots?: Json
+          id?: string
+          kind: string
+          led_presets?: Json
+          meta?: Json
+          node_id?: string | null
+          product_id?: string | null
+          published_media?: Json
+          series_id?: string | null
+          sort?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          created_by?: string | null
+          draft_media?: Json
+          hotspots?: Json
+          id?: string
+          kind?: string
+          led_presets?: Json
+          meta?: Json
+          node_id?: string | null
+          product_id?: string | null
+          published_media?: Json
+          series_id?: string | null
+          sort?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       models: {
         Row: {
           created_at: string

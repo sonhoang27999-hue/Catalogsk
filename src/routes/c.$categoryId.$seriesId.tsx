@@ -21,6 +21,7 @@ import { LazyEmbed } from "@/components/LazyEmbed";
 import { ProductActions } from "@/components/catalog/WorkflowProvider";
 import { ProductMedia } from "@/components/catalog/ProductMedia";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
+import { ImmersiveSection } from "@/components/immersive/ImmersiveSection";
 
 export const Route = createFileRoute("/c/$categoryId/$seriesId")({
   // Chỉ nạp models/products/videos của đúng đời xe đang xem.
@@ -188,6 +189,12 @@ function SeriesPage() {
           </section>
         ) : null}
       </div>
+
+      <ImmersiveSection
+        scope={{ seriesId: series.dbId }}
+        targetName={series.name}
+        products={products.map((p) => ({ dbId: p.dbId, name: p.name }))}
+      />
 
       <ProductListNote />
 
