@@ -133,15 +133,6 @@ function ImmersiveStage({
   const models = scenes.filter((s) => s.kind === "model");
   const media = scenes.filter((s) => s.kind === "photo" || s.kind === "video");
   const compare = scenes.filter((s) => s.kind === "compare");
-  const tabs = (
-    [
-      ["panorama", "360°", Orbit, pano.length],
-      ["model", "3D", Box, models.length],
-      ["media", "Ảnh & video", Images, media.length],
-      ["compare", "Trước / Sau", SplitSquareHorizontal, compare.length],
-    ] as const
-  ).filter((t) => t[3] > 0);
-  const [tab, setTab] = useState<Tab>(tabs[0]?.[0] ?? "media");
   const url = useCallback((p?: string) => (p ? urls[p] : undefined), [urls]);
 
   return (
@@ -152,30 +143,11 @@ function ImmersiveStage({
           Trải nghiệm thực tế trên xe
         </h2>
       </div>
-      {tabs.length > 1 ? (
-        <div role="tablist" className="flex gap-1.5 overflow-x-auto">
-          {tabs.map(([id, label, Icon]) => (
-            <button
-              key={id}
-              role="tab"
-              type="button"
-              aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                tab === id ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground"
-              }`}
-            >
-              <Icon className="size-3.5" />
-              {label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-
-      {tab === "panorama" && pano.length ? <PanoramaTab scenes={pano} url={url} productName={productName} /> : null}
-      {tab === "model" && models.length ? <ModelTab scenes={models} url={url} productName={productName} /> : null}
-      {tab === "media" && media.length ? (
+      {pano.length ? (<div className="space-y-2"><h3 className="flex items-center gap-1.5 text-sm font-semibold"><Orbit className="size-4 text-primary" />360°</h3><PanoramaTab scenes={pano} url={url} productName={productName} /></div>) : null}
+      {models.length ? (<div className="space-y-2"><h3 className="flex items-center gap-1.5 text-sm font-semibold"><Box className="size-4 text-primary" />3D</h3><ModelTab scenes={models} url={url} productName={productName} /></div>) : null}
+      {media.length ? (
         <div className="space-y-3">
+          <h3 className="flex items-center gap-1.5 text-sm font-semibold"><Images className="size-4 text-primary" />Ảnh & video</h3>
           {media.map((s) => (
             <figure key={s.id} className="sk-edge overflow-hidden rounded-lg bg-card">
               {s.kind === "photo" ? (
@@ -203,7 +175,7 @@ function ImmersiveStage({
           ))}
         </div>
       ) : null}
-      {tab === "compare" && compare.length ? (
+      {false && compare.length ? (
         <div className="space-y-3">
           {compare.map((s) => (
             <figure key={s.id} className="sk-edge overflow-hidden rounded-lg bg-card">

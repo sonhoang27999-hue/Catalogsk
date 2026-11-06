@@ -243,7 +243,7 @@ function AddScene({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
-        {(Object.keys(KIND_LABEL) as SceneKind[]).map((k) => (
+        {(Object.keys(KIND_LABEL) as SceneKind[]).filter((k) => k !== "compare").map((k) => (
           <button
             key={k}
             type="button"
