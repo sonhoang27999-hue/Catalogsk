@@ -190,7 +190,51 @@ export default function PanoramaViewer({ scenes, currentId, onSceneChange, onPic
     };
   }, [onPick]);
 
+  // Xoay theo cảm biến nghiêng của điện thoại (bật bằng nút, iOS cần cho phép).
+  const [gyroOk, setGyroOk] = useState(false);
+  const [gyroOn, setGyroOn] = useState(false);
+  useEffect(() => {
+    setGyroOk(!onPick && typeof window !== "undefined" && "DeviceOrientationEvent" in window && window.matchMedia("(pointer: coarse)").matches);
+  }, [onPick]);
+  useEffect(() => {
+    if (!gyroOn) return;
+    let prev: { a: number; b: number; g: number } | null = null;
+    const wrap = (d: number) => ((d + 540) % 360) - 180;
+    const onOri = (e: DeviceOrientationEvent) => {
+      if (e.alpha == null || e.beta == null || e.gamma == null) return;
+      const cur = { a: e.alpha, b: e.beta, g: e.gamma };
+      const view = viewerRef.current?.view();
+      if (prev && view) {
+        const angle = (screen.orientation?.angle ?? 0) % 360;
+        const dA = wrap(cur.a - prev.a);
+        const dTilt = angle === 90 ? -(cur.g - prev.g) : angle === 270 ? cur.g - prev.g : cur.b - prev.b;
+        const rad = Math.PI / 180;
+        if (Math.abs(dA) < 30 && Math.abs(dTilt) < 30) {
+          view.setYaw(view.yaw() + dA * rad);
+          view.setPitch(view.pitch() - dTilt * rad);
+        }
+      }
+      prev = cur;
+    };
+    window.addEventListener("deviceorientation", onOri);
+    return () => window.removeEventListener("deviceorientation", onOri);
+  }, [gyroOn]);
+  const toggleGyro = async () => {
+    if (gyroOn) return setGyroOn(false);
+    const D = window.DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> };
+    try {
+      if (typeof D.requestPermission === "function" && (await D.requestPermission()) !== "granted") {
+        onError?.("Chưa được phép dùng cảm biến nghiêng. Anh/chị có thể kéo để xoay.");
+        return;
+      }
+      setGyroOn(true);
+    } catch {
+      onError?.("Máy không hỗ trợ xoay theo cảm biến. Vui lòng kéo để xoay.");
+    }
+  };
+
   return (
+    <>
     <div
       ref={hostRef}
       tabIndex={0}
@@ -198,5 +242,16 @@ export default function PanoramaViewer({ scenes, currentId, onSceneChange, onPic
       aria-label="Ảnh 360°: kéo hoặc dùng phím mũi tên để xoay, phím + và - để phóng to"
       className={`absolute inset-0 touch-none outline-none focus-visible:ring-2 focus-visible:ring-primary ${onPick ? "cursor-crosshair" : "cursor-grab"}`}
     />
+    {gyroOk ? (
+      <button
+        type="button"
+        onClick={toggleGyro}
+        aria-pressed={gyroOn}
+        className={`absolute bottom-3 left-3 z-10 rounded-full border px-3 py-1.5 text-xs font-semibold backdrop-blur ${gyroOn ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background/70 text-foreground"}`}
+      >
+        {gyroOn ? "Tắt xoay theo máy" : "Xoay theo điện thoại"}
+      </button>
+    ) : null}
+    </>
   );
 }
