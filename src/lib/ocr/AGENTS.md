@@ -1,3 +1,0 @@
-## OCR rules
-- On-device camera OCR uses tesseract.js (lazy dynamic import, never in SSR graph) via src/lib/ocr/offlineOcr.ts; the chi_sim+vie+eng language data is downloaded once on demand and cached in IndexedDB by tesseract.js itself (kv flag ocrPack:v1 tracks readiness) — so camera translation works without internet after one download.
-- OCR lines go through src/lib/ocr/detect.ts splitLines (strips spaces OCR inserts between CJK chars so dictionary/cache matching works) and detectLineLang, then translate(..., "offline") — offline camera translation uses exact local dictionaries and downloaded sentence MT, with saved AI translations only as fallback.
