@@ -33,6 +33,7 @@ export function ProductMedia({
           />
         </ImageZoom>
       )}
+      <span aria-hidden="true" className="sk-loading-sweep" />
     </div>
   );
 }

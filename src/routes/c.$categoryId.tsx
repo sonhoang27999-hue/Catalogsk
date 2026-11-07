@@ -86,7 +86,7 @@ function CategoryPage() {
     <div>
       <RememberVehicle path={`/c/${category.id}`} name={category.name} />
       <PageHeader title={`Đời xe ${category.name}`} />
-      <div className="sk-glass sticky top-14 z-20 px-3 py-3">
+      <div className="sk-sticky-sub sk-glass sticky top-14 z-20 px-3 py-3">
         <SearchBar
           value={query}
           onChange={setQuery}

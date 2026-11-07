@@ -4,11 +4,12 @@ import { formatPrice } from '@/data/catalog.repository';
 import { LazyEmbed } from '@/components/LazyEmbed';
 import { toEmbedUrl, isVerticalUrl } from '@/lib/video';
 import { safeWebLink } from '@/lib/productChecks';
+import { ExpandableText } from './ExpandableText';
 export function SafeProductCard({product,children}: {product:Product;children?:React.ReactNode}) {
   const sale = product.salePrice != null && product.salePrice > 0 && product.salePrice < product.price;
   const discount = sale ? Math.round(((product.price - (product.salePrice ?? product.price)) / product.price) * 100) : 0;
   return <div className="sk-reveal"><article className="sk-edge sk-product-card overflow-hidden rounded-lg">
-    <div className="bg-secondary px-3 py-3"><h2 className="text-xl font-bold">{product.name}</h2>{product.description ? <p className="mt-1 text-sm text-muted-foreground">{product.description}</p> : null}{children}</div>
+    <div className="bg-secondary px-3 py-3"><h2 className="text-xl font-bold">{product.name}</h2>{product.description ? <ExpandableText className="mt-1 text-sm text-muted-foreground">{product.description}</ExpandableText> : null}{children}</div>
     <ProductMedia src={product.image} name={product.name} price={product.price} salePrice={product.salePrice} />
     {product.detailUrl && safeWebLink(product.detailUrl) ? <a href={product.detailUrl} target="_blank" rel="noopener noreferrer" className="block px-3 py-3 text-center text-sm text-gold">Xem sản phẩm lên xe thực tế</a> : null}
     {toEmbedUrl(product.videoUrl) ? <LazyEmbed src={toEmbedUrl(product.videoUrl) ?? ''} title={product.name} vertical={isVerticalUrl(product.videoUrl)} /> : null}

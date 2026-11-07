@@ -91,6 +91,7 @@ export function HeaderMenu() {
       <button
         type="button"
         aria-label="Menu tài khoản"
+        aria-expanded={open}
         onClick={() => setOpen(true)}
         className="relative flex size-9 items-center justify-center rounded-full text-foreground transition-colors active:bg-secondary"
       >

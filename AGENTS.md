@@ -10,6 +10,17 @@
 <!-- LOVABLE:END -->
 
 - Public catalog visual effects are scoped under `.sk-catalog`; administration dialogs render outside that scope to preserve their UI.
+- HomeSearch owns only public suggestion/keyboard/recent-search presentation; index retains database query timing, so interaction changes cannot alter catalog search reads.
+- Public loading sweeps sit behind media and derive visibility from existing data-loaded attributes; SmartImage loading and clarity behavior stays untouched.
+- ExpandableText measures actual overflow after hydration and resize, reserves the SSR control row only for likely-long descriptions until measurement, and animates only transform/opacity rather than layout height to protect low-end phones.
+- Public scroll direction is governed by pure publicScroll rules and useHideOnScroll with passive/rAF scheduling and protected focus/menu/search states; headers retain sticky layout while moving by transform only.
+- Only the header instance writes the catalog's data-header-hidden attribute; secondary sticky bars transform with it, while consultation instances cannot overwrite header state.
+- VehiclePicker consumes loaded brands and fetches only the selected category; pure picker helpers govern tree steps without extra storage or preloading.
+- NodeLevel's guest product jump nav observes all product wrappers with one IntersectionObserver; active-chip visibility scrolls only its own nav, not the page.
+- NodeLevel filters are keyed per category/node and use a pure public-field projection; draft confirmation alone changes the visible list, while admin and dealer-price queries retain the full list.
+- Slider renders one thumb per controlled/default value with optional labels; single-value callers stay unchanged, enabling accessible public price ranges without another library.
+- Public lightbox gestures operate on a wrapper without changing SmartImage; native multi-touch stays unblocked, single-touch downward dismissal only starts at scroll top, and imperative rAF transforms reset on unmount.
+- ConsultationBar reports its actual height to the public shell; BackToTop writes progress directly without per-scroll React state and sits left/above fixed admin actions to avoid contact and install controls.
 - Public product previews share ProductMedia and ProductPlaceholder; keep SmartImage fallbacks opt-in so admin previews and data resolution remain unchanged.
 - ProductMedia uses SmartImage's data-loaded state for loading-only height reservation; mobile full-bleed rules target product wrappers rather than entire lists to preserve neighboring controls and videos.
 - Use existing CONTACT values for the public consultation bar; contact configuration remains the single source of truth.

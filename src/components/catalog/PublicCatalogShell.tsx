@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { ConsultationBar } from "./ConsultationBar";
+import { BackToTop } from "./BackToTop";
 
 export function PublicCatalogShell({
   children,
@@ -118,6 +119,7 @@ export function PublicCatalogShell({
         </div>
       </div>
       <ConsultationBar />
+      <BackToTop pathname={pathname} />
     </div>
   );
 }

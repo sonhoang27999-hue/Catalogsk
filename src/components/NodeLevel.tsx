@@ -3,7 +3,7 @@
  * mỗi tầng hiển thị các mục con (lưới) + danh sách sản phẩm của chính tầng đó,
  * kèm 2 nút [+] cho admin: thêm mục con và thêm sản phẩm.
  */
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { CatalogNode, Product } from "@/data/catalog";
 import { AddFab, AddTile } from "@/components/admin/AddTile";
@@ -23,8 +23,22 @@ import { SmartImage } from "@/components/SmartImage";
 import { ProductActions } from "@/components/catalog/WorkflowProvider";
 import { ProductMedia } from "@/components/catalog/ProductMedia";
 import { ImmersiveSection } from "@/components/immersive/ImmersiveSection";
+import { ExpandableText } from "@/components/catalog/ExpandableText";
+import { ProductJumpNav } from "@/components/catalog/ProductJumpNav";
+import { canShowProductJump } from "@/lib/productJump";
+import { ProductFilter } from "@/components/catalog/ProductFilter";
+import { Button } from "@/components/ui/button";
+import { activeProductFilterCount, applyProductFilters, buildProductFacets, canShowProductFilter, emptyProductFilters, type ProductFilters } from "@/lib/productFilter";
 
-export function NodeLevel({
+export function NodeLevel(props: NodeLevelProps) {
+  return <NodeLevelContent key={`${props.categoryId}:${props.parentNodeId ?? 'root'}`} {...props} />;
+}
+
+type NodeLevelProps = {
+  categoryId: string; categoryDbId: string; parentNodeId: string | null; parentName: string; childLabel: string; nodes: CatalogNode[]; products: Product[];
+};
+
+function NodeLevelContent({
   categoryId,
   categoryDbId,
   parentNodeId,
@@ -55,9 +69,25 @@ export function NodeLevel({
   );
   const [nodeOpen, setNodeOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [filters, setFilters] = useState<ProductFilters>(emptyProductFilters);
+  const facets = useMemo(() => buildProductFacets(products), [products]);
+  const filtering = !isAdmin && activeProductFilterCount(filters) > 0;
+  const visibleProducts = useMemo(() => filtering ? applyProductFilters(products, filters) : products, [products,filters,filtering]);
+  const showFilter = canShowProductFilter(products, isAdmin, facets);
+  const showJump = canShowProductJump(visibleProducts.length, isAdmin);
+  const applyFilters = (next: ProductFilters) => {
+    setFilters(next);
+    // Schedule after commit; never scroll if the list is already on screen.
+    requestAnimationFrame(() => {
+      const list = listRef.current;
+      if (list && list.getBoundingClientRect().top < 0) list.scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+    });
+  };
 
   return (
     <div className="pb-8">
+      {showJump ? <ProductJumpNav products={visibleProducts} listRef={listRef} /> : null}
       {products.length > 0 ? (
         <p className="px-3 text-center text-xs text-muted-foreground">
           Giá niêm yết đã gồm VAT
@@ -77,6 +107,7 @@ export function NodeLevel({
                 params={{ categoryId, nodeId: n.id }}
                 className="sk-edge sk-shimmer overflow-hidden rounded-lg"
               >
+                <span className="sk-loading-frame relative block aspect-square overflow-hidden">
                 <SmartImage
                   src={n.image}
                   alt={n.name}
@@ -84,6 +115,8 @@ export function NodeLevel({
                   sizes="33vw"
                   className="aspect-square w-full rounded-t-lg object-contain p-2"
                 />
+                <span aria-hidden="true" className="sk-loading-sweep" />
+                </span>
                 <p className="px-1 py-2 text-center text-xs leading-snug font-semibold text-foreground">
                   {n.name}
                 </p>
@@ -107,16 +140,17 @@ export function NodeLevel({
         </div>
       ) : null}
 
-      <div className="sk-product-list space-y-6 px-3 pb-3">
-        {products.map((p, i) => (
-          <div key={p.id} className="sk-reveal space-y-2">
+      {showFilter ? <ProductFilter products={products} facets={facets} applied={filters} shown={visibleProducts.length} onApply={applyFilters} /> : null}
+      <div ref={listRef} className={`sk-product-list sk-filter-list space-y-6 px-3 pb-3${filtering ? ' sk-filtered-list' : ''}`}>
+        {visibleProducts.map((p, i) => (
+          <div key={p.id} data-jump-product={p.id} className={`sk-reveal space-y-2${showJump ? ' sk-jump-target' : ''}`}>
             <div className="sk-edge sk-product-card block overflow-hidden rounded-lg">
               <div className="bg-secondary px-3 py-3">
                 <h2 className="text-xl leading-snug font-bold text-foreground">{p.name}</h2>
                 {p.description ? (
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  <ExpandableText className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {p.description}
-                  </p>
+                  </ExpandableText>
                 ) : null}
               </div>
               <ProductActions id={p.dbId} name={p.name} />
@@ -175,6 +209,8 @@ export function NodeLevel({
             ) : null}
           </div>
         ))}
+
+        {filtering && visibleProducts.length === 0 ? <div className="py-8 text-center"><p className="text-sm text-muted-foreground">Không có sản phẩm phù hợp với bộ lọc</p><Button variant="secondary" className="mt-3 min-h-11" onClick={() => applyFilters(emptyProductFilters())}>Xoá lọc</Button></div> : null}
 
         {products.length === 0 && nodes.length === 0 && !isAdmin ? (
           <p className="py-8 text-center text-sm text-muted-foreground">

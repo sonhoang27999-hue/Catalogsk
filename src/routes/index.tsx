@@ -11,7 +11,7 @@ import { AddCategoryDialog } from "@/components/admin/AddDialogs";
 import { useAdmin } from "@/hooks/useAdmin";
 import { HomeBanner } from "@/components/HomeBanner";
 import { HeaderMenu } from "@/components/HeaderMenu";
-import { SearchBar } from "@/components/SearchBar";
+import { HomeSearch } from "@/components/catalog/HomeSearch";
 import { categoriesQueryOptions } from "@/data/catalog.queries";
 import { SEARCH_MIN_LENGTH, searchQueryOptions } from "@/data/search.queries";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -19,9 +19,9 @@ import { SmartImage } from "@/components/SmartImage";
 import { PageSkeleton } from "@/components/CatalogSkeleton";
 import { HOME_BANNER_KEY, settingsQueryOptions } from "@/data/settings.api";
 import { imageUrl } from "@/lib/imageUrl";
-import { IMG } from "@/data/images";
 import { PersonalShortcuts } from "@/components/catalog/PersonalShortcuts";
-import { ProductPlaceholder } from "@/components/catalog/ProductPlaceholder";
+import { useHideOnScroll } from "@/hooks/useHideOnScroll";
+import { VehiclePicker } from "@/components/catalog/VehiclePicker";
 
 export const Route = createFileRoute("/")({
   // Trang chủ chỉ cần danh sách hãng xe (không nạp sản phẩm/video/giá nhập).
@@ -70,13 +70,14 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const [query, setQuery] = useState("");
+  const { ref: headerRef, hidden } = useHideOnScroll<HTMLDivElement>();
   const { canManage: isAdmin } = useAdmin();
   const [addOpen, setAddOpen] = useState(false);
 
   // Tìm kiếm chạy ở database: chờ 300ms sau khi ngừng gõ, tối thiểu 2 ký tự.
   // React Query tự huỷ/bỏ qua kết quả cũ theo query key nên không hiện dữ liệu lỗi thời.
   const debouncedQuery = useDebouncedValue(query, 300);
-  const { data: searchData, isFetching: isSearching } = useQuery(
+  const { data: searchData, isFetching: isSearching, isError: searchFailed } = useQuery(
     searchQueryOptions(debouncedQuery),
   );
   const results = query.trim() === debouncedQuery.trim() ? (searchData ?? []) : [];
@@ -85,13 +86,14 @@ function Home() {
   return (
     <div>
       <HomeBanner />
-      <div className="sk-glass sticky top-0 z-20 flex items-center gap-2 px-3 py-3">
+      <div ref={headerRef} data-scroll-hidden={hidden} className="sk-scroll-header sk-glass sticky top-0 z-20 flex items-center gap-2 px-3 py-3">
         <div className="flex-1">
-          <SearchBar value={query} onChange={setQuery} />
+          <HomeSearch value={query} onChange={setQuery} categories={categories} results={results} loading={isSearching || query.trim() !== debouncedQuery.trim()} tooShort={tooShort} failed={searchFailed} />
         </div>
         <HeaderMenu />
       </div>
 
+      <VehiclePicker categories={categories} />
       <PersonalShortcuts />
 
       {/* Hướng dẫn sử dụng LED: đặt ngay dưới ô tìm kiếm để khách thấy ngay khi mở trang. */}
@@ -111,61 +113,6 @@ function Home() {
         <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground" />
       </Link>
 
-      {query ? (
-        <section className="p-3">
-          <h2 className="mb-2 text-sm font-semibold text-muted-foreground">
-            {tooShort ? "Nhập ít nhất 2 ký tự" : `${results.length} kết quả`} cho “{query}”
-          </h2>
-          <div className="space-y-2">
-            {results.map((r) => (
-              <Link
-                key={r.id}
-                to={
-                  r.params.seriesId
-                    ? "/c/$categoryId/$seriesId"
-                    : r.params.nodeId
-                      ? "/c/$categoryId/n/$nodeId"
-                      : "/c/$categoryId"
-                }
-                params={{
-                  categoryId: r.params.categoryId,
-                  seriesId: r.params.seriesId,
-                  nodeId: r.params.nodeId,
-                }}
-                className="flex items-center gap-3 rounded-md border border-border bg-card p-2"
-              >
-                <SmartImage
-                  src={r.level === "product" && r.image === IMG.car ? "" : r.image}
-                  alt={r.title}
-                  size="thumb"
-                  width={48}
-                  height={48}
-                  className="size-12 rounded-md bg-muted object-contain"
-                  fallbackContent={
-                    r.level === "product" ? (
-                      <ProductPlaceholder className="size-12 shrink-0 rounded-md [&_svg]:w-10 [&_span]:hidden" />
-                    ) : undefined
-                  }
-                />
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{r.title}</span>
-                  <span className="block truncate text-xs text-muted-foreground">{r.subtitle}</span>
-                </span>
-              </Link>
-            ))}
-            {results.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                {tooShort
-                  ? "Nhập ít nhất 2 ký tự để tìm kiếm."
-                  : isSearching
-                    ? "Đang tìm..."
-                    : "Không tìm thấy kết quả phù hợp."}
-              </p>
-            ) : null}
-          </div>
-        </section>
-      ) : (
-        <>
           <div className="flex items-end justify-between gap-3 px-4 pt-7 pb-3">
             <h2
               className="sk-gradient-text sk-title-sweep w-fit text-2xl font-bold"
@@ -187,7 +134,7 @@ function Home() {
                   params={{ categoryId: c.id }}
                   className="flex w-full flex-col items-center gap-1.5"
                 >
-                  <span className="sk-edge sk-brand-tile sk-shimmer flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg text-brand">
+                  <span className="sk-edge sk-brand-tile sk-shimmer sk-loading-frame relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg text-brand">
                     {c.image && /^https?:\/\//.test(c.image) ? (
                       <SmartImage
                         src={c.image}
@@ -202,6 +149,7 @@ function Home() {
                     ) : (
                       <Car className="size-12" />
                     )}
+                    <span aria-hidden="true" className="sk-loading-sweep" />
                   </span>
                   <span className="line-clamp-2 h-10 pt-1 text-center text-sm leading-5 font-semibold text-foreground">
                     {c.name}
@@ -233,8 +181,6 @@ function Home() {
           </div>
 
           {isAdmin ? <AddCategoryDialog open={addOpen} onOpenChange={setAddOpen} /> : null}
-        </>
-      )}
     </div>
   );
 }

@@ -3,9 +3,11 @@ import { useRouter } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 import { HeaderMenu } from "./HeaderMenu";
 import { Button } from "@/components/ui/button";
+import { useHideOnScroll } from "@/hooks/useHideOnScroll";
 
 export function PageHeader({ title }: { title: string }) {
   const router = useRouter();
+  const { ref, hidden } = useHideOnScroll<HTMLElement>();
 
   const goBack = () => {
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -16,7 +18,7 @@ export function PageHeader({ title }: { title: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/95 px-2 backdrop-blur">
+    <header ref={ref} data-scroll-hidden={hidden} className="sk-scroll-header sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/95 px-2 backdrop-blur">
       <Button
         variant="ghost"
         type="button"
