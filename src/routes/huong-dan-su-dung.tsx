@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink, Phone } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/PageHeader";
+import { CONTACT } from "@/data/catalog";
+import { withCatalogSource } from "@/lib/catalogSource";
 import { Button } from "@/components/ui/button";
 import {
   GUIDE_APK_KEY,
@@ -91,7 +93,7 @@ function GuidePage() {
             decoding="async"
             className="h-auto w-full rounded-lg"
           />
-          <LinkBtn href="https://sklight.vn">Mở sklight.vn</LinkBtn>
+          <LinkBtn href={withCatalogSource("https://sklight.vn")}>Mở sklight.vn</LinkBtn>
         </Step>
         <Step n={2} title="Tải ứng dụng SK Ambient Light">
           <p>iPhone: mở App Store, tìm "SK Ambient Light" và cài đặt.</p>
@@ -111,10 +113,10 @@ function GuidePage() {
             <li>Điều chỉnh độ sáng và tốc độ hiệu ứng</li>
           </ul>
         </Step>
-        <LinkBtn href={links.source}>Xem bài hướng dẫn đầy đủ</LinkBtn>
+        <LinkBtn href={withCatalogSource(links.source)}>Xem bài hướng dẫn đầy đủ</LinkBtn>
         <Button asChild className="w-full">
-          <a href="tel:0868055555">
-            <Phone className="size-4" /> Hỗ trợ: 0868055555
+          <a href={`tel:${CONTACT.zalo}`}>
+            <Phone className="size-4" /> Hỗ trợ: {CONTACT.hotline}
           </a>
         </Button>
       </div>

@@ -93,8 +93,8 @@ export const resolveImage = (url?: string | null, key?: string | null): string =
 /** Thông tin liên hệ / báo giá. */
 export const CONTACT = {
   shopName: "SK Ambient Light Luxury",
-  hotline: "0909 123 456",
-  zalo: "0909123456",
-  address: "128 Nguyễn Văn Linh, Quận 7, TP.HCM",
-  workingHours: "08:00 - 19:00, T2 - CN",
+  hotline: "0868 055 555",
+  zalo: "0868055555",
+  address: "197 Thanh Am, Việt Hưng, Long Biên, Hà Nội",
+  workingHours: "08:00 - 22:00",
 };

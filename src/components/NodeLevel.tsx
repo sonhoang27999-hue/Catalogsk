@@ -26,6 +26,7 @@ import { ImmersiveSection } from "@/components/immersive/ImmersiveSection";
 import { ExpandableText } from "@/components/catalog/ExpandableText";
 import { ProductJumpNav } from "@/components/catalog/ProductJumpNav";
 import { canShowProductJump } from "@/lib/productJump";
+import { withCatalogSource } from "@/lib/catalogSource";
 import { ProductFilter } from "@/components/catalog/ProductFilter";
 import { Button } from "@/components/ui/button";
 import { activeProductFilterCount, applyProductFilters, buildProductFacets, canShowProductFilter, emptyProductFilters, type ProductFilters } from "@/lib/productFilter";
@@ -158,7 +159,7 @@ function NodeLevelContent({
 
               {p.detailUrl ? (
                 <a
-                  href={p.detailUrl}
+                  href={withCatalogSource(p.detailUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="sk-shimmer block lux-cta px-3 py-3 text-center text-sm font-semibold"

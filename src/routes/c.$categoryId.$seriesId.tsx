@@ -17,6 +17,7 @@ import { EditButton, externalImage } from "@/components/admin/EditDialogs";
 import { ProductPrice } from "@/components/ProductPrice";
 import { ProductListNote } from "@/components/ProductListNote";
 import { isVerticalUrl, toEmbedUrl } from "@/lib/video";
+import { withCatalogSource } from "@/lib/catalogSource";
 import { LazyEmbed } from "@/components/LazyEmbed";
 import { ProductActions } from "@/components/catalog/WorkflowProvider";
 import { ProductMedia } from "@/components/catalog/ProductMedia";
@@ -106,7 +107,7 @@ function SeriesPage() {
 
               {p.detailUrl ? (
                 <a
-                  href={p.detailUrl}
+                  href={withCatalogSource(p.detailUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-1.5 sk-shimmer lux-cta px-3 py-3 text-center text-sm font-semibold"
