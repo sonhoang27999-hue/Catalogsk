@@ -1,11 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ExternalLink, Phone } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/PageHeader";
-import { CONTACT } from "@/data/catalog";
 import { withCatalogSource } from "@/lib/catalogSource";
-import { useDealerContact } from "@/hooks/useDealerContact";
-import { formatPhone, telHref } from "@/lib/dealerLink";
 import { Button } from "@/components/ui/button";
 import {
   GUIDE_APK_KEY,
@@ -75,9 +72,6 @@ function LinkBtn({ href, children }: { href: string; children: React.ReactNode }
 
 function GuidePage() {
   const links = useGuideLinks();
-  // Khách vào qua link đại lý cấp 1 thì gọi hỗ trợ về số của đại lý; còn lại là số SK.
-  const { contact } = useDealerContact();
-  const supportPhone = contact?.phone ?? CONTACT.hotline;
   return (
     <div className="pb-8">
       <PageHeader title="Hướng dẫn sử dụng LED" />
@@ -119,11 +113,6 @@ function GuidePage() {
           </ul>
         </Step>
         <LinkBtn href={withCatalogSource(links.source)}>Xem bài hướng dẫn đầy đủ</LinkBtn>
-        <Button asChild className="w-full">
-          <a href={telHref(supportPhone)}>
-            <Phone className="size-4" /> Hỗ trợ: {formatPhone(supportPhone)}
-          </a>
-        </Button>
       </div>
     </div>
   );
