@@ -17,6 +17,7 @@ import { Route as HuongDanSuDungRouteImport } from './routes/huong-dan-su-dung'
 import { Route as YeuThichRouteImport } from './routes/yeu-thich'
 import { Route as CCategoryIdRouteImport } from './routes/c.$categoryId'
 import { Route as ChiaSeShareIdRouteImport } from './routes/chia-se.$shareId'
+import { Route as DCodeRouteImport } from './routes/d.$code'
 import { Route as DemoImmersiveRouteImport } from './routes/demo.immersive'
 import { Route as CCategoryIdSeriesIdRouteImport } from './routes/c.$categoryId.$seriesId'
 import { Route as CCategoryIdNNodeIdRouteImport } from './routes/c.$categoryId.n.$nodeId'
@@ -61,6 +62,11 @@ const ChiaSeShareIdRoute = ChiaSeShareIdRouteImport.update({
   path: '/chia-se/$shareId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DCodeRoute = DCodeRouteImport.update({
+  id: '/d/$code',
+  path: '/d/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoImmersiveRoute = DemoImmersiveRouteImport.update({
   id: '/demo/immersive',
   path: '/demo/immersive',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
   '/chia-se/$shareId': typeof ChiaSeShareIdRoute
+  '/d/$code': typeof DCodeRoute
   '/demo/immersive': typeof DemoImmersiveRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
   '/chia-se/$shareId': typeof ChiaSeShareIdRoute
+  '/d/$code': typeof DCodeRoute
   '/demo/immersive': typeof DemoImmersiveRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/yeu-thich': typeof YeuThichRoute
   '/c/$categoryId': typeof CCategoryIdRouteWithChildren
   '/chia-se/$shareId': typeof ChiaSeShareIdRoute
+  '/d/$code': typeof DCodeRoute
   '/demo/immersive': typeof DemoImmersiveRoute
   '/c/$categoryId/$seriesId': typeof CCategoryIdSeriesIdRoute
   '/c/$categoryId/n/$nodeId': typeof CCategoryIdNNodeIdRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/yeu-thich'
     | '/c/$categoryId'
     | '/chia-se/$shareId'
+    | '/d/$code'
     | '/demo/immersive'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/yeu-thich'
     | '/c/$categoryId'
     | '/chia-se/$shareId'
+    | '/d/$code'
     | '/demo/immersive'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/yeu-thich'
     | '/c/$categoryId'
     | '/chia-se/$shareId'
+    | '/d/$code'
     | '/demo/immersive'
     | '/c/$categoryId/$seriesId'
     | '/c/$categoryId/n/$nodeId'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   YeuThichRoute: typeof YeuThichRoute
   CCategoryIdRoute: typeof CCategoryIdRouteWithChildren
   ChiaSeShareIdRoute: typeof ChiaSeShareIdRoute
+  DCodeRoute: typeof DCodeRoute
   DemoImmersiveRoute: typeof DemoImmersiveRoute
 }
 
@@ -229,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChiaSeShareIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/d/$code': {
+      id: '/d/$code'
+      path: '/d/$code'
+      fullPath: '/d/$code'
+      preLoaderRoute: typeof DCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/immersive': {
       id: '/demo/immersive'
       path: '/demo/immersive'
@@ -276,6 +296,7 @@ const rootRouteChildren: RootRouteChildren = {
   YeuThichRoute: YeuThichRoute,
   CCategoryIdRoute: CCategoryIdRouteWithChildren,
   ChiaSeShareIdRoute: ChiaSeShareIdRoute,
+  DCodeRoute: DCodeRoute,
   DemoImmersiveRoute: DemoImmersiveRoute,
 }
 export const routeTree = rootRouteImport

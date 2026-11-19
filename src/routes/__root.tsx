@@ -7,6 +7,7 @@ import {
   useRouterState,
   HeadContent,
   Scripts,
+  retainSearchParams,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -83,6 +84,13 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Mã đại lý cấp 1 (?dl=<mã>) đi theo mọi liên kết trong catalog, để người nhận link
+  // xem tiếp hoặc gửi lại trang con vẫn ra đúng nút tư vấn của đại lý đó.
+  validateSearch: (search: Record<string, unknown>): { dl?: string } => {
+    const dl = search["dl"];
+    return typeof dl === "string" && dl ? { dl } : {};
+  },
+  search: { middlewares: [retainSearchParams(["dl"])] },
   // Nạp cấu hình giao diện (ảnh bìa, màu sắc) ngay từ server để khách và admin
   // thấy giao diện GIỐNG HỆT NHAU ở lần vẽ đầu tiên. Lỗi mạng không làm sập trang.
   loader: ({ context }) =>

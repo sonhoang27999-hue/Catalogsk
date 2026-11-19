@@ -6,7 +6,9 @@ import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
 import { SmartImage } from "@/components/SmartImage";
 import { ProductPlaceholder } from "./ProductPlaceholder";
-import { CONTACT, type Category } from "@/data/catalog";
+import type { Category } from "@/data/catalog";
+import { useDealerContact } from "@/hooks/useDealerContact";
+import { zaloHref } from "@/lib/dealerLink";
 import { IMG } from "@/data/images";
 import type { SearchResult } from "@/data/catalog.repository";
 import { RECENT_SEARCH_KEY, recentSearches, rememberSearch, searchTextParts } from "@/lib/catalogSearch";
@@ -20,6 +22,8 @@ export function HomeSearch({ value, onChange, categories, results, loading, tooS
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [recent, setRecent] = useState<string[]>([]);
+  // Nút hỏi qua Zalo chỉ hiện khi khách vào qua link của đại lý cấp 1.
+  const { contact } = useDealerContact();
   const empty = !value.trim();
   const brands = categories.slice(0, 8);
   const count = empty ? recent.length + brands.length : results.length;
@@ -80,7 +84,7 @@ export function HomeSearch({ value, onChange, categories, results, loading, tooS
           <h2 className="break-words text-base font-semibold">{failed ? "Chưa tải được kết quả" : `Chưa thấy “${value.trim()}”`}</h2>
           <p className="mt-2 mb-4 text-sm text-muted-foreground">Thử gõ ngắn hơn, chỉ tên hãng hoặc dòng xe</p>
           {brandChips(0, false)}
-          <Button asChild variant="secondary" className="mt-4 text-gold"><a href={`https://zalo.me/${CONTACT.zalo.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle />Hỏi SK qua Zalo</a></Button>
+          {contact ? <Button asChild variant="secondary" className="mt-4 text-gold"><a href={zaloHref(contact.zalo)} target="_blank" rel="noopener noreferrer"><MessageCircle />Hỏi tư vấn qua Zalo</a></Button> : null}
         </div> : null}
       </>}
     </div> : null}

@@ -92,6 +92,10 @@ export function useAdmin() {
     canViewDealerPrice: data.canViewDealerPrice,
     priceMode: data.priceMode,
     isAuthenticated: typeof userId === "string",
+    /** Id tài khoản đang đăng nhập (null = khách hoặc chưa xác định phiên). */
+    userId: typeof userId === "string" ? userId : null,
+    /** Đã biết chắc là khách hay người đăng nhập (trước đó chưa nên tra theo tài khoản). */
+    sessionKnown: userId !== undefined,
     ready: userId !== undefined && (userId === null || roles.isSuccess || roles.isError),
   };
 }

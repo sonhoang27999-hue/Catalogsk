@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { KeyRound, Trash2, UserPlus, Users, Wallet, ShieldCheck } from "lucide-react";
+import { KeyRound, Link2, Trash2, UserPlus, Users, Wallet, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +33,7 @@ import {
 } from "@/lib/accounts.functions";
 import { displayLogin, toLoginEmail } from "@/lib/username";
 import { useAdmin } from "@/hooks/useAdmin";
+import { DealerProfileDialog } from "@/components/admin/DealerProfileDialog";
 
 const ROLE_LABEL: Record<AccountRole, string> = {
   admin: "Admin (toàn quyền)",
@@ -68,6 +69,8 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
   const [password, setPassword] = useState("");
   const [priceViewer, setPriceViewer] = useState(true);
   const [newRole, setNewRole] = useState<AccountRole>("dealer");
+  // Đại lý cấp 1 đang được sửa thông tin tư vấn (chỉ admin / quản trị viên).
+  const [dealerEdit, setDealerEdit] = useState<{ id: string; login: string } | null>(null);
 
   const accounts = useQuery({ queryKey: ["accounts"], queryFn: () => fetchList({}) });
   const refresh = () => qc.invalidateQueries({ queryKey: ["accounts"] });
@@ -243,6 +246,17 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
                       onCheckedChange={(v) => viewerMut.mutate({ userId: a.id, enabled: v })}
                     />
                   ) : null}
+                  {full && rowRole === "dealer1" ? (
+                    <button
+                      type="button"
+                      aria-label="Link và thông tin tư vấn của đại lý"
+                      title="Link và thông tin tư vấn"
+                      className="text-muted-foreground"
+                      onClick={() => setDealerEdit({ id: a.id, login: displayLogin(a.email) })}
+                    >
+                      <Link2 className="size-4" />
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     aria-label="Đổi mật khẩu"
@@ -305,6 +319,18 @@ export function AccountManager({ embedded = false }: { embedded?: boolean } = {}
           <li className="text-xs text-muted-foreground">Chưa có tài khoản nào.</li>
         ) : null}
       </ul>
+
+      {full && dealerEdit ? (
+        <DealerProfileDialog
+          staff
+          userId={dealerEdit.id}
+          loginName={dealerEdit.login}
+          open
+          onOpenChange={(next) => {
+            if (!next) setDealerEdit(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

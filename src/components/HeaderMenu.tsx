@@ -1,5 +1,14 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ClipboardList, ImageOff, LogIn, LogOut, Menu, ShieldCheck, UserRound } from "lucide-react";
+import {
+  ClipboardList,
+  ImageOff,
+  Link2,
+  LogIn,
+  LogOut,
+  Menu,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,7 +34,14 @@ const GuideLinkManager = lazy(() =>
 const Dealer1Accounts = lazy(() =>
   import("@/components/admin/Dealer1Accounts").then((m) => ({ default: m.Dealer1Accounts })),
 );
-const ChangeHistory = lazy(() => import("@/components/admin/ChangeHistory").then(m => ({default:m.ChangeHistory})));
+const DealerProfileDialog = lazy(() =>
+  import("@/components/admin/DealerProfileDialog").then((m) => ({
+    default: m.DealerProfileDialog,
+  })),
+);
+const ChangeHistory = lazy(() =>
+  import("@/components/admin/ChangeHistory").then((m) => ({ default: m.ChangeHistory })),
+);
 const ChangePassword = lazy(() =>
   import("@/components/ChangePassword").then((m) => ({ default: m.ChangePassword })),
 );
@@ -47,7 +63,8 @@ import {
 export function HeaderMenu() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
-  const { isAdmin, isManager, isDealer1 } = useAdmin();
+  const { isAdmin, isManager, isDealer1, userId } = useAdmin();
+  const [dealerOpen, setDealerOpen] = useState(false);
   const canSettings = isAdmin || isManager;
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -70,6 +87,7 @@ export function HeaderMenu() {
       void import("@/components/admin/ThemeManager");
     } else if (isDealer1) {
       void import("@/components/admin/Dealer1Accounts");
+      void import("@/components/admin/DealerProfileDialog");
     }
   }, [email, canSettings, isDealer1]);
 
@@ -163,9 +181,28 @@ export function HeaderMenu() {
                   </>
                 ) : null}
                 {!canSettings && isDealer1 ? (
-                  <Suspense fallback={<MenuItemSkeleton />}>
-                    <Dealer1Accounts />
-                  </Suspense>
+                  <>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => setDealerOpen(true)}
+                    >
+                      <Link2 className="size-4" /> Link & thông tin tư vấn của tôi
+                    </Button>
+                    {dealerOpen && userId ? (
+                      <Suspense fallback={null}>
+                        <DealerProfileDialog
+                          userId={userId}
+                          loginName={displayLogin(email)}
+                          open={dealerOpen}
+                          onOpenChange={setDealerOpen}
+                        />
+                      </Suspense>
+                    ) : null}
+                    <Suspense fallback={<MenuItemSkeleton />}>
+                      <Dealer1Accounts />
+                    </Suspense>
+                  </>
                 ) : null}
 
                 <Suspense fallback={<MenuItemSkeleton />}>
