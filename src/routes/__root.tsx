@@ -108,6 +108,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@skambientlight" },
     ],
+    scripts: [
+      // Google Analytics 4 (SK Light, dùng chung một ID cho mọi subdomain sklight.vn)
+      { src: "https://www.googletagmanager.com/gtag/js?id=G-EJEG49VGVF", async: true },
+      {
+        children:
+          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-EJEG49VGVF');",
+      },
+    ],
     links: [
       {
         rel: "stylesheet",
