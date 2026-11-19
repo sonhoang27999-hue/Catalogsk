@@ -75,6 +75,10 @@ export const listAccounts = createServerFn({ method: "GET" })
     const { data: modes } = await (supabaseAdmin.from("dealer_price_modes" as any) as any).select("user_id, mode");
     const modeOf = new Map<string, string>(((modes ?? []) as { user_id: string; mode: string }[]).map((m) => [m.user_id, m.mode]));
     const ownerOf = new Map((owners ?? []).map((o) => [o.user_id, o.created_by]));
+    // Đại lý cấp 1 đã có link / thông tin tư vấn hay chưa (chỉ đọc).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: profiles } = await (supabaseAdmin.from("dealer_profiles" as any) as any).select("user_id");
+    const hasProfile = new Set(((profiles ?? []) as { user_id: string }[]).map((p) => p.user_id));
 
     return data.users
       .filter((u) => (isFull(actor) ? true : ownerOf.get(u.id) === actor.userId))
@@ -82,6 +86,9 @@ export const listAccounts = createServerFn({ method: "GET" })
         id: u.id,
         email: u.email ?? "",
         createdAt: u.created_at,
+        lastSignInAt: (u.last_sign_in_at ?? null) as string | null,
+        createdBy: (ownerOf.get(u.id) ?? null) as string | null,
+        hasDealerProfile: hasProfile.has(u.id),
         roles: (roles ?? []).filter((r) => r.user_id === u.id).map((r) => r.role as string),
         priceMode: (modeOf.get(u.id) ?? "both") as PriceMode,
       }));
