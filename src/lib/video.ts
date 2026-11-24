@@ -21,17 +21,21 @@ export function toEmbedUrl(input?: string | null): string | null {
   const host = url.hostname.replace(/^www\./, "").toLowerCase();
   const path = url.pathname;
 
-  // YouTube
+  // YouTube — rel=0: hết video chỉ gợi ý video cùng kênh, không gợi ý kênh khác
+  const yt = (id: string) => `https://www.youtube.com/embed/${id}?rel=0`;
   if (host === "youtu.be") {
     const id = path.split("/").filter(Boolean)[0];
-    return id ? `https://www.youtube.com/embed/${id}` : raw;
+    return id ? yt(id) : raw;
   }
   if (host.endsWith("youtube.com") || host === "youtube-nocookie.com") {
-    if (path.startsWith("/embed/")) return url.toString();
+    if (path.startsWith("/embed/")) {
+      url.searchParams.set("rel", "0");
+      return url.toString();
+    }
     const v = url.searchParams.get("v");
-    if (v) return `https://www.youtube.com/embed/${v}`;
+    if (v) return yt(v);
     const m = path.match(/^\/(shorts|live|v)\/([^/]+)/);
-    if (m?.[2]) return `https://www.youtube.com/embed/${m[2]}`;
+    if (m?.[2]) return yt(m[2]);
     return raw;
   }
 
@@ -56,11 +60,12 @@ export function toEmbedUrl(input?: string | null): string | null {
     )}&show_text=false`;
   }
 
-  // TikTok
+  // TikTok — tắt thông tin nhạc, mô tả và video gợi ý khi phát xong
   if (host.endsWith("tiktok.com")) {
-    if (path.startsWith("/player/")) return url.toString();
-    const id = path.match(/\/video\/(\d+)/)?.[1];
-    return id ? `https://www.tiktok.com/player/v1/${id}` : raw;
+    const id = path.startsWith("/player/")
+      ? path.match(/\/player\/v1\/(\d+)/)?.[1]
+      : path.match(/\/video\/(\d+)/)?.[1];
+    return id ? `https://www.tiktok.com/player/v1/${id}?music_info=0&description=0&rel=0` : raw;
   }
 
   return url.toString();
