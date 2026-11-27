@@ -45,16 +45,16 @@ export const Route = createFileRoute("/")({
             { name: "twitter:image", content: loaderData.bannerHref },
           ]
         : []),
-      { title: "Danh mục Phụ kiện Ô tô | SK" },
+      { title: "Báo giá phụ kiện ô tô | SK Ambient Light" },
       {
         name: "description",
         content:
-          "Tra cứu phụ kiện ô tô theo hãng xe, đời xe và năm sản xuất: đèn trần sao, loa treble, nội thất và báo giá lắp đặt.",
+          "Xem báo giá đèn nội thất, đèn trần sao, loa treble và phụ kiện theo đúng hãng xe, đời xe. Nhắn Zalo để được tư vấn.",
       },
-      { property: "og:title", content: "Danh mục Phụ kiện Ô tô | SK" },
+      { property: "og:title", content: "Báo giá phụ kiện ô tô | SK Ambient Light" },
       {
         property: "og:description",
-        content: "Catalog phụ kiện ô tô phân cấp theo hãng xe, đời xe và năm sản xuất.",
+        content: "Xem báo giá đèn nội thất, đèn trần sao, loa treble và phụ kiện theo đúng hãng xe, đời xe. Nhắn Zalo để được tư vấn.",
       },
     ],
     // Preload ảnh banner (phần tử LCP) để trình duyệt tải NGAY từ HTML,
